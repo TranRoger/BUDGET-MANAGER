@@ -1,0 +1,58 @@
+.
+├── ai-service
+├── API.md
+├── backend
+│   ├── config
+│   │   └── database.js
+│   ├── Dockerfile
+│   ├── middleware
+│   │   └── auth.js
+│   ├── package.json
+│   ├── README.md
+│   ├── routes
+│   │   ├── ai.js
+│   │   ├── auth.js
+│   │   ├── budgets.js
+│   │   ├── categories.js
+│   │   ├── reports.js
+│   │   ├── transactions.js
+│   │   └── users.js
+│   ├── server.js
+│   └── services
+│       └── aiService.js
+├── CONTRIBUTING.md
+├── database
+│   ├── schema.sql
+│   └── seed.sql
+├── docker-compose.yml
+├── frontend
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   ├── logo192.png
+│   │   ├── logo512.png
+│   │   ├── manifest.json
+│   │   └── robots.txt
+│   ├── README.md
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.test.tsx
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   ├── index.tsx
+│   │   ├── logo.svg
+│   │   ├── react-app-env.d.ts
+│   │   ├── reportWebVitals.ts
+│   │   ├── services
+│   │   └── setupTests.ts
+│   └── tsconfig.json
+├── project-structure.txt
+├── README.md
+├── setup-manual.sh
+├── SETUP.md
+└── start.sh
+
+12 directories, 44 files
