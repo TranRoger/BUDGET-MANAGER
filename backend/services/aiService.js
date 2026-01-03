@@ -1,13 +1,9 @@
-const { VertexAI } = require('@google-cloud/vertexai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const db = require('../config/database');
 
-// Initialize Vertex AI
-const vertexAI = new VertexAI({
-  project: process.env.GOOGLE_CLOUD_PROJECT_ID,
-  location: process.env.VERTEX_AI_LOCATION
-});
-
-const model = 'gemini-pro';
+// Initialize Google AI with API Key
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 // Generate financial insights using AI
 async function generateFinancialInsights(userId) {
@@ -46,11 +42,7 @@ Please provide:
 
 Format the response as JSON with these sections.`;
 
-    const generativeModel = vertexAI.preview.getGenerativeModel({
-      model: model,
-    });
-
-    const result = await generativeModel.generateContent(prompt);
+    const result = await model.generateContent(prompt);
     const response = result.response;
     
     return {
@@ -202,16 +194,14 @@ When the user mentions a financial transaction, debt, or goal, you should use th
       }
     ];
 
-    const generativeModel = vertexAI.preview.getGenerativeModel({
-      model: model,
-      generationConfig: {
-        temperature: 0.7,
-      },
+    const modelWithTools = genAI.getGenerativeModel({
+      model: 'gemini-pro',
       tools: [{ functionDeclarations: functions }]
     });
 
     // Build conversation
-    const chat = generativeModel.startChat({
+    const chat = modelWithTools.startChat({
+      generationConfig: { temperature: 0.7 },
       history: [
         {
           role: 'user',
@@ -470,15 +460,15 @@ Return ONLY a JSON array with this exact structure:
   }
 ]`;
 
-    const generativeModel = vertexAI.preview.getGenerativeModel({
-      model: model,
+    const modelForRecommendations = genAI.getGenerativeModel({
+      model: 'gemini-pro',
       generationConfig: {
         temperature: 0.7,
         responseMimeType: 'application/json'
       }
     });
 
-    const result = await generativeModel.generateContent(prompt);
+    const result = await modelForRecommendations.generateContent(prompt);
     const response = result.response;
     let recommendations = [];
     
@@ -569,8 +559,7 @@ async function generatePersonalizedPlan(userId) {
       Output format: Markdown. Be specific with numbers.
     `;
 
-    const generativeModel = vertexAI.preview.getGenerativeModel({ model: 'gemini-pro' });
-    const result = await generativeModel.generateContent(prompt);
+    const result = await model.generateContent(prompt);
     
     return {
       roadmap: result.response.candidates[0].content.parts[0].text,

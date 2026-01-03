@@ -32,9 +32,11 @@ Mục tiêu của dự án Budget Manager bao gồm:
 
 ## AI Service
 
-Google Cloud AI được sử dụng để cung cấp các tính năng AI trong ứng dụng Budget Manager. Dịch vụ này bao gồm:    
-- **AI Insights**: Sử dụng mô hình học máy để phân tích dữ liệu tài chính của người dùng và cung cấp các gợi ý cải thiện quản lý tài chính.    
+Google AI Studio (Gemini API) được sử dụng để cung cấp các tính năng AI trong ứng dụng Budget Manager. Dịch vụ này bao gồm:    
+- **AI Insights**: Sử dụng mô hình Gemini Pro để phân tích dữ liệu tài chính của người dùng và cung cấp các gợi ý cải thiện quản lý tài chính.    
 - **AI Chatbot**: Tích hợp chatbot sử dụng mô hình ngôn ngữ tự nhiên để trả lời các câu hỏi tài chính của người dùng và cung cấp hỗ trợ tức thì
+- **Function Calling**: AI có thể tự động thêm transactions, debts, và goals vào database khi người dùng nói chuyện
+- **Smart Recommendations**: Phân tích thu nhập, nợ, và chi tiêu để đưa ra gợi ý tiết kiệm thông minh
 
 ## Quick Start
 
@@ -45,25 +47,34 @@ Google Cloud AI được sử dụng để cung cấp các tính năng AI trong 
 git clone <repository-url>
 cd BUDGET-MANAGER
 
-# 2. Set up Google Cloud credentials
-mkdir -p credentials
-# Place your service-account-key.json in the credentials folder
+# 2. Get Google AI Studio API Key
+# Visit: https://aistudio.google.com/app/apikey
+# Create API Key and copy it
 
-# 3. Run the setup script
+# 3. Configure environment
+cd backend
+cp .env.example .env
+# Edit .env and add: GOOGLE_AI_API_KEY=your-api-key-here
+
+# 4. Run the setup script
 ./start.sh
 ```
 
 ### Option 2: Manual Setup
 
 ```bash
-# 1. Run the manual setup script
+# 1. Get Google AI Studio API Key from https://aistudio.google.com/app/apikey
+
+# 2. Run the manual setup script
 ./setup-manual.sh
 
-# 2. Start backend (in one terminal)
+# 3. Configure backend/.env with GOOGLE_AI_API_KEY
+
+# 4. Start backend (in one terminal)
 cd backend
 npm run dev
 
-# 3. Start frontend (in another terminal)
+# 5. Start frontend (in another terminal)
 cd frontend
 npm start
 ```

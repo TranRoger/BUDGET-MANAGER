@@ -1,16 +1,12 @@
 # 🚀 QUICK START - Budget Manager
 
-## Bắt đầu nhanh trong 3 bước!
+## Bắt đầu nhanh trong 2 bước!
 
-### Bước 1: Chuẩn bị Google Cloud Credentials
+### Bước 1: Lấy Google AI Studio API Key
 
-```bash
-# Tạo thư mục credentials
-mkdir -p credentials
-
-# Đặt file service-account-key.json vào đây
-# (Download từ Google Cloud Console)
-```
+1. Truy cập: https://aistudio.google.com/app/apikey
+2. Click "Create API Key"
+3. Copy API key
 
 ### Bước 2: Cấu hình môi trường
 
@@ -20,7 +16,7 @@ cd backend
 cp .env.example .env
 
 # Chỉnh sửa backend/.env:
-# - GOOGLE_CLOUD_PROJECT_ID=your-project-id
+# - GOOGLE_AI_API_KEY=your-api-key-here
 # - JWT_SECRET=random-strong-string-here
 ```
 
