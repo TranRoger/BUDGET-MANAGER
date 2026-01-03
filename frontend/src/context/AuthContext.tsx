@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authService, User } from '../services/authService';
+import { User } from '../services/authService';
 
 interface AuthContextType {
   user: User | null;
@@ -12,40 +12,43 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Single user mode - no authentication needed
+const defaultUser: User = {
+  id: 1,
+  email: 'user@budgetmanager.local',
+  name: 'Budget Manager User'
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(defaultUser);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const token = authService.getToken();
-    if (token) {
-      // TODO: Validate token and get user info
-      setLoading(false);
-    } else {
-      setLoading(false);
-    }
+    // Always set default user - no authentication needed
+    setUser(defaultUser);
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await authService.login({ email, password });
-    setUser(response.user);
+    // No-op - authentication disabled
+    setUser(defaultUser);
   };
 
   const register = async (email: string, password: string, name: string) => {
-    await authService.register({ email, password, name });
+    // No-op - authentication disabled
+    setUser(defaultUser);
   };
 
   const logout = () => {
-    authService.logout();
-    setUser(null);
+    // No-op - authentication disabled
+    // User stays logged in
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: authService.isAuthenticated(),
+        isAuthenticated: true,
         login,
         register,
         logout,

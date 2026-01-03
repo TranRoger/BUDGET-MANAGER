@@ -1,20 +1,13 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
+// Authentication disabled - single user mode
 const Navbar: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
-  if (!isAuthenticated) {
-    return null;
-  }
+  // Always show navbar in single user mode
 
   return (
     <nav className="navbar">
@@ -33,9 +26,7 @@ const Navbar: React.FC = () => {
 
         <div className="navbar-user">
           <span className="navbar-username">{user?.name || 'User'}</span>
-          <button onClick={handleLogout} className="navbar-logout">
-            Logout
-          </button>
+          {/* Logout removed - single user mode */}
         </div>
       </div>
     </nav>
