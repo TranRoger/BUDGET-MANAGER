@@ -18,7 +18,7 @@ const transactionValidation = [
 
 // Get all transactions
 router.get('/', authenticate, asyncHandler(async (req, res) => {
-  const { startDate, endDate, type, categoryId } = req.query;
+  const { startDate, endDate, type, categoryId, limit } = req.query;
   let query = 'SELECT * FROM transactions WHERE user_id = $1';
   const params = [req.userId];
 
@@ -39,10 +39,15 @@ router.get('/', authenticate, asyncHandler(async (req, res) => {
     query += ` AND category_id = $${params.length}`;
   }
 
-  query += ' ORDER BY date DESC';
+  query += ' ORDER BY date DESC, created_at DESC';
+
+  if (limit) {
+    params.push(parseInt(limit));
+    query += ` LIMIT $${params.length}`;
+  }
 
   const result = await db.query(query, params);
-  res.json({ success: true, data: result.rows });
+  res.json(result.rows);
 }));
 
 // Create transaction

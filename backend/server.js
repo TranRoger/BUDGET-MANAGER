@@ -43,6 +43,8 @@ const budgetRoutes = require('./routes/budgets');
 const categoryRoutes = require('./routes/categories');
 const reportRoutes = require('./routes/reports');
 const aiRoutes = require('./routes/ai');
+const debtRoutes = require('./routes/debts');
+const goalRoutes = require('./routes/goals');
 const testRoutes = require('./routes/test'); // Test route
 
 // Apply rate limiters to specific routes
@@ -59,6 +61,8 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/budgets', budgetRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/debts', debtRoutes);
+app.use('/api/goals', goalRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -26,6 +26,7 @@ export interface TransactionFilters {
   endDate?: string;
   type?: 'income' | 'expense';
   categoryId?: number;
+  limit?: number;
 }
 
 export const transactionService = {

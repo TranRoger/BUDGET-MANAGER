@@ -39,3 +39,13 @@ router.get('/recommendations', authenticate, async (req, res) => {
 });
 
 module.exports = router;
+
+// Generate personalized financial plan!!!!!!!
+router.get('/plan', authenticate, async (req, res) => {
+  try {
+    const plan = await aiService.generatePersonalizedPlan(req.userId);
+    res.json(plan);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});

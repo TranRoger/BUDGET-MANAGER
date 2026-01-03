@@ -10,15 +10,43 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface FunctionCall {
+  functionCall: {
+    name: string;
+    args: any;
+  };
+  functionResponse?: {
+    name: string;
+    response: any;
+  };
+}
+
 export interface ChatResponse {
   message: string;
-  timestamp: string;
+  timestamp?: string;
+  functionCalls?: FunctionCall[];
 }
 
 export interface Recommendation {
+  title: string;
+  description: string;
   category: string;
-  recommendation: string;
   potential_savings: number;
+  priority: 'high' | 'medium' | 'low';
+  action: string;
+}
+
+export interface RecommendationsResponse {
+  recommendations: Recommendation[];
+  summary: {
+    monthlyIncome: number;
+    totalMonthlyExpenses: number;
+    netMonthly: number;
+    totalDebt: number;
+    discretionarySpending: number;
+    savingsRate: number;
+  };
+  generatedAt: string;
 }
 
 export const aiService = {
@@ -35,7 +63,7 @@ export const aiService = {
     return response.data;
   },
 
-  async getRecommendations(): Promise<{ recommendations: string; generatedAt: string }> {
+  async getRecommendations(): Promise<RecommendationsResponse> {
     const response = await api.get('/ai/recommendations');
     return response.data;
   },

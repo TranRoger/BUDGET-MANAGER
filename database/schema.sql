@@ -87,6 +87,29 @@ CREATE TABLE IF NOT EXISTS debts (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Bảng lưu trữ Dự định/Mục tiêu (Mua nhà, du lịch, quỹ khẩn cấp...)
+CREATE TABLE IF NOT EXISTS financial_goals (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users (id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    target_amount DECIMAL(10, 2) NOT NULL,
+    current_amount DECIMAL(10, 2) DEFAULT 0,
+    deadline DATE,
+    priority VARCHAR(20) CHECK (
+        priority IN (
+            'low',
+            'medium',
+            'high',
+            'critical'
+        )
+    ) DEFAULT 'medium',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Cập nhật bảng Categories để đánh dấu "Khoản cố định" (Fixed Expenses)
+-- Ví dụ: Tiền thuê nhà, Tiền mạng là is_fixed = true
+ALTER TABLE categories ADD COLUMN is_fixed BOOLEAN DEFAULT FALSE;
+
 -- Create Chat History Table (for AI chatbot)
 CREATE TABLE IF NOT EXISTS chat_history (
   id SERIAL PRIMARY KEY,

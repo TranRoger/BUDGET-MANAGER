@@ -20,8 +20,9 @@ const Navbar: React.FC = () => {
           <Link to="/" className="navbar-item">Dashboard</Link>
           <Link to="/transactions" className="navbar-item">Transactions</Link>
           <Link to="/budgets" className="navbar-item">Budgets</Link>
+          <Link to="/debts" className="navbar-item">Debts</Link>
+          <Link to="/goals" className="navbar-item">Goals</Link>
           <Link to="/reports" className="navbar-item">Reports</Link>
-          <Link to="/ai-chat" className="navbar-item">AI Assistant</Link>
         </div>
 
         <div className="navbar-user">
