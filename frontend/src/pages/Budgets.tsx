@@ -17,7 +17,7 @@ const Budgets: React.FC = () => {
       <div className="budgets-grid">
         {loading ? (
           <div className="loading">Loading budgets...</div>
-        ) : budgets.length === 0 ? (
+        ) : !Array.isArray(budgets) || budgets.length === 0 ? (
           <Card>
             <div className="empty-state">
               <p>No budgets created yet</p>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { transactionService, Transaction, TransactionFilters } from '../services/transactionService';
 
 export const useTransactions = (filters?: TransactionFilters) => {
@@ -6,7 +6,7 @@ export const useTransactions = (filters?: TransactionFilters) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       setLoading(true);
       const data = await transactionService.getAll(filters);
@@ -17,11 +17,11 @@ export const useTransactions = (filters?: TransactionFilters) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
   useEffect(() => {
     fetchTransactions();
-  }, [JSON.stringify(filters)]);
+  }, [fetchTransactions]);
 
   const createTransaction = async (data: any) => {
     const newTransaction = await transactionService.create(data);

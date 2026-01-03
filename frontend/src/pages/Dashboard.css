@@ -1,56 +1,79 @@
 .dashboard {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2.5rem;
 }
 
 .page-title {
-  font-size: 2rem;
-  color: #2d3748;
-  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1a202c, #4a5568);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 2.5rem;
+  letter-spacing: -1px;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
 }
 
 .stat-card {
   text-align: center;
-  padding: 1.5rem !important;
+  padding: 2rem !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--stat-color), transparent);
 }
 
 .stat-card.income {
-  border-top: 4px solid #28a745;
+  --stat-color: #10b981;
+  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
 }
 
 .stat-card.expense {
-  border-top: 4px solid #dc3545;
+  --stat-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
 }
 
 .stat-card.savings {
-  border-top: 4px solid #667eea;
+  --stat-color: #6366f1;
+  background: linear-gradient(135deg, #eef2ff 0%, #ffffff 100%);
 }
 
 .stat-icon {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
 .stat-label {
   font-size: 0.875rem;
-  color: #718096;
-  margin-bottom: 0.5rem;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  font-weight: 700;
 }
 
 .stat-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #2d3748;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #1a202c;
+  letter-spacing: -1px;
 }
 
 .dashboard-grid {

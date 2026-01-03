@@ -16,10 +16,7 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // No auth redirect needed
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
+    // No auth redirect needed - just return the error
     return Promise.reject(error);
   }
 );

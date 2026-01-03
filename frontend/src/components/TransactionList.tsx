@@ -10,7 +10,7 @@ interface TransactionListProps {
 }
 
 const TransactionList: React.FC<TransactionListProps> = ({ transactions, onEdit, onDelete }) => {
-  if (transactions.length === 0) {
+  if (!Array.isArray(transactions) || transactions.length === 0) {
     return <div className="empty-state">No transactions found</div>;
   }
 

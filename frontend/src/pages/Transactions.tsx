@@ -14,13 +14,15 @@ const Transactions: React.FC = () => {
     description: '',
     date: new Date().toISOString().split('T')[0],
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       await createTransaction({
         ...formData,
-        amount: parseFloat(formData.amount),
+        amount: Number.parseFloat(formData.amount),
       });
       setShowForm(false);
       setFormData({
@@ -32,11 +34,14 @@ const Transactions: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to create transaction:', error);
+      alert('Failed to create transaction. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this transaction?')) {
+    if (globalThis.confirm('Are you sure you want to delete this transaction?')) {
       try {
         await deleteTransaction(id);
       } catch (error) {
@@ -55,57 +60,119 @@ const Transactions: React.FC = () => {
       </div>
 
       {showForm && (
-        <Card title="Add New Transaction" className="form-card">
-          <form onSubmit={handleSubmit} className="transaction-form">
-            <div className="form-row">
+        <div className="form-card-wrapper">
+          <Card className="form-card">
+            <div className="form-header">
+              <div className="form-header-content">
+                <div className="form-icon">💰</div>
+                <div>
+                  <h2 className="form-title">Add New Transaction</h2>
+                  <p className="form-subtitle">Track your income or expenses</p>
+                </div>
+              </div>
+            </div>
+            <form onSubmit={handleSubmit} className="transaction-form">
+              <div className="type-selector">
+                <button
+                  type="button"
+                  className={`type-btn ${formData.type === 'expense' ? 'active expense' : ''}`}
+                  onClick={() => setFormData({ ...formData, type: 'expense' })}
+                >
+                  <span className="type-icon">📤</span>
+                  <span>Expense</span>
+                </button>
+                <button
+                  type="button"
+                  className={`type-btn ${formData.type === 'income' ? 'active income' : ''}`}
+                  onClick={() => setFormData({ ...formData, type: 'income' })}
+                >
+                  <span className="type-icon">📥</span>
+                  <span>Income</span>
+                </button>
+              </div>
+
               <div className="form-group">
-                <label>Amount</label>
+                <label htmlFor="amount">
+                  <span className="label-icon">💵</span>
+                  Amount
+                </label>
+                <div className="input-wrapper">
+                  <span className="input-prefix">$</span>
+                  <input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    placeholder="0.00"
+                    required
+                    className="amount-input"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="description">
+                  <span className="label-icon">📝</span>
+                  Description
+                </label>
                 <input
-                  type="number"
-                  step="0.01"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  id="description"
+                  type="text"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="What was this transaction for?"
                   required
+                  maxLength={200}
                 />
               </div>
 
               <div className="form-group">
-                <label>Type</label>
-                <select
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                >
-                  <option value="expense">Expense</option>
-                  <option value="income">Income</option>
-                </select>
+                <label htmlFor="date">
+                  <span className="label-icon">📅</span>
+                  Date
+                </label>
+                <input
+                  id="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  required
+                  max={new Date().toISOString().split('T')[0]}
+                />
               </div>
-            </div>
 
-            <div className="form-group">
-              <label>Description</label>
-              <input
-                type="text"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Date</label>
-              <input
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                required
-              />
-            </div>
-
-            <button type="submit" className="btn-primary">
-              Add Transaction
-            </button>
-          </form>
-        </Card>
+              <div className="form-actions">
+                <button 
+                  type="button" 
+                  className="btn-secondary"
+                  onClick={() => setShowForm(false)}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn-primary"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="spinner"></span>
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <span>✓</span>
+                      Add Transaction
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </Card>
+        </div>
       )}
 
       <Card title={`All Transactions (${transactions.length})`}>
