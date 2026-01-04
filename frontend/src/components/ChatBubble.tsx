@@ -76,7 +76,7 @@ const ChatBubble: React.FC = () => {
     <>
       {/* Chat Bubble Button */}
       <button
-        className={`fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-primary-600 to-purple-600 text-white shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center text-2xl z-50 ${isOpen ? 'rotate-90' : ''}`}
+        className={`fixed bottom-6 right-6 w-16 h-16 rounded-full bg-primary-600 text-white shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 flex items-center justify-center text-2xl z-50 ${isOpen ? 'rotate-90' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle AI Chat"
       >
@@ -85,7 +85,7 @@ const ChatBubble: React.FC = () => {
 
       {/* Chat Window */}
       <div className={`fixed bottom-24 right-6 w-96 h-[600px] bg-white rounded-2xl shadow-2xl transform transition-all duration-300 z-40 ${isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'} flex flex-col`}>
-        <div className="bg-gradient-to-r from-primary-600 to-purple-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+        <div className="bg-primary-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-2xl backdrop-blur-sm">🤖</div>
             <div>

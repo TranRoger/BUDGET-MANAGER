@@ -64,7 +64,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions, onEdit,
                 {formatCurrency(transaction.amount)}
               </div>
 
-              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="flex gap-2">
                 {onEdit && (
                   <button 
                     onClick={() => onEdit(transaction)}

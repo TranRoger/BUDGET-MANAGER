@@ -95,9 +95,9 @@ const Reports: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">📊 Báo Cáo & Phân Tích</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">📊 Báo Cáo & Phân Tích</h1>
       </div>
 
       {/* Date Filter */}
@@ -146,17 +146,17 @@ const Reports: React.FC = () => {
         <>
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-lg p-6 border border-green-100 hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+            <div className="bg-green-50 rounded-2xl shadow-lg p-6 border border-green-100 hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
               <div className="text-4xl mb-3">📥</div>
               <span className="block text-sm text-gray-600 font-medium mb-1">Tổng Thu Nhập</span>
               <span className="block text-2xl font-bold text-green-600">{formatCurrency(summary?.totalIncome || 0)}</span>
             </div>
-            <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl shadow-lg p-6 border border-red-100 hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+            <div className="bg-red-50 rounded-2xl shadow-lg p-6 border border-red-100 hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
               <div className="text-4xl mb-3">📤</div>
               <span className="block text-sm text-gray-600 font-medium mb-1">Tổng Chi Tiêu</span>
               <span className="block text-2xl font-bold text-red-600">{formatCurrency(summary?.totalExpense || 0)}</span>
             </div>
-            <div className={`bg-gradient-to-br ${(summary?.netSavings || 0) >= 0 ? 'from-blue-50 to-cyan-50 border-blue-100' : 'from-orange-50 to-yellow-50 border-orange-100'} rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}>
+            <div className={`${(summary?.netSavings || 0) >= 0 ? 'bg-blue-50 border-blue-100' : 'bg-orange-50 border-orange-100'} rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}>
               <div className="text-4xl mb-3">{(summary?.netSavings || 0) >= 0 ? '💰' : '⚠️'}</div>
               <span className="block text-sm text-gray-600 font-medium mb-1">Tiết Kiệm Ròng</span>
               <span className={`block text-2xl font-bold ${(summary?.netSavings || 0) >= 0 ? 'text-blue-600' : 'text-orange-600'}`}>{formatCurrency(summary?.netSavings || 0)}</span>

@@ -97,9 +97,9 @@ const Transactions: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">💳 Giao Dịch</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">💳 Giao Dịch</h1>
         <button 
           className="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5" 
           onClick={() => {

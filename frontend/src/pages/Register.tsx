@@ -34,12 +34,12 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 px-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-block text-6xl mb-4 transform hover:rotate-12 transition-transform duration-300">💰</div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Budget Manager</h1>
-          <h2 className="text-xl text-gray-600">Tạo Tài Khoản</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-8">
+      <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 w-full max-w-md">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-block text-5xl sm:text-6xl mb-3 sm:mb-4 transform hover:rotate-12 transition-transform duration-300">💰</div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Budget Manager</h1>
+          <h2 className="text-lg sm:text-xl text-gray-600">Tạo Tài Khoản</h2>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -113,7 +113,7 @@ const Register: React.FC = () => {
 
           <button 
             type="submit" 
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" 
+            className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100" 
             disabled={loading}
           >
             {loading ? (

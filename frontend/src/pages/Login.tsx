@@ -26,18 +26,18 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 space-y-6">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 space-y-6">
           {/* Header */}
           <div className="text-center space-y-2">
             <div className="flex justify-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-4xl shadow-lg transform rotate-12 hover:rotate-0 transition-transform">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-primary-600 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl shadow-lg transform rotate-12 hover:rotate-0 transition-transform">
                 💰
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Quản Lý Ngân Sách</h1>
-            <h2 className="text-lg text-gray-600">Đăng nhập vào tài khoản</h2>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Quản Lý Ngân Sách</h1>
+            <h2 className="text-base sm:text-lg text-gray-600">Đăng nhập vào tài khoản</h2>
           </div>
           
           {/* Form */}
@@ -82,7 +82,7 @@ const Login: React.FC = () => {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">

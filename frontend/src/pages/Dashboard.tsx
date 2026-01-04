@@ -129,23 +129,23 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Tổng Quan</h1>
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">Tổng Quan</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-lg p-6 border border-green-100 hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+        <div className="bg-green-50 rounded-2xl shadow-lg p-6 border border-green-100 hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
           <div className="text-4xl mb-3">💵</div>
           <div className="text-sm text-gray-600 font-medium mb-1">Tổng Thu Nhập</div>
           <div className="text-2xl font-bold text-green-600">{formatCurrency(summary?.totalIncome || 0)}</div>
         </div>
 
-        <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl shadow-lg p-6 border border-red-100 hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+        <div className="bg-red-50 rounded-2xl shadow-lg p-6 border border-red-100 hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
           <div className="text-4xl mb-3">💸</div>
           <div className="text-sm text-gray-600 font-medium mb-1">Tổng Chi Tiêu</div>
           <div className="text-2xl font-bold text-red-600">{formatCurrency(summary?.totalExpense || 0)}</div>
         </div>
 
-        <div className={`bg-gradient-to-br ${(summary?.netSavings || 0) >= 0 ? 'from-blue-50 to-cyan-50 border-blue-100' : 'from-orange-50 to-yellow-50 border-orange-100'} rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}>
+        <div className={`${(summary?.netSavings || 0) >= 0 ? 'bg-blue-50 border-blue-100' : 'bg-orange-50 border-orange-100'} rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all duration-200 hover:-translate-y-1`}>
           <div className="text-4xl mb-3">💰</div>
           <div className="text-sm text-gray-600 font-medium mb-1">Tiết Kiệm Ròng</div>
           <div className={`text-2xl font-bold ${(summary?.netSavings || 0) >= 0 ? 'text-blue-600' : 'text-orange-600'}`}>{formatCurrency(summary?.netSavings || 0)}</div>
@@ -322,7 +322,7 @@ const Dashboard: React.FC = () => {
                 />
               </div>
 
-              <button type="submit" className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled={loadingPlan}>
+              <button type="submit" className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled={loadingPlan}>
                 {loadingPlan ? '⏳ Đang tạo kế hoạch...' : '✨ Tạo Kế Hoạch'}
               </button>
             </form>
@@ -349,29 +349,45 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             
-            <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-li:text-gray-700 prose-table:text-sm">
+            <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 sm:p-6 border border-gray-200">
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]}
                 components={{
-                  h1: ({node, ...props}) => <h1 className="text-2xl font-bold mb-4 text-gray-900" {...props} />,
-                  h2: ({node, ...props}) => <h2 className="text-xl font-bold mt-6 mb-3 text-gray-900" {...props} />,
-                  h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-4 mb-2 text-gray-900" {...props} />,
-                  h4: ({node, ...props}) => <h4 className="text-base font-semibold mt-3 mb-2 text-gray-800" {...props} />,
-                  p: ({node, ...props}) => <p className="mb-3 leading-relaxed text-gray-700" {...props} />,
-                  ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-1" {...props} />,
-                  ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 space-y-1" {...props} />,
-                  li: ({node, ...props}) => <li className="text-gray-700" {...props} />,
-                  table: ({node, ...props}) => <div className="overflow-x-auto mb-4"><table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg" {...props} /></div>,
-                  thead: ({node, ...props}) => <thead className="bg-gray-50" {...props} />,
+                  h1: ({node, ...props}) => <h1 className="text-xl sm:text-2xl font-bold mb-4 pb-3 text-gray-900 border-b-2 border-blue-500" {...props} />,
+                  h2: ({node, ...props}) => <h2 className="text-lg sm:text-xl font-bold mt-6 mb-3 text-primary-600 flex items-center gap-2" {...props} />,
+                  h3: ({node, ...props}) => <h3 className="text-base sm:text-lg font-semibold mt-5 mb-3 text-gray-800 bg-blue-50 px-3 py-2 rounded-lg border-l-4 border-blue-500" {...props} />,
+                  h4: ({node, ...props}) => <h4 className="text-sm sm:text-base font-semibold mt-4 mb-2 text-gray-700" {...props} />,
+                  p: ({node, ...props}) => <p className="mb-4 leading-relaxed text-sm sm:text-base text-gray-700" {...props} />,
+                  ul: ({node, ...props}) => <ul className="list-none pl-0 mb-5 space-y-2 sm:space-y-2.5" {...props} />,
+                  ol: ({node, ...props}) => <ol className="list-none pl-0 mb-5 space-y-2 sm:space-y-2.5 counter-reset-[item]" {...props} />,
+                  li: ({node, children, ...props}) => {
+                    const isOrdered = props.className?.includes('ordered');
+                    return (
+                      <li className="text-gray-700 text-sm sm:text-base flex items-start gap-3 bg-white p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all" {...props}>
+                        <span className={`flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full text-xs font-bold ${isOrdered ? 'bg-blue-500 text-white' : 'bg-green-500 text-white'}`}>
+                          {isOrdered ? '▶' : '✓'}
+                        </span>
+                        <span className="flex-1">{children}</span>
+                      </li>
+                    );
+                  },
+                  table: ({node, ...props}) => (
+                    <div className="overflow-x-auto mb-6 rounded-lg shadow-md border border-gray-200">
+                      <table className="min-w-full divide-y divide-gray-300" {...props} />
+                    </div>
+                  ),
+                  thead: ({node, ...props}) => <thead className="bg-gradient-to-r from-blue-600 to-blue-500 text-white" {...props} />,
                   tbody: ({node, ...props}) => <tbody className="bg-white divide-y divide-gray-200" {...props} />,
-                  tr: ({node, ...props}) => <tr {...props} />,
-                  th: ({node, ...props}) => <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider" {...props} />,
-                  td: ({node, ...props}) => <td className="px-4 py-3 text-sm text-gray-700" {...props} />,
-                  strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
-                  em: ({node, ...props}) => <em className="italic text-gray-700" {...props} />,
-                  code: ({node, ...props}) => <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono text-gray-800" {...props} />,
-                  blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-blue-500 pl-4 italic text-gray-600 my-4" {...props} />,
-                  hr: ({node, ...props}) => <hr className="my-6 border-gray-200" {...props} />,
+                  tr: ({node, ...props}) => <tr className="hover:bg-blue-50 transition-colors" {...props} />,
+                  th: ({node, ...props}) => <th className="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-bold text-white uppercase tracking-wider" {...props} />,
+                  td: ({node, ...props}) => <td className="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 whitespace-nowrap" {...props} />,
+                  strong: ({node, ...props}) => <strong className="font-bold text-gray-900 bg-yellow-100 px-1 rounded" {...props} />,
+                  em: ({node, ...props}) => <em className="italic text-blue-600" {...props} />,
+                  code: ({node, ...props}) => <code className="bg-gray-800 text-green-400 px-2 py-1 rounded text-xs sm:text-sm font-mono" {...props} />,
+                  blockquote: ({node, ...props}) => (
+                    <blockquote className="border-l-4 border-blue-500 bg-blue-50 pl-4 pr-4 py-3 italic text-gray-700 my-5 rounded-r-lg shadow-sm" {...props} />
+                  ),
+                  hr: ({node, ...props}) => <hr className="my-8 border-t-2 border-gray-300" {...props} />,
                 }}
               >
                 {plan.plan}
