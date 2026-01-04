@@ -59,8 +59,9 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: budget-manager-frontend
+    env_file: ./frontend/.env
     environment:
-      REACT_APP_API_URL: http://localhost/api
+      REACT_APP_API_URL: /api
       WDS_SOCKET_PORT: 0
     expose:
       - "3000"
