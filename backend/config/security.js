@@ -10,7 +10,9 @@ const setupSecurity = (app) => {
     'http://localhost:3000',
     'http://localhost',
     'https://budget.roger.works',
-    'http://budget.roger.works'
+    'http://budget.roger.works',
+    'https://budman.roger.works',
+    'http://budman.roger.works'
   ];
 
   const corsOptions = {
@@ -21,6 +23,7 @@ const setupSecurity = (app) => {
       if (allowedOrigins.indexOf(origin) !== -1 || process.env.CORS_ORIGIN === '*') {
         callback(null, true);
       } else {
+        console.log('❌ CORS blocked - Origin:', origin, 'not in allowed list:', allowedOrigins);
         callback(new Error('Not allowed by CORS'));
       }
     },
