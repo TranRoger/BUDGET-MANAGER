@@ -113,8 +113,9 @@ const SpendingLimits: React.FC = () => {
           <h3 className="text-xl font-semibold text-gray-900 mb-6">Thêm Giới Hạn Chi Tiêu Mới</h3>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Danh mục chi tiêu</label>
+              <label htmlFor="category-select" className="block text-sm font-medium text-gray-700 mb-2">Danh mục chi tiêu</label>
               <select
+                id="category-select"
                 value={formData.category_id}
                 onChange={(e) => setFormData({ ...formData, category_id: parseInt(e.target.value) })}
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
@@ -130,8 +131,9 @@ const SpendingLimits: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Số tiền giới hạn</label>
+              <label htmlFor="amount-input" className="block text-sm font-medium text-gray-700 mb-2">Số tiền giới hạn</label>
               <input
+                id="amount-input"
                 type="number"
                 value={formData.amount || ''}
                 onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
@@ -144,8 +146,9 @@ const SpendingLimits: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Kỳ hạn</label>
+              <label htmlFor="period-select" className="block text-sm font-medium text-gray-700 mb-2">Kỳ hạn</label>
               <select
+                id="period-select"
                 value={formData.period}
                 onChange={(e) => setFormData({ ...formData, period: e.target.value as any })}
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
@@ -159,8 +162,9 @@ const SpendingLimits: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Ngày bắt đầu</label>
+                <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-2">Ngày bắt đầu</label>
                 <input
+                  id="start-date"
                   type="date"
                   value={formData.start_date}
                   onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
@@ -170,8 +174,9 @@ const SpendingLimits: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Ngày kết thúc</label>
+                <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-2">Ngày kết thúc</label>
                 <input
+                  id="end-date"
                   type="date"
                   value={formData.end_date}
                   onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}

@@ -439,8 +439,9 @@ const Debts: React.FC = () => {
                         <form onSubmit={(e) => handleTransactionSubmit(e, debt.id)} className="space-y-3">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Loại</label>
+                              <label htmlFor="transaction-type" className="block text-sm font-medium text-gray-700 mb-1">Loại</label>
                               <select
+                                id="transaction-type"
                                 value={transactionFormData.type}
                                 onChange={(e) => setTransactionFormData({ ...transactionFormData, type: e.target.value as 'payment' | 'increase' })}
                                 className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500"
@@ -450,8 +451,9 @@ const Debts: React.FC = () => {
                               </select>
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Số tiền</label>
+                              <label htmlFor="transaction-amount" className="block text-sm font-medium text-gray-700 mb-1">Số tiền</label>
                               <input
+                                id="transaction-amount"
                                 type="number"
                                 step="0.01"
                                 value={transactionFormData.amount}
@@ -461,8 +463,9 @@ const Debts: React.FC = () => {
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Ngày</label>
+                              <label htmlFor="transaction-date" className="block text-sm font-medium text-gray-700 mb-1">Ngày</label>
                               <input
+                                id="transaction-date"
                                 type="date"
                                 value={transactionFormData.date}
                                 onChange={(e) => setTransactionFormData({ ...transactionFormData, date: e.target.value })}
@@ -471,8 +474,9 @@ const Debts: React.FC = () => {
                             </div>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
+                            <label htmlFor="transaction-description" className="block text-sm font-medium text-gray-700 mb-1">Ghi chú</label>
                             <input
+                              id="transaction-description"
                               type="text"
                               value={transactionFormData.description}
                               onChange={(e) => setTransactionFormData({ ...transactionFormData, description: e.target.value })}
