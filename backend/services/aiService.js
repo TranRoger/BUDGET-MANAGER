@@ -126,8 +126,9 @@ Format the response as JSON with these sections.`;
 // Chat with AI assistant with function calling
 async function chatWithAssistant(userId, message, conversationHistory = []) {
   try {
-    // Get AI model for this user
-    const model = await getModelForUser(userId);
+    // Get AI config for this user
+    const { apiKey, modelName } = await getUserAIConfig(userId);
+    const genAI = new GoogleGenerativeAI(apiKey);
     
     // Get user context
     const [recentTransactions, budgets, debts, goals] = await Promise.all([
@@ -268,7 +269,7 @@ Hãy trả lời bằng tiếng Việt một cách tự nhiên và thân thiện
     ];
 
     const modelWithTools = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: modelName,
       tools: [{ functionDeclarations: functions }]
     });
 
