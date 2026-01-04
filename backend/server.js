@@ -10,6 +10,9 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy (needed when behind nginx/reverse proxy)
+app.set('trust proxy', 1);
+
 // Security middleware (helmet + CORS)
 setupSecurity(app);
 
