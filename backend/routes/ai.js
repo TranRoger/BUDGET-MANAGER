@@ -27,6 +27,18 @@ router.post('/chat', authenticate, async (req, res) => {
   }
 });
 
+// Get current active plan
+router.get('/plan/current', authenticate, async (req, res) => {
+  try {
+    const { userId } = req;
+    const plan = await aiService.getCurrentPlan(userId);
+    res.json(plan);
+  } catch (error) {
+    console.error('Error getting current plan:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Generate spending plan with user input
 router.post('/plan', authenticate, async (req, res) => {
   try {
@@ -42,6 +54,27 @@ router.post('/plan', authenticate, async (req, res) => {
     const plan = await aiService.generateSpendingPlan(userId, monthlyIncome, targetDate, notes);
     res.json(plan);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update existing plan with new requirements
+router.put('/plan/:id', authenticate, async (req, res) => {
+  try {
+    const { userId } = req;
+    const { id } = req.params;
+    const { updateRequest } = req.body;
+    
+    if (!updateRequest) {
+      return res.status(400).json({ 
+        message: 'Vui lòng cung cấp yêu cầu cập nhật' 
+      });
+    }
+    
+    const updatedPlan = await aiService.updateSpendingPlan(userId, id, updateRequest);
+    res.json(updatedPlan);
+  } catch (error) {
+    console.error('Error updating plan:', error);
     res.status(500).json({ message: error.message });
   }
 });

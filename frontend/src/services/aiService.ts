@@ -37,6 +37,7 @@ export interface Recommendation {
 }
 
 export interface SpendingPlan {
+  id?: number;
   plan: string; // Markdown content
   targetDate: string;
   monthlyIncome: number;
@@ -49,7 +50,8 @@ export interface SpendingPlan {
     goalCount: number;
     debtCount: number;
   };
-  generatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export const aiService = {
@@ -66,11 +68,27 @@ export const aiService = {
     return response.data;
   },
 
+  async getCurrentPlan(): Promise<SpendingPlan | null> {
+    try {
+      const response = await api.get('/ai/plan/current');
+      return response.data;
+    } catch (error) {
+      return null;
+    }
+  },
+
   async generatePlan(monthlyIncome: number, targetDate: string, notes?: string): Promise<SpendingPlan> {
     const response = await api.post('/ai/plan', {
       monthlyIncome,
       targetDate,
       notes,
+    });
+    return response.data;
+  },
+
+  async updatePlan(planId: number, updateRequest: string): Promise<SpendingPlan> {
+    const response = await api.put(`/ai/plan/${planId}`, {
+      updateRequest,
     });
     return response.data;
   },

@@ -15,15 +15,33 @@ const Dashboard: React.FC = () => {
   const [plan, setPlan] = useState<SpendingPlan | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showPlanForm, setShowPlanForm] = useState(true);
+  const [showPlanForm, setShowPlanForm] = useState(false);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [monthlyIncome, setMonthlyIncome] = useState<string>('');
   const [targetDate, setTargetDate] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
+  const [updateRequest, setUpdateRequest] = useState<string>('');
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchSummary();
+    loadCurrentPlan();
   }, []);
+
+  const loadCurrentPlan = async () => {
+    try {
+      const currentPlan = await aiService.getCurrentPlan();
+      if (currentPlan) {
+        setPlan(currentPlan);
+        setShowPlanForm(false);
+      } else {
+        setShowPlanForm(true);
+      }
+    } catch (error) {
+      console.error('Failed to load current plan:', error);
+      setShowPlanForm(true);
+    }
+  };
 
   const handleGeneratePlan = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,10 +59,39 @@ const Dashboard: React.FC = () => {
       const planData = await aiService.generatePlan(Number.parseFloat(monthlyIncome), targetDate, notes);
       setPlan(planData);
       setShowPlanForm(false);
+      setShowUpdateForm(false);
+      setMonthlyIncome('');
+      setTargetDate('');
+      setNotes('');
     } catch (error: any) {
       console.error('Failed to generate plan:', error);
       console.error('Error details:', error.response?.data || error.message);
       alert(`Không thể tạo kế hoạch: ${error.response?.data?.message || error.message || 'Vui lòng thử lại.'}`);
+    } finally {
+      setLoadingPlan(false);
+    }
+  };
+
+  const handleUpdatePlan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!plan?.id) {
+      alert('Không tìm thấy kế hoạch để cập nhật');
+      return;
+    }
+    if (!updateRequest.trim()) {
+      alert('Vui lòng nhập yêu cầu cập nhật');
+      return;
+    }
+
+    setLoadingPlan(true);
+    try {
+      const updatedPlan = await aiService.updatePlan(plan.id, updateRequest);
+      setPlan(updatedPlan);
+      setShowUpdateForm(false);
+      setUpdateRequest('');
+    } catch (error: any) {
+      console.error('Failed to update plan:', error);
+      alert(`Không thể cập nhật kế hoạch: ${error.response?.data?.message || error.message || 'Vui lòng thử lại.'}`);
     } finally {
       setLoadingPlan(false);
     }
@@ -154,17 +201,64 @@ const Dashboard: React.FC = () => {
       <div className="recommendations-section">
         <div className="recommendations-header">
           <h2 className="section-title">🤖 Kế Hoạch Chi Tiêu Thông Minh</h2>
-          {!showPlanForm && plan && (
-            <button 
-              className="btn-refresh"
-              onClick={() => { setShowPlanForm(true); setPlan(null); }}
-            >
-              📝 Tạo Kế Hoạch Mới
-            </button>
+          {!showPlanForm && !showUpdateForm && plan && (
+            <div className="plan-action-buttons">
+              <button 
+                className="btn-update"
+                onClick={() => setShowUpdateForm(true)}
+                disabled={loadingPlan}
+              >
+                🔄 Cập Nhật Kế Hoạch
+              </button>
+              <button 
+                className="btn-new"
+                onClick={() => { setShowPlanForm(true); setPlan(null); }}
+                disabled={loadingPlan}
+              >
+                ✨ Tạo Kế Hoạch Mới
+              </button>
+            </div>
           )}
         </div>
         
-        {showPlanForm ? (
+        {showUpdateForm && plan ? (
+          <Card>
+            <form onSubmit={handleUpdatePlan} className="plan-form">
+              <div className="form-intro update-intro">
+                <p>🔄 <strong>Cập nhật kế hoạch hiện tại</strong></p>
+                <p>Kế hoạch sẽ được đồng bộ với dữ liệu tài chính mới nhất và điều chỉnh theo yêu cầu của bạn.</p>
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="updateRequest">Yêu cầu cập nhật <span className="required">*</span></label>
+                <textarea
+                  id="updateRequest"
+                  value={updateRequest}
+                  onChange={(e) => setUpdateRequest(e.target.value)}
+                  placeholder="Ví dụ: Thêm kế hoạch mua laptop 20 triệu, giảm chi tiêu giải trí, tăng tiết kiệm..."
+                  rows={6}
+                  required
+                  disabled={loadingPlan}
+                  className="form-textarea"
+                />
+              </div>
+
+              <div className="form-buttons">
+                <button type="submit" className="btn-generate" disabled={loadingPlan}>
+                  {loadingPlan ? '⏳ Đang cập nhật...' : '🔄 Cập Nhật'}
+                </button>
+                <button 
+                  type="button" 
+                  className="btn-cancel" 
+                  onClick={() => { setShowUpdateForm(false); setUpdateRequest(''); }}
+                  disabled={loadingPlan}
+                >
+                  Hủy
+                </button>
+              </div>
+            </form>
+          </Card>
+        ) : showPlanForm ? (
           <Card>
             <form onSubmit={handleGeneratePlan} className="plan-form">
               <div className="form-intro">
