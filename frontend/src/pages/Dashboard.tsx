@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { reportService, FinancialSummary } from '../services/reportService';
 import { transactionService, Transaction } from '../services/transactionService';
+import { budgetService } from '../services/budgetService';
 import { aiService, SpendingPlan } from '../services/aiService';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import Card from '../components/Card';
@@ -16,7 +17,7 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showPlanForm, setShowPlanForm] = useState(false);
   const [showUpdateForm, setShowUpdateForm] = useState(false);
-  const [monthlyIncome, setMonthlyIncome] = useState<string>('');
+  const [calculatedIncome, setCalculatedIncome] = useState<number>(0);
   const [targetDate, setTargetDate] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [updateRequest, setUpdateRequest] = useState<string>('');
@@ -25,7 +26,48 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     fetchSummary();
     loadCurrentPlan();
+    calculateMonthlyIncome();
   }, []);
+
+  const calculateMonthlyIncome = async () => {
+    try {
+      const budgets = await budgetService.getAll();
+      const now = new Date();
+      
+      // Filter active budgets (within date range)
+      const activeBudgets = budgets.filter(budget => {
+        const startDate = new Date(budget.start_date);
+        const endDate = new Date(budget.end_date);
+        return now >= startDate && now <= endDate;
+      });
+      
+      // Calculate monthly income
+      let monthlyTotal = 0;
+      activeBudgets.forEach(budget => {
+        let amount = budget.amount;
+        
+        // Convert to monthly based on period
+        switch(budget.period) {
+          case 'daily':
+            amount = amount * 30;
+            break;
+          case 'weekly':
+            amount = amount * 4;
+            break;
+          case 'yearly':
+            amount = amount / 12;
+            break;
+          // monthly stays the same
+        }
+        
+        monthlyTotal += amount;
+      });
+      
+      setCalculatedIncome(monthlyTotal);
+    } catch (error) {
+      console.error('Failed to calculate monthly income:', error);
+    }
+  };
 
   const loadCurrentPlan = async () => {
     try {
@@ -44,8 +86,8 @@ const Dashboard: React.FC = () => {
 
   const handleGeneratePlan = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!monthlyIncome || Number.parseFloat(monthlyIncome) <= 0) {
-      alert('Vui lòng nhập thu nhập hợp lệ');
+    if (calculatedIncome <= 0) {
+      alert('Không tìm thấy thu nhập. Vui lòng thêm ngân sách thu nhập trước.');
       return;
     }
     if (!targetDate) {
@@ -55,11 +97,10 @@ const Dashboard: React.FC = () => {
 
     setLoadingPlan(true);
     try {
-      const planData = await aiService.generatePlan(Number.parseFloat(monthlyIncome), targetDate, notes);
+      const planData = await aiService.generatePlan(calculatedIncome, targetDate, notes);
       setPlan(planData);
       setShowPlanForm(false);
       setShowUpdateForm(false);
-      setMonthlyIncome('');
       setTargetDate('');
       setNotes('');
     } catch (error: any) {
@@ -269,27 +310,23 @@ const Dashboard: React.FC = () => {
         ) : showPlanForm ? (
           <Card>
             <form onSubmit={handleGeneratePlan} className="space-y-6">
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-l-4 border-purple-500 p-4 rounded-lg">
-                <p className="text-purple-900 font-medium">🎯 Để AI tạo kế hoạch chi tiêu tối ưu, vui lòng cung cấp thông tin:</p>
+              <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-lg">
+                <p className="text-purple-900 font-semibold mb-2">🎯 AI sẽ tạo kế hoạch chi tiêu tối ưu dựa trên:</p>
+                <ul className="text-sm text-purple-700 space-y-1 ml-4">
+                  <li>• Thu nhập hàng tháng từ Ngân sách: <span className="font-bold">{formatCurrency(calculatedIncome)}</span></li>
+                  <li>• Dữ liệu giao dịch thực tế của bạn</li>
+                  <li>• Mục tiêu và ghi chú của bạn</li>
+                </ul>
               </div>
-              
-              <div>
-                <label htmlFor="monthlyIncome" className="block text-sm font-medium text-gray-700 mb-2">
-                  Thu nhập hàng tháng (VNĐ) <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="monthlyIncome"
-                  type="number"
-                  value={monthlyIncome}
-                  onChange={(e) => setMonthlyIncome(e.target.value)}
-                  placeholder="Ví dụ: 10000000"
-                  min="0"
-                  step="100000"
-                  required
-                  disabled={loadingPlan}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all duration-200"
-                />
-              </div>
+
+              {calculatedIncome <= 0 && (
+                <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
+                  <p className="text-yellow-900 font-medium mb-1">⚠️ Chưa có thu nhập</p>
+                  <p className="text-sm text-yellow-700">
+                    Vui lòng thêm ngân sách thu nhập trong trang <a href="/budgets" className="underline font-semibold">Ngân Sách</a> trước khi tạo kế hoạch.
+                  </p>
+                </div>
+              )}
 
               <div>
                 <label htmlFor="targetDate" className="block text-sm font-medium text-gray-700 mb-2">

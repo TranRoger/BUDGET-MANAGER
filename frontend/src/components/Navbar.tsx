@@ -68,24 +68,24 @@ const Navbar: React.FC = () => {
           </Link>
           
           {/* Nav Menu */}
-          <div className="flex items-center gap-0.5 sm:gap-1 flex-1 justify-center overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-0.5 sm:gap-1 flex-1 justify-center">
             <Link to="/" className={navItemClass(isActive('/') || isActive('/dashboard'))}>
               <span className="text-base sm:text-lg">📊</span>
               <span className="hidden md:inline">Tổng Quan</span>
             </Link>
 
             {/* Finance Dropdown */}
-            <div className="relative" ref={financeMenuRef}>
+            <div className="relative z-10" ref={financeMenuRef}>
               <button 
                 onClick={() => setShowFinanceMenu(!showFinanceMenu)}
-                className={navItemClass(isInGroup(['/transactions', '/budgets', '/debts', '/goals']))}
+                className={navItemClass(isInGroup(['/transactions', '/budgets', '/spending-limits', '/debts', '/goals']))}
               >
                 <span className="text-base sm:text-lg">💳</span>
                 <span className="hidden md:inline">Tài Chính</span>
                 <span className={`text-xs transition-transform ${showFinanceMenu ? 'rotate-180' : ''}`}>▼</span>
               </button>
               {showFinanceMenu && (
-                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-2xl min-w-[240px] overflow-hidden animate-slideDown">
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-2xl min-w-[240px] overflow-hidden animate-slideDown z-50">
                   <Link to="/transactions" className={dropdownItemClass(isActive('/transactions'))} onClick={() => setShowFinanceMenu(false)}>
                     <span className="text-2xl">💳</span>
                     <div>
@@ -94,10 +94,17 @@ const Navbar: React.FC = () => {
                     </div>
                   </Link>
                   <Link to="/budgets" className={dropdownItemClass(isActive('/budgets'))} onClick={() => setShowFinanceMenu(false)}>
-                    <span className="text-2xl">💼</span>
+                    <span className="text-2xl">💰</span>
                     <div>
                       <div className="font-semibold text-gray-900">Ngân Sách</div>
-                      <div className="text-xs text-gray-500">Giới hạn chi tiêu</div>
+                      <div className="text-xs text-gray-500">Thu nhập của bạn</div>
+                    </div>
+                  </Link>
+                  <Link to="/spending-limits" className={dropdownItemClass(isActive('/spending-limits'))} onClick={() => setShowFinanceMenu(false)}>
+                    <span className="text-2xl">🎯</span>
+                    <div>
+                      <div className="font-semibold text-gray-900">Giới Hạn Chi Tiêu</div>
+                      <div className="text-xs text-gray-500">Kiểm soát chi tiêu</div>
                     </div>
                   </Link>
                   <Link to="/debts" className={dropdownItemClass(isActive('/debts'))} onClick={() => setShowFinanceMenu(false)}>
@@ -108,7 +115,7 @@ const Navbar: React.FC = () => {
                     </div>
                   </Link>
                   <Link to="/goals" className={dropdownItemClass(isActive('/goals'))} onClick={() => setShowFinanceMenu(false)}>
-                    <span className="text-2xl">🎯</span>
+                    <span className="text-2xl">🏆</span>
                     <div>
                       <div className="font-semibold text-gray-900">Mục Tiêu</div>
                       <div className="text-xs text-gray-500">Tiết kiệm & đầu tư</div>
@@ -124,7 +131,7 @@ const Navbar: React.FC = () => {
             </Link>
 
             {/* Manage Dropdown */}
-            <div className="relative" ref={manageMenuRef}>
+            <div className="relative z-10" ref={manageMenuRef}>
               <button 
                 onClick={() => setShowManageMenu(!showManageMenu)}
                 className={navItemClass(isInGroup(['/categories', '/settings', '/admin/users']))}
@@ -134,7 +141,7 @@ const Navbar: React.FC = () => {
                 <span className={`text-xs transition-transform ${showManageMenu ? 'rotate-180' : ''}`}>▼</span>
               </button>
               {showManageMenu && (
-                <div className="absolute top-full mt-2 right-0 bg-white rounded-2xl shadow-2xl min-w-[240px] overflow-hidden animate-slideDown">
+                <div className="absolute top-full mt-2 right-0 bg-white rounded-2xl shadow-2xl min-w-[240px] overflow-hidden animate-slideDown z-50">
                   <Link to="/categories" className={dropdownItemClass(isActive('/categories'))} onClick={() => setShowManageMenu(false)}>
                     <span className="text-2xl">🏷️</span>
                     <div>
@@ -164,7 +171,7 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* User Menu */}
-          <div className="relative flex-shrink-0" ref={userMenuRef}>
+          <div className="relative flex-shrink-0 z-10" ref={userMenuRef}>
             <button 
               onClick={() => setShowUserMenu(!showUserMenu)}
               className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1.5 rounded-full bg-white/15 hover:bg-white/25 transition-all duration-200 border border-white/20"
@@ -179,7 +186,7 @@ const Navbar: React.FC = () => {
               <span className={`hidden sm:inline text-white text-xs transition-transform ${showUserMenu ? 'rotate-180' : ''}`}>▼</span>
             </button>
             {showUserMenu && (
-              <div className="absolute top-full mt-2 right-0 bg-white rounded-2xl shadow-2xl min-w-[280px] overflow-hidden animate-slideDown">
+              <div className="absolute top-full mt-2 right-0 bg-white rounded-2xl shadow-2xl min-w-[280px] overflow-hidden animate-slideDown z-50">
                 <div className="px-4 py-4 bg-primary-600 text-white">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl border-2 border-white/30">

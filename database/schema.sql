@@ -62,6 +62,19 @@ CREATE TABLE IF NOT EXISTS budgets (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create Spending Limits Table
+CREATE TABLE IF NOT EXISTS spending_limits (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+  amount DECIMAL(10, 2) NOT NULL,
+  period VARCHAR(20) CHECK (period IN ('daily', 'weekly', 'monthly', 'yearly')) NOT NULL DEFAULT 'monthly',
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create Assets Table
 CREATE TABLE IF NOT EXISTS assets (
   id SERIAL PRIMARY KEY,

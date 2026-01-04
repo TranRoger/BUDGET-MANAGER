@@ -28,12 +28,121 @@ router.get('/', authenticate, asyncHandler(async (req, res) => {
 // Create budget
 router.post('/', authenticate, budgetValidation, asyncHandler(async (req, res) => {
   const { category_id, amount, period, start_date, end_date } = req.body;
-  const result = await db.query(
-    `INSERT INTO budgets (user_id, category_id, amount, period, start_date, end_date)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-    [req.userId, category_id, amount, period, start_date, end_date]
-  );
-  res.status(201).json({ success: true, data: result.rows[0] });
+  
+  // Start transaction
+  const client = await db.connect();
+  
+  try {
+    await client.query('BEGIN');
+    
+    // Create budget
+    const budgetResult = await client.query(
+      `INSERT INTO budgets (user_id, category_id, amount, period, start_date, end_date)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [req.userId, category_id, amount, period, start_date, end_date]
+    );
+    
+    const budget = budgetResult.rows[0];
+    
+    // Get category info
+    const categoryResult = await client.query(
+      'SELECT name, type FROM categories WHERE id = $1',
+      [category_id]
+    );
+    
+    if (categoryResult.rows.length === 0) {
+      throw new Error('Category not found');
+    }
+    
+    const category = categoryResult.rows[0];
+    
+    // Auto-create income transactions based on period
+    const transactions = [];
+    const startDate = new Date(start_date);
+    const endDate = new Date(end_date);
+    
+    let currentDate = new Date(startDate);
+    let transactionAmount = amount;
+    let description = `Thu nhập từ ${category.name}`;
+    
+    // Generate transactions based on period
+    switch(period) {
+      case 'daily':
+        // Create daily transactions
+        while (currentDate <= endDate) {
+          transactions.push({
+            date: new Date(currentDate).toISOString().split('T')[0],
+            amount: transactionAmount,
+            description: `${description} (Hàng ngày)`
+          });
+          currentDate.setDate(currentDate.getDate() + 1);
+          
+          // Limit to avoid too many transactions
+          if (transactions.length >= 365) break;
+        }
+        break;
+        
+      case 'weekly':
+        // Create weekly transactions
+        while (currentDate <= endDate) {
+          transactions.push({
+            date: new Date(currentDate).toISOString().split('T')[0],
+            amount: transactionAmount,
+            description: `${description} (Hàng tuần)`
+          });
+          currentDate.setDate(currentDate.getDate() + 7);
+          
+          if (transactions.length >= 52) break;
+        }
+        break;
+        
+      case 'monthly':
+        // Create monthly transactions
+        while (currentDate <= endDate) {
+          transactions.push({
+            date: new Date(currentDate).toISOString().split('T')[0],
+            amount: transactionAmount,
+            description: `${description} (Hàng tháng)`
+          });
+          currentDate.setMonth(currentDate.getMonth() + 1);
+          
+          if (transactions.length >= 12) break;
+        }
+        break;
+        
+      case 'yearly':
+        // Create yearly transaction
+        transactions.push({
+          date: start_date,
+          amount: transactionAmount,
+          description: `${description} (Hàng năm)`
+        });
+        break;
+    }
+    
+    // Insert all transactions
+    for (const txn of transactions) {
+      await client.query(
+        `INSERT INTO transactions (user_id, amount, type, category_id, description, date)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [req.userId, txn.amount, 'income', category_id, txn.description, txn.date]
+      );
+    }
+    
+    await client.query('COMMIT');
+    
+    res.status(201).json({ 
+      success: true, 
+      data: budget,
+      transactionsCreated: transactions.length,
+      message: `Đã tạo ngân sách và ${transactions.length} giao dịch thu nhập`
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 }));
 
 // Update budget

@@ -78,29 +78,32 @@ const Budgets: React.FC = () => {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Ngân Sách</h1>
+      <div className="flex justify-between items-center mb-6 sm:mb-8">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">💰 Ngân Sách (Thu Nhập)</h1>
+          <p className="text-sm text-gray-600 mt-1">Quản lý các nguồn thu nhập của bạn</p>
+        </div>
         <button 
-          className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 font-semibold"
+          className="bg-primary-600 hover:bg-primary-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 font-semibold text-sm sm:text-base"
           onClick={() => setShowForm(!showForm)}
         >
-          {showForm ? 'Hủy' : '+ Tạo Ngân Sách'}
+          {showForm ? 'Hủy' : '+ Thêm Thu Nhập'}
         </button>
       </div>
 
       {showForm && (
         <Card className="mb-8">
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">Tạo Ngân Sách Mới</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-6">Thêm Nguồn Thu Nhập Mới</h3>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Danh mục</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Danh mục thu nhập</label>
               <select
                 value={formData.category_id}
                 onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 required
               >
-                <option value="">-- Chọn danh mục --</option>
+                <option value="">-- Chọn danh mục thu nhập --</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.icon} {cat.name}
@@ -110,12 +113,12 @@ const Budgets: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Số tiền giới hạn</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Số tiền thu nhập</label>
               <input
                 type="number"
                 value={formData.amount}
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                placeholder="VD: 5000000"
+                placeholder="VD: 10000000"
                 className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 min="0"
                 required
