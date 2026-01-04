@@ -11,19 +11,19 @@
   padding: 1.25rem;
   border-radius: 12px;
   border-left: 5px solid;
-  background: linear-gradient(to right, #ffffff, #fafbfc);
+  background: #fafbfc;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .transaction-item.income {
   border-left-color: #10b981;
-  background: linear-gradient(to right, #f0fdf4, #fafbfc);
+  background: #f8f9fa;
 }
 
 .transaction-item.expense {
   border-left-color: #ef4444;
-  background: linear-gradient(to right, #fef2f2, #fafbfc);
+  background: #f8f9fa;
 }
 
 .transaction-item:hover {
@@ -85,7 +85,7 @@
 }
 
 .btn-edit {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #2d2d44;
   color: white;
 }
 
@@ -95,7 +95,7 @@
 }
 
 .btn-delete {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: #4a2d2d;
   color: white;
 }
 

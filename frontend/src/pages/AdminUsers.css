@@ -15,7 +15,7 @@
 
 .btn-create {
   padding: 0.875rem 1.5rem;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #2d2d44;
   color: white;
   border: none;
   border-radius: 10px;
@@ -61,7 +61,7 @@
 }
 
 .users-table thead {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: #2d2d44;
 }
 
 .users-table th {
@@ -107,12 +107,12 @@
 }
 
 .role-badge.admin {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  background: #f1f3f5;
   color: #92400e;
 }
 
 .role-badge.user {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  background: #f1f3f5;
   color: #1e40af;
 }
 
@@ -132,11 +132,11 @@
 }
 
 .btn-edit {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #2d3d35;
 }
 
 .btn-delete {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: #4a2d2d;
 }
 
 .btn-edit:hover,
@@ -148,7 +148,7 @@
 .btn-submit {
   flex: 2;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #2d3d35;
   color: white;
   border: none;
   border-radius: 10px;

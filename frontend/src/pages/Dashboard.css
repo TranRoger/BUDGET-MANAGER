@@ -7,10 +7,7 @@
 .page-title {
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #1a202c, #4a5568);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #1a202c;
   margin-bottom: 2.5rem;
   letter-spacing: -1px;
 }
@@ -36,22 +33,22 @@
   left: 0;
   right: 0;
   height: 5px;
-  background: linear-gradient(90deg, var(--stat-color), transparent);
+  background: var(--stat-color);
 }
 
 .stat-card.income {
   --stat-color: #10b981;
-  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+  background: #f8f9fa;
 }
 
 .stat-card.expense {
   --stat-color: #ef4444;
-  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+  background: #f8f9fa;
 }
 
 .stat-card.savings {
   --stat-color: #6366f1;
-  background: linear-gradient(135deg, #eef2ff 0%, #ffffff 100%);
+  background: #f8f9fa;
 }
 
 .stat-icon {
@@ -93,7 +90,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: linear-gradient(to right, #fafbfc, #ffffff);
+  background: #fafbfc;
   border-radius: 10px;
   border-left: 4px solid;
   transition: all 0.2s;
@@ -101,12 +98,12 @@
 
 .recent-transaction-item.income {
   border-left-color: #10b981;
-  background: linear-gradient(to right, #f0fdf4, #ffffff);
+  background: #f8f9fa;
 }
 
 .recent-transaction-item.expense {
   border-left-color: #ef4444;
-  background: linear-gradient(to right, #fef2f2, #ffffff);
+  background: #f8f9fa;
 }
 
 .recent-transaction-item:hover {
@@ -148,7 +145,7 @@
 .view-all-btn {
   margin-top: 0.5rem;
   padding: 0.875rem;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #2d2d44;
   color: white;
   border: none;
   border-radius: 10px;
@@ -175,13 +172,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.875rem;
-  background: linear-gradient(to right, #fafbfc, #ffffff);
+  background: #fafbfc;
   border-radius: 10px;
   transition: all 0.2s;
 }
 
 .category-item:hover {
-  background: linear-gradient(to right, #f3f4f6, #fafbfc);
+  background: #f3f4f6;
   transform: translateX(2px);
 }
 
@@ -232,19 +229,19 @@
 }
 
 .action-btn.income {
-  background: linear-gradient(135deg, #28a745, #20c997);
+  background: #2d3d35;
 }
 
 .action-btn.expense {
-  background: linear-gradient(135deg, #dc3545, #e74c3c);
+  background: #4a2d2d;
 }
 
 .action-btn.budget {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #1a1a2e;
 }
 
 .action-btn.ai {
-  background: linear-gradient(135deg, #f093fb, #f5576c);
+  background: #3d3d5c;
 }
 
 .action-icon {
@@ -287,10 +284,7 @@
 .section-title {
   font-size: 1.75rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: #2d2d44;
   margin: 0;
 }
 
@@ -309,11 +303,11 @@
 
 .btn-refresh,
 .btn-new {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #2d2d44;
 }
 
 .btn-update {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #2d3d35;
 }
 
 .btn-refresh:hover:not(:disabled),
@@ -378,18 +372,18 @@
 }
 
 .recommendation-card.priority-high {
-  --priority-color: linear-gradient(90deg, #ef4444, #dc2626);
-  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+  --priority-color: #4a2d2d;
+  background: #f8f9fa;
 }
 
 .recommendation-card.priority-medium {
-  --priority-color: linear-gradient(90deg, #f59e0b, #d97706);
-  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+  --priority-color: #4a4a3d;
+  background: #f8f9fa;
 }
 
 .recommendation-card.priority-low {
-  --priority-color: linear-gradient(90deg, #10b981, #059669);
-  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+  --priority-color: #2d3d35;
+  background: #f8f9fa;
 }
 
 .recommendation-card:hover {
@@ -428,22 +422,22 @@
 }
 
 .priority-badge.high {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  background: #f5f5f5;
   color: #991b1b;
 }
 
 .priority-badge.medium {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  background: #f1f3f5;
   color: #92400e;
 }
 
 .priority-badge.low {
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  background: #f5f5f5;
   color: #065f46;
 }
 
 .potential-savings {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #2d3d35;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -478,7 +472,7 @@
   font-size: 0.875rem;
   color: #1a202c;
   font-weight: 700;
-  background: linear-gradient(to right, #f9fafb, #ffffff);
+  background: #fafbfc;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
   border-left: 3px solid #6366f1;
@@ -487,7 +481,7 @@
 .btn-primary {
   margin-top: 1rem;
   padding: 0.875rem 1.5rem;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #2d2d44;
   color: white;
   border: none;
   border-radius: 10px;
@@ -509,7 +503,7 @@
 .form-intro {
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+  background: #f5f5f5;
   border-radius: 8px;
   border-left: 4px solid #6366f1;
 }
@@ -521,7 +515,7 @@
 }
 
 .update-intro {
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  background: #f5f5f5;
   border-left-color: #10b981;
 }
 
@@ -538,7 +532,7 @@
 .btn-cancel {
   flex: 1;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #6b7280, #4b5563);
+  background: #4b5563;
   color: white;
   border: none;
   border-radius: 10px;
@@ -629,7 +623,7 @@
 .btn-generate {
   width: 100%;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #2d3d35;
   color: white;
   border: none;
   border-radius: 10px;
@@ -653,7 +647,7 @@
 
 /* Plan Result */
 .plan-result-card {
-  background: linear-gradient(135deg, #fafbfc 0%, #ffffff 100%);
+  background: #fafbfc;
 }
 
 .plan-summary {
@@ -661,7 +655,7 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+  background: #f5f5f5;
   border-radius: 10px;
   margin-bottom: 2rem;
 }
@@ -694,7 +688,7 @@
   color: #1f2937;
   font-size: 1rem;
   padding: 2.5rem;
-  background: linear-gradient(to bottom, #ffffff, #fafbfc);
+  background: #fafbfc;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   max-width: 100%;
@@ -709,10 +703,10 @@
   margin: 0 0 1.5rem 0;
   padding-bottom: 0.75rem;
   border-bottom: 4px solid transparent;
-  background: linear-gradient(white, white) padding-box,
-              linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899) border-box;
+  background: white
+              #2d2d44 border-box;
   border-image-slice: 1;
-  border-image-source: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+  border-image-source: #2d2d44;
   letter-spacing: -0.5px;
 }
 
@@ -727,7 +721,7 @@
   margin: 2.5rem 0 1.25rem 0;
   padding: 0.75rem 0 0.75rem 1rem;
   border-left: 5px solid #10b981;
-  background: linear-gradient(90deg, #f0fdf4 0%, transparent 100%);
+  background: #f8f9fa;
   border-radius: 0 8px 8px 0;
   letter-spacing: -0.3px;
 }
@@ -812,7 +806,7 @@
 }
 
 .plan-content .md-thead {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: #2d2d44;
 }
 
 .plan-content .md-th {
@@ -854,7 +848,7 @@
 .plan-content .md-strong {
   color: #111827;
   font-weight: 800;
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  background: #f1f3f5;
   padding: 0.15rem 0.5rem;
   border-radius: 5px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -866,11 +860,11 @@
   font-weight: 600;
   padding-bottom: 2px;
   border-bottom: 2px solid #c7d2fe;
-  background: linear-gradient(to bottom, transparent 50%, #eef2ff 50%);
+  background: #f5f5f5;
 }
 
 .plan-content .md-code {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  background: #f5f5f5;
   color: #991b1b;
   padding: 0.3rem 0.6rem;
   border-radius: 6px;
@@ -883,7 +877,7 @@
 .plan-content .md-blockquote {
   margin: 2rem 0;
   padding: 1.25rem 1.75rem;
-  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+  background: #f5f5f5;
   border-left: 6px solid #3b82f6;
   border-radius: 0 10px 10px 0;
   font-style: italic;
@@ -909,7 +903,7 @@
   margin: 3rem 0;
   border: none;
   height: 3px;
-  background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+  background: #e5e7eb;
   border-radius: 2px;
 }
 

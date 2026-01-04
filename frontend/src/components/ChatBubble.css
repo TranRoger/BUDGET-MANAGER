@@ -6,7 +6,7 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #2d2d44;
   color: white;
   border: none;
   font-size: 2rem;
@@ -29,7 +29,7 @@
 }
 
 .chat-bubble-btn.open {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: #4a2d2d;
   font-size: 1.5rem;
 }
 
@@ -61,7 +61,7 @@
 
 /* Chat Header */
 .chat-bubble-header {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #2d2d44;
   color: white;
   padding: 1.25rem;
   display: flex;
@@ -202,7 +202,7 @@
 }
 
 .example-item {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  background: #f1f3f5;
   padding: 0.75rem 1rem;
   border-radius: 10px;
   margin-bottom: 0.5rem;
@@ -237,7 +237,7 @@
 .bubble-avatar {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #2d2d44;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -247,7 +247,7 @@
 }
 
 .bubble-message.user .bubble-avatar {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #2d3d35;
 }
 
 .bubble-content {
@@ -272,7 +272,7 @@
 }
 
 .bubble-message.user .bubble-text {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #2d2d44;
   color: white;
   border-radius: 16px 16px 4px 16px;
 }
@@ -356,7 +356,7 @@
 .bubble-send-btn {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: #2d2d44;
   border: none;
   border-radius: 50%;
   color: white;

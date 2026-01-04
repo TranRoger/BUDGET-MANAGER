@@ -14,10 +14,7 @@
 .page-title {
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #1a202c, #4a5568);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #1a202c;
   letter-spacing: -1px;
 }
 
@@ -36,17 +33,17 @@
 }
 
 .stat-card.debt-total {
-  background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
+  background: #f8f9fa;
   border-top: 5px solid #ef4444;
 }
 
 .stat-card.debt-count {
-  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+  background: #f8f9fa;
   border-top: 5px solid #3b82f6;
 }
 
 .stat-card.debt-interest {
-  background: linear-gradient(135deg, #fef3c7 0%, #ffffff 100%);
+  background: #f8f9fa;
   border-top: 5px solid #f59e0b;
 }
 
@@ -105,7 +102,7 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 1.5rem;
-  background: linear-gradient(to right, #fafbfc, #ffffff);
+  background: #fafbfc;
   border-radius: 12px;
   border-left: 5px solid #cbd5e0;
   transition: all 0.3s;
@@ -119,12 +116,12 @@
 
 .debt-item.overdue {
   border-left-color: #ef4444;
-  background: linear-gradient(to right, #fef2f2, #ffffff);
+  background: #f8f9fa;
 }
 
 .debt-item.due-soon {
   border-left-color: #f59e0b;
-  background: linear-gradient(to right, #fffbeb, #ffffff);
+  background: #f8f9fa;
 }
 
 .debt-main {
