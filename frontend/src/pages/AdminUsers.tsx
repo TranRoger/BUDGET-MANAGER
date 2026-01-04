@@ -31,7 +31,7 @@ const AdminUsers: React.FC = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/auth/admin/users', {
+      const response = await fetch('/api/auth/admin/users', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -57,7 +57,7 @@ const AdminUsers: React.FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/auth/admin/users', {
+      const response = await fetch('/api/auth/admin/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ const AdminUsers: React.FC = () => {
         updateData.password = formData.password;
       }
 
-      const response = await fetch(`http://localhost:5000/api/auth/admin/users/${editingUser.id}`, {
+      const response = await fetch(`/api/auth/admin/users/${editingUser.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ const AdminUsers: React.FC = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/auth/admin/users/${id}`, {
+      const response = await fetch(`/api/auth/admin/users/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

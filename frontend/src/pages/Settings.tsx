@@ -30,7 +30,7 @@ const Settings: React.FC = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/auth/settings', {
+      const response = await fetch('/api/auth/settings', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -63,7 +63,7 @@ const Settings: React.FC = () => {
       setMessage(null);
 
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/auth/settings', {
+      const response = await fetch('/api/auth/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ const Settings: React.FC = () => {
       setMessage(null);
 
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/auth/test-ai-key', {
+      const response = await fetch('/api/auth/test-ai-key', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
