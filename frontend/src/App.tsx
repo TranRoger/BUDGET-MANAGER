@@ -3,36 +3,45 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import ChatBubble from './components/ChatBubble';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Budgets from './pages/Budgets';
 import Reports from './pages/Reports';
 import Debts from './pages/Debts';
 import Goals from './pages/Goals';
+import AdminUsers from './pages/AdminUsers';
 import './App.css';
 
-// Authentication disabled - single user mode
 function App() {
   return (
     <AuthProvider>
       <Router>
         <div className="App">
-          <Navbar />
           <Routes>
-            {/* Auth pages removed - no login needed */}
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/budgets" element={<Budgets />} />
-            <Route path="/debts" element={<Debts />} />
-            <Route path="/goals" element={<Goals />} />
-            <Route path="/reports" element={<Reports />} />
-            {/* Redirect any auth routes to dashboard */}
-            <Route path="/login" element={<Navigate to="/" replace />} />
-            <Route path="/register" element={<Navigate to="/" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/*"
+              element={
+                <ProtectedRoute>
+                  <Navbar />
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/budgets" element={<Budgets />} />
+                    <Route path="/debts" element={<Debts />} />
+                    <Route path="/goals" element={<Goals />} />
+                    <Route path="/reports" element={<Reports />} />
+                    <Route path="/admin/users" element={<AdminUsers />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                  <ChatBubble />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
-          <ChatBubble />
         </div>
       </Router>
     </AuthProvider>

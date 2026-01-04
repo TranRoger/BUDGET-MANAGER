@@ -36,7 +36,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Import routes
-// Auth routes removed - single user mode
+const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const transactionRoutes = require('./routes/transactions');
 const budgetRoutes = require('./routes/budgets');
@@ -48,7 +48,7 @@ const goalRoutes = require('./routes/goals');
 const testRoutes = require('./routes/test'); // Test route
 
 // Apply rate limiters to specific routes
-// Auth routes removed - single user mode
+app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiLimiter, aiRoutes);
 app.use('/api/test', testRoutes); // Test route (no rate limit)
 

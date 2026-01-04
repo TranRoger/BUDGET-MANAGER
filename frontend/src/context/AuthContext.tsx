@@ -1,56 +1,59 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User } from '../services/authService';
+import { User, authService } from '../services/authService';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Single user mode - no authentication needed
-const defaultUser: User = {
-  id: 1,
-  email: 'user@budgetmanager.local',
-  name: 'Budget Manager User'
-};
-
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(defaultUser);
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Always set default user - no authentication needed
-    setUser(defaultUser);
-    setLoading(false);
+    // Check if user is already logged in
+    const token = authService.getToken();
+    if (token) {
+      loadCurrentUser();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const login = async (email: string, password: string) => {
-    // No-op - authentication disabled
-    setUser(defaultUser);
+  const loadCurrentUser = async () => {
+    try {
+      const currentUser = await authService.getCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      console.error('Failed to load user:', error);
+      authService.logout();
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const register = async (email: string, password: string, name: string) => {
-    // No-op - authentication disabled
-    setUser(defaultUser);
+  const login = async (email: string, password: string) => {
+    const response = await authService.login({ email, password });
+    setUser(response.user);
   };
 
   const logout = () => {
-    // No-op - authentication disabled
-    // User stays logged in
+    authService.logout();
+    setUser(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: true,
+        isAuthenticated: !!user,
         login,
-        register,
         logout,
         loading,
       }}

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { authService } from './authService';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -9,14 +10,29 @@ const api = axios.create({
   },
 });
 
-// Authentication disabled - no token needed
-// All requests work without authentication
+// Add token to requests
+api.interceptors.request.use(
+  (config) => {
+    const token = authService.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // Handle response errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // No auth redirect needed - just return the error
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      authService.logout();
+      window.location.href = '/login';
+    }
     return Promise.reject(error);
   }
 );

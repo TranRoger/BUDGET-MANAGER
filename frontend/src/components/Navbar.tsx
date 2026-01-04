@@ -1,33 +1,46 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
-// Authentication disabled - single user mode
 const Navbar: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  // Always show navbar in single user mode
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-brand">
-          💰 Budget Manager
+          💰 Quản Lý Ngân Sách
         </Link>
         
         <div className="navbar-menu">
-          <Link to="/" className="navbar-item">Dashboard</Link>
-          <Link to="/transactions" className="navbar-item">Transactions</Link>
-          <Link to="/budgets" className="navbar-item">Budgets</Link>
-          <Link to="/debts" className="navbar-item">Debts</Link>
-          <Link to="/goals" className="navbar-item">Goals</Link>
-          <Link to="/reports" className="navbar-item">Reports</Link>
+          <Link to="/" className="navbar-item">Tổng Quan</Link>
+          <Link to="/transactions" className="navbar-item">Giao Dịch</Link>
+          <Link to="/budgets" className="navbar-item">Ngân Sách</Link>
+          <Link to="/debts" className="navbar-item">Nợ</Link>
+          <Link to="/goals" className="navbar-item">Mục Tiêu</Link>
+          <Link to="/reports" className="navbar-item">Báo Cáo</Link>
+          {user?.role === 'admin' && (
+            <Link to="/admin/users" className="navbar-item navbar-item-admin">
+              👑 Quản Lý User
+            </Link>
+          )}
         </div>
 
         <div className="navbar-user">
-          <span className="navbar-username">{user?.name || 'User'}</span>
-          {/* Logout removed - single user mode */}
+          <span className="navbar-username">
+            {user?.role === 'admin' && '👑 '}
+            {user?.name || 'User'}
+          </span>
+          <button onClick={handleLogout} className="navbar-logout">
+            Đăng Xuất
+          </button>
         </div>
       </div>
     </nav>
