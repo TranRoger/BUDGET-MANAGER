@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
@@ -8,6 +8,26 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showFinanceMenu, setShowFinanceMenu] = useState(false);
+  const [showManageMenu, setShowManageMenu] = useState(false);
+  
+  const financeMenuRef = useRef<HTMLDivElement>(null);
+  const manageMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (financeMenuRef.current && !financeMenuRef.current.contains(event.target as Node)) {
+        setShowFinanceMenu(false);
+      }
+      if (manageMenuRef.current && !manageMenuRef.current.contains(event.target as Node)) {
+        setShowManageMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -18,12 +38,16 @@ const Navbar: React.FC = () => {
     return location.pathname === path;
   };
 
+  const isInGroup = (paths: string[]) => {
+    return paths.some(path => location.pathname === path);
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-brand">
           <span className="brand-icon">💰</span>
-          <span className="brand-text">Quản Lý Ngân Sách</span>
+          <span className="brand-text">Budget Manager</span>
         </Link>
         
         <div className="navbar-menu">
@@ -34,34 +58,67 @@ const Navbar: React.FC = () => {
             <span className="nav-icon">📊</span>
             <span className="nav-text">Tổng Quan</span>
           </Link>
-          <Link 
-            to="/transactions" 
-            className={`navbar-item ${isActive('/transactions') ? 'active' : ''}`}
-          >
-            <span className="nav-icon">💳</span>
-            <span className="nav-text">Giao Dịch</span>
-          </Link>
-          <Link 
-            to="/budgets" 
-            className={`navbar-item ${isActive('/budgets') ? 'active' : ''}`}
-          >
-            <span className="nav-icon">💼</span>
-            <span className="nav-text">Ngân Sách</span>
-          </Link>
-          <Link 
-            to="/debts" 
-            className={`navbar-item ${isActive('/debts') ? 'active' : ''}`}
-          >
-            <span className="nav-icon">💸</span>
-            <span className="nav-text">Nợ</span>
-          </Link>
-          <Link 
-            to="/goals" 
-            className={`navbar-item ${isActive('/goals') ? 'active' : ''}`}
-          >
-            <span className="nav-icon">🎯</span>
-            <span className="nav-text">Mục Tiêu</span>
-          </Link>
+
+          {/* Finance Dropdown */}
+          <div className="navbar-dropdown" ref={financeMenuRef}>
+            <button 
+              className={`navbar-item dropdown-trigger ${isInGroup(['/transactions', '/budgets', '/debts', '/goals']) ? 'active' : ''}`}
+              onClick={() => setShowFinanceMenu(!showFinanceMenu)}
+            >
+              <span className="nav-icon">💳</span>
+              <span className="nav-text">Tài Chính</span>
+              <span className={`dropdown-arrow ${showFinanceMenu ? 'open' : ''}`}>▼</span>
+            </button>
+            {showFinanceMenu && (
+              <div className="dropdown-menu">
+                <Link 
+                  to="/transactions" 
+                  className={`dropdown-item ${isActive('/transactions') ? 'active' : ''}`}
+                  onClick={() => setShowFinanceMenu(false)}
+                >
+                  <span className="dropdown-icon">💳</span>
+                  <div className="dropdown-item-content">
+                    <span className="dropdown-item-title">Giao Dịch</span>
+                    <span className="dropdown-item-desc">Thu chi hàng ngày</span>
+                  </div>
+                </Link>
+                <Link 
+                  to="/budgets" 
+                  className={`dropdown-item ${isActive('/budgets') ? 'active' : ''}`}
+                  onClick={() => setShowFinanceMenu(false)}
+                >
+                  <span className="dropdown-icon">💼</span>
+                  <div className="dropdown-item-content">
+                    <span className="dropdown-item-title">Ngân Sách</span>
+                    <span className="dropdown-item-desc">Giới hạn chi tiêu</span>
+                  </div>
+                </Link>
+                <Link 
+                  to="/debts" 
+                  className={`dropdown-item ${isActive('/debts') ? 'active' : ''}`}
+                  onClick={() => setShowFinanceMenu(false)}
+                >
+                  <span className="dropdown-icon">💸</span>
+                  <div className="dropdown-item-content">
+                    <span className="dropdown-item-title">Công Nợ</span>
+                    <span className="dropdown-item-desc">Quản lý nợ vay</span>
+                  </div>
+                </Link>
+                <Link 
+                  to="/goals" 
+                  className={`dropdown-item ${isActive('/goals') ? 'active' : ''}`}
+                  onClick={() => setShowFinanceMenu(false)}
+                >
+                  <span className="dropdown-icon">🎯</span>
+                  <div className="dropdown-item-content">
+                    <span className="dropdown-item-title">Mục Tiêu</span>
+                    <span className="dropdown-item-desc">Tiết kiệm & đầu tư</span>
+                  </div>
+                </Link>
+              </div>
+            )}
+          </div>
+
           <Link 
             to="/reports" 
             className={`navbar-item ${isActive('/reports') ? 'active' : ''}`}
@@ -69,22 +126,57 @@ const Navbar: React.FC = () => {
             <span className="nav-icon">📈</span>
             <span className="nav-text">Báo Cáo</span>
           </Link>
-          <Link 
-            to="/settings" 
-            className={`navbar-item ${isActive('/settings') ? 'active' : ''}`}
-          >
-            <span className="nav-icon">⚙️</span>
-            <span className="nav-text">Cài Đặt</span>
-          </Link>
-          {user?.role === 'admin' && (
-            <Link 
-              to="/admin/users" 
-              className={`navbar-item navbar-item-admin ${isActive('/admin/users') ? 'active' : ''}`}
+
+          {/* Manage Dropdown */}
+          <div className="navbar-dropdown" ref={manageMenuRef}>
+            <button 
+              className={`navbar-item dropdown-trigger ${isInGroup(['/categories', '/settings', '/admin/users']) ? 'active' : ''}`}
+              onClick={() => setShowManageMenu(!showManageMenu)}
             >
-              <span className="nav-icon">👑</span>
-              <span className="nav-text">Quản Lý User</span>
-            </Link>
-          )}
+              <span className="nav-icon">⚙️</span>
+              <span className="nav-text">Quản Lý</span>
+              <span className={`dropdown-arrow ${showManageMenu ? 'open' : ''}`}>▼</span>
+            </button>
+            {showManageMenu && (
+              <div className="dropdown-menu">
+                <Link 
+                  to="/categories" 
+                  className={`dropdown-item ${isActive('/categories') ? 'active' : ''}`}
+                  onClick={() => setShowManageMenu(false)}
+                >
+                  <span className="dropdown-icon">🏷️</span>
+                  <div className="dropdown-item-content">
+                    <span className="dropdown-item-title">Danh Mục</span>
+                    <span className="dropdown-item-desc">Phân loại thu chi</span>
+                  </div>
+                </Link>
+                <Link 
+                  to="/settings" 
+                  className={`dropdown-item ${isActive('/settings') ? 'active' : ''}`}
+                  onClick={() => setShowManageMenu(false)}
+                >
+                  <span className="dropdown-icon">⚙️</span>
+                  <div className="dropdown-item-content">
+                    <span className="dropdown-item-title">Cài Đặt</span>
+                    <span className="dropdown-item-desc">API & tùy chỉnh</span>
+                  </div>
+                </Link>
+                {user?.role === 'admin' && (
+                  <Link 
+                    to="/admin/users" 
+                    className={`dropdown-item admin ${isActive('/admin/users') ? 'active' : ''}`}
+                    onClick={() => setShowManageMenu(false)}
+                  >
+                    <span className="dropdown-icon">👑</span>
+                    <div className="dropdown-item-content">
+                      <span className="dropdown-item-title">Quản Lý User</span>
+                      <span className="dropdown-item-desc">Dành cho Admin</span>
+                    </div>
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="navbar-user">

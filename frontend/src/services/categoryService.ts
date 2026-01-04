@@ -12,17 +12,18 @@ export interface Category {
 export const categoryService = {
   async getAll(): Promise<Category[]> {
     const response = await api.get('/categories');
-    return response.data;
+    // Handle both { success, data } and direct array response
+    return response.data?.data || response.data || [];
   },
 
   async create(data: Omit<Category, 'id' | 'user_id'>): Promise<Category> {
     const response = await api.post('/categories', data);
-    return response.data;
+    return response.data?.data || response.data;
   },
 
   async update(id: number, data: Partial<Omit<Category, 'id' | 'user_id'>>): Promise<Category> {
     const response = await api.put(`/categories/${id}`, data);
-    return response.data;
+    return response.data?.data || response.data;
   },
 
   async delete(id: number): Promise<void> {

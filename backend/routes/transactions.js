@@ -19,27 +19,32 @@ const transactionValidation = [
 // Get all transactions
 router.get('/', authenticate, asyncHandler(async (req, res) => {
   const { startDate, endDate, type, categoryId, limit } = req.query;
-  let query = 'SELECT * FROM transactions WHERE user_id = $1';
+  let query = `
+    SELECT t.*, c.name as category_name, c.icon as category_icon, c.color as category_color
+    FROM transactions t
+    LEFT JOIN categories c ON t.category_id = c.id
+    WHERE t.user_id = $1
+  `;
   const params = [req.userId];
 
   if (startDate) {
     params.push(startDate);
-    query += ` AND date >= $${params.length}`;
+    query += ` AND t.date >= $${params.length}`;
   }
   if (endDate) {
     params.push(endDate);
-    query += ` AND date <= $${params.length}`;
+    query += ` AND t.date <= $${params.length}`;
   }
   if (type) {
     params.push(type);
-    query += ` AND type = $${params.length}`;
+    query += ` AND t.type = $${params.length}`;
   }
   if (categoryId) {
     params.push(categoryId);
-    query += ` AND category_id = $${params.length}`;
+    query += ` AND t.category_id = $${params.length}`;
   }
 
-  query += ' ORDER BY date DESC, created_at DESC';
+  query += ' ORDER BY t.date DESC, t.created_at DESC';
 
   if (limit) {
     params.push(parseInt(limit));

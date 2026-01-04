@@ -1,20 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTransactions } from '../hooks/useTransactions';
+import { categoryService, Category } from '../services/categoryService';
 import Card from '../components/Card';
 import TransactionList from '../components/TransactionList';
 import './Transactions.css';
 
 const Transactions: React.FC = () => {
   const { transactions, loading, createTransaction, deleteTransaction } = useTransactions();
+  const [categories, setCategories] = useState<Category[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     amount: '',
     type: 'expense' as 'income' | 'expense',
-    category_id: 1,
+    category_id: 0,
     description: '',
     date: new Date().toISOString().split('T')[0],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await categoryService.getAll();
+        setCategories(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  // Filter categories by transaction type
+  const filteredCategories = categories.filter(c => c.type === formData.type);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +45,7 @@ const Transactions: React.FC = () => {
       setFormData({
         amount: '',
         type: 'expense',
-        category_id: 1,
+        category_id: 0,
         description: '',
         date: new Date().toISOString().split('T')[0],
       });
@@ -113,16 +130,40 @@ const Transactions: React.FC = () => {
               </div>
 
               <div className="form-group">
+                <label htmlFor="category">
+                  <span className="label-icon">🏷️</span>
+                  Danh Mục
+                </label>
+                <select
+                  id="category"
+                  value={formData.category_id}
+                  onChange={(e) => setFormData({ ...formData, category_id: Number(e.target.value) })}
+                  required
+                  className="category-select"
+                >
+                  <option value={0} disabled>-- Chọn danh mục --</option>
+                  {filteredCategories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.icon} {cat.name}
+                    </option>
+                  ))}
+                </select>
+                {filteredCategories.length === 0 && (
+                  <p className="no-category-hint">Chưa có danh mục cho {formData.type === 'expense' ? 'chi tiêu' : 'thu nhập'}. <a href="/categories">Tạo danh mục</a></p>
+                )}
+              </div>
+
+              <div className="form-group">
                 <label htmlFor="description">
                   <span className="label-icon">📝</span>
-                  Description
+                  Mô Tả
                 </label>
                 <input
                   id="description"
                   type="text"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="What was this transaction for?"
+                  placeholder="Giao dịch này là gì?"
                   required
                   maxLength={200}
                 />
