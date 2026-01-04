@@ -11,15 +11,18 @@ import {
   Modal,
   RefreshControl,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { goalService, FinancialGoal, CreateGoalData } from '../services/goalService';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { useTheme } from '../context/ThemeContext';
 
 const GoalsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { colors } = useTheme();
   const [goals, setGoals] = useState<FinancialGoal[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showPriorityPicker, setShowPriorityPicker] = useState(false);
+  const [showDeadlinePicker, setShowDeadlinePicker] = useState(false);
   const [editingGoal, setEditingGoal] = useState<FinancialGoal | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState<CreateGoalData>({
@@ -139,17 +142,18 @@ const GoalsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2563eb" />
+      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Mục Tiêu</Text>
-        <TouchableOpacity style={styles.addButton} onPress={() => setShowForm(true)}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.text }]}>Mục Tiêu</Text>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.primary }]} onPress={() => setShowForm(true)}>
           <Text style={styles.addButtonText}>+ Thêm</Text>
         </TouchableOpacity>
       </View>
@@ -164,11 +168,11 @@ const GoalsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             return (
               <TouchableOpacity
                 key={goal.id}
-                style={styles.goalCard}
+                style={[styles.goalCard, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
                 onPress={() => handleEdit(goal)}
               >
                 <View style={styles.goalHeader}>
-                  <Text style={styles.goalName}>{goal.name}</Text>
+                  <Text style={[styles.goalName, { color: colors.text }]}>{goal.name}</Text>
                   <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(goal.priority) }]}>
                     <Text style={styles.priorityText}>
                       {goal.priority === 'high' ? 'Cao' : goal.priority === 'medium' ? 'TB' : 'Thấp'}
@@ -177,29 +181,29 @@ const GoalsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 </View>
 
                 <View style={styles.progressContainer}>
-                  <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: `${Math.min(progress, 100)}%` }]} />
+                  <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
+                    <View style={[styles.progressFill, { width: `${Math.min(progress, 100)}%`, backgroundColor: colors.success }]} />
                   </View>
-                  <Text style={styles.progressText}>{progress.toFixed(0)}%</Text>
+                  <Text style={[styles.progressText, { color: colors.success }]}>{progress.toFixed(0)}%</Text>
                 </View>
 
                 <View style={styles.goalStats}>
                   <View style={styles.statItem}>
-                    <Text style={styles.statLabel}>Đã Tiết Kiệm</Text>
-                    <Text style={styles.statValue}>{formatCurrency(goal.current_amount)}</Text>
+                    <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Đã Tiết Kiệm</Text>
+                    <Text style={[styles.statValue, { color: colors.text }]}>{formatCurrency(goal.current_amount)}</Text>
                   </View>
                   <View style={styles.statItem}>
-                    <Text style={styles.statLabel}>Mục Tiêu</Text>
-                    <Text style={styles.statValue}>{formatCurrency(goal.target_amount)}</Text>
+                    <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Mục Tiêu</Text>
+                    <Text style={[styles.statValue, { color: colors.text }]}>{formatCurrency(goal.target_amount)}</Text>
                   </View>
                 </View>
 
                 {goal.deadline && (
-                  <Text style={styles.deadline}>📅 Hạn: {formatDate(goal.deadline)}</Text>
+                  <Text style={[styles.deadline, { color: colors.textSecondary }]}>📅 Hạn: {formatDate(goal.deadline)}</Text>
                 )}
 
                 {goal.description && (
-                  <Text style={styles.description}>{goal.description}</Text>
+                  <Text style={[styles.description, { color: colors.textSecondary }]}>{goal.description}</Text>
                 )}
 
                 <TouchableOpacity
@@ -209,94 +213,103 @@ const GoalsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     handleDelete(goal.id);
                   }}
                 >
-                  <Text style={styles.deleteText}>🗑️ Xóa</Text>
+                  <Text style={[styles.deleteText, { color: colors.danger }]}>🗑️ Xóa</Text>
                 </TouchableOpacity>
               </TouchableOpacity>
             );
           })
         ) : (
-          <Text style={styles.emptyText}>Chưa có mục tiêu nào</Text>
+          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Chưa có mục tiêu nào</Text>
         )}
       </ScrollView>
 
       {/* Form Modal */}
       <Modal visible={showForm} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: colors.cardBg }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
                 {editingGoal ? 'Sửa Mục Tiêu' : 'Thêm Mục Tiêu'}
               </Text>
               <TouchableOpacity onPress={resetForm}>
-                <Text style={styles.closeButton}>✕</Text>
+                <Text style={[styles.closeButton, { color: colors.textSecondary }]}>✕</Text>
               </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.form}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Tên Mục Tiêu *</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Tên Mục Tiêu *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
                   value={formData.name}
                   onChangeText={(text) => setFormData({ ...formData, name: text })}
                   placeholder="Ví dụ: Mua nhà, Du lịch..."
+                  placeholderTextColor={colors.textSecondary}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Số Tiền Mục Tiêu *</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Số Tiền Mục Tiêu *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
                   value={formData.target_amount.toString()}
                   onChangeText={(text) => setFormData({ ...formData, target_amount: Number(text) || 0 })}
                   placeholder="0"
+                  placeholderTextColor={colors.textSecondary}
                   keyboardType="numeric"
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Số Tiền Hiện Tại</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Số Tiền Hiện Tại</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
                   value={formData.current_amount?.toString() || '0'}
                   onChangeText={(text) => setFormData({ ...formData, current_amount: Number(text) || 0 })}
                   placeholder="0"
+                  placeholderTextColor={colors.textSecondary}
                   keyboardType="numeric"
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Mức Độ Ưu Tiên</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={formData.priority}
-                    onValueChange={(value) => setFormData({ ...formData, priority: value })}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="Cao" value="high" />
-                    <Picker.Item label="Trung Bình" value="medium" />
-                    <Picker.Item label="Thấp" value="low" />
-                  </Picker>
-                </View>
+                <Text style={[styles.label, { color: colors.text }]}>Mức Độ Ưu Tiên</Text>
+                <TouchableOpacity
+                  style={[styles.prioritySelector, { backgroundColor: colors.inputBg, borderColor: colors.border }]}
+                  onPress={() => setShowPriorityPicker(true)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.prioritySelectorText, { color: colors.text }]}>
+                    {formData.priority === 'high' && 'Cao'}
+                    {formData.priority === 'medium' && 'Trung Bình'}
+                    {formData.priority === 'low' && 'Thấp'}
+                  </Text>
+                  <Text style={styles.dropdownIcon}>▼</Text>
+                </TouchableOpacity>
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Hạn Chót</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.deadline}
-                  onChangeText={(text) => setFormData({ ...formData, deadline: text })}
-                  placeholder="YYYY-MM-DD"
-                />
+                <Text style={[styles.label, { color: colors.text }]}>Hạn Chốt</Text>
+                <TouchableOpacity
+                  style={[styles.prioritySelector, { backgroundColor: colors.inputBg, borderColor: colors.border }]}
+                  onPress={() => setShowDeadlinePicker(true)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.prioritySelectorText, { color: colors.text }]}>
+                    {formData.deadline || 'Chọn ngày'}
+                  </Text>
+                  <Text style={styles.dropdownIcon}>📅</Text>
+                </TouchableOpacity>
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Mô Tả</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Mô Tả</Text>
                 <TextInput
-                  style={[styles.input, styles.textArea]}
+                  style={[styles.input, styles.textArea, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
                   value={formData.description}
                   onChangeText={(text) => setFormData({ ...formData, description: text })}
                   placeholder="Mô tả mục tiêu..."
+                  placeholderTextColor={colors.textSecondary}
                   multiline
                   numberOfLines={4}
                 />
@@ -304,7 +317,7 @@ const GoalsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
               <View style={styles.formButtons}>
                 <TouchableOpacity
-                  style={[styles.submitButton, submitting && styles.submitButtonDisabled]}
+                  style={[styles.submitButton, { backgroundColor: colors.primary }, submitting && styles.submitButtonDisabled]}
                   onPress={handleSubmit}
                   disabled={submitting}
                 >
@@ -316,11 +329,141 @@ const GoalsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     </Text>
                   )}
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.cancelButton} onPress={resetForm}>
-                  <Text style={styles.cancelButtonText}>Hủy</Text>
+                <TouchableOpacity style={[styles.cancelButton, { backgroundColor: colors.border }]} onPress={resetForm}>
+                  <Text style={[styles.cancelButtonText, { color: colors.text }]}>Hủy</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
+
+            {/* Priority Picker Overlay */}
+            {showPriorityPicker && (
+              <View style={styles.pickerOverlay}>
+                <TouchableOpacity
+                  style={styles.pickerBackdrop}
+                  activeOpacity={1}
+                  onPress={() => setShowPriorityPicker(false)}
+                />
+                <View style={[styles.pickerModal, { backgroundColor: colors.cardBg }]}>
+                  <View style={[styles.pickerHeader, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.pickerTitle, { color: colors.text }]}>Chọn Mức Độ Ưu Tiên</Text>
+                    <TouchableOpacity 
+                      onPress={() => setShowPriorityPicker(false)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.pickerCloseButton, { color: colors.textSecondary }]}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <ScrollView style={styles.pickerList}>
+                    {[
+                      { value: 'high', label: 'Cao', emoji: '🔴' },
+                      { value: 'medium', label: 'Trung Bình', emoji: '🟡' },
+                      { value: 'low', label: 'Thấp', emoji: '🟢' },
+                    ].map((priority) => (
+                      <TouchableOpacity
+                        key={priority.value}
+                        style={[
+                          styles.pickerOption,
+                          { borderBottomColor: colors.border },
+                          formData.priority === priority.value && { backgroundColor: colors.primaryLight },
+                        ]}
+                        onPress={() => {
+                          setFormData({ ...formData, priority: priority.value as any });
+                          setShowPriorityPicker(false);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.pickerOptionContent}>
+                          <Text style={styles.pickerIcon}>{priority.emoji}</Text>
+                          <Text
+                            style={[
+                              styles.pickerOptionText,
+                              { color: colors.text },
+                              formData.priority === priority.value && { color: colors.primary, fontWeight: '600' },
+                            ]}
+                          >
+                            {priority.label}
+                          </Text>
+                        </View>
+                        {formData.priority === priority.value && (
+                          <Text style={[styles.checkmark, { color: colors.primary }]}>✓</Text>
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              </View>
+            )}
+
+            {/* Deadline Picker Overlay */}
+            {showDeadlinePicker && (
+              <View style={styles.pickerOverlay}>
+                <TouchableOpacity
+                  style={styles.pickerBackdrop}
+                  activeOpacity={1}
+                  onPress={() => setShowDeadlinePicker(false)}
+                />
+                <View style={[styles.pickerModal, { backgroundColor: colors.cardBg }]}>
+                  <View style={[styles.pickerHeader, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.pickerTitle, { color: colors.text }]}>Chọn Hạn Chốt</Text>
+                    <TouchableOpacity 
+                      onPress={() => setShowDeadlinePicker(false)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.pickerCloseButton, { color: colors.textSecondary }]}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.datePickerContent}>
+                    <View style={styles.dateInputRow}>
+                      <TextInput
+                        style={[styles.dateInput, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
+                        value={formData.deadline}
+                        onChangeText={(text) => setFormData({ ...formData, deadline: text })}
+                        placeholder="YYYY-MM-DD"
+                        placeholderTextColor={colors.textSecondary}
+                      />
+                    </View>
+                    <View style={styles.quickDateButtons}>
+                      <TouchableOpacity
+                        style={[styles.quickDateButton, { backgroundColor: colors.primaryLight, borderColor: colors.primary }]}
+                        onPress={() => {
+                          const oneMonth = new Date();
+                          oneMonth.setMonth(oneMonth.getMonth() + 1);
+                          setFormData({ ...formData, deadline: oneMonth.toISOString().split('T')[0] });
+                          setShowDeadlinePicker(false);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[styles.quickDateButtonText, { color: colors.primary }]}>1 tháng</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.quickDateButton, { backgroundColor: colors.primaryLight, borderColor: colors.primary }]}
+                        onPress={() => {
+                          const threeMonths = new Date();
+                          threeMonths.setMonth(threeMonths.getMonth() + 3);
+                          setFormData({ ...formData, deadline: threeMonths.toISOString().split('T')[0] });
+                          setShowDeadlinePicker(false);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[styles.quickDateButtonText, { color: colors.primary }]}>3 tháng</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.quickDateButton, { backgroundColor: colors.primaryLight, borderColor: colors.primary }]}
+                        onPress={() => {
+                          const oneYear = new Date();
+                          oneYear.setFullYear(oneYear.getFullYear() + 1);
+                          setFormData({ ...formData, deadline: oneYear.toISOString().split('T')[0] });
+                          setShowDeadlinePicker(false);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[styles.quickDateButtonText, { color: colors.primary }]}>1 năm</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            )}
           </View>
         </View>
       </Modal>
@@ -337,6 +480,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
   },
   header: {
     flexDirection: 'row',
@@ -514,14 +661,138 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
-  pickerContainer: {
+  prioritySelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e5e7eb',
     borderRadius: 8,
-    overflow: 'hidden',
+    padding: 12,
+    backgroundColor: '#fff',
   },
-  picker: {
-    height: 50,
+  prioritySelectorText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  dropdownIcon: {
+    fontSize: 12,
+    color: '#9ca3af',
+  },
+  pickerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  pickerBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  pickerModal: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    width: '90%',
+    maxHeight: '70%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  pickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  pickerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  pickerCloseButton: {
+    fontSize: 24,
+    color: '#6b7280',
+    fontWeight: 'bold',
+  },
+  pickerList: {
+    maxHeight: 400,
+  },
+  pickerOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  pickerOptionSelected: {
+    backgroundColor: '#eff6ff',
+  },
+  pickerOptionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pickerIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  pickerOptionText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  pickerOptionTextSelected: {
+    color: '#2563eb',
+    fontWeight: '600',
+  },
+  checkmark: {
+    fontSize: 20,
+    color: '#2563eb',
+    fontWeight: 'bold',
+  },
+  datePickerContent: {
+    padding: 20,
+  },
+  dateInputRow: {
+    marginBottom: 16,
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  quickDateButtons: {
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
+  },
+  quickDateButton: {
+    flex: 1,
+    backgroundColor: '#eff6ff',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2563eb',
+    alignItems: 'center',
+  },
+  quickDateButtonText: {
+    color: '#2563eb',
+    fontSize: 14,
+    fontWeight: '600',
   },
   formButtons: {
     gap: 12,

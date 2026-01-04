@@ -12,12 +12,14 @@ import {
   Alert,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { colors } = useTheme();
 
   const handleSubmit = async () => {
     if (!email || !password) {
@@ -38,26 +40,27 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <View style={styles.iconContainer}>
+          <View style={[styles.iconContainer, { backgroundColor: colors.primary }]}>
             <Text style={styles.icon}>💰</Text>
           </View>
-          <Text style={styles.title}>Quản Lý Ngân Sách</Text>
-          <Text style={styles.subtitle}>Đăng nhập vào tài khoản</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Quản Lý Ngân Sách</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Đăng nhập vào tài khoản</Text>
         </View>
 
-        <View style={styles.form}>
+        <View style={[styles.form, { backgroundColor: colors.cardBg }]}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Email</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
               value={email}
               onChangeText={setEmail}
               placeholder="email@example.com"
+              placeholderTextColor={colors.textSecondary}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -66,12 +69,13 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Mật Khẩu</Text>
+            <Text style={[styles.label, { color: colors.text }]}>Mật Khẩu</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
               value={password}
               onChangeText={setPassword}
               placeholder="••••••••"
+              placeholderTextColor={colors.textSecondary}
               secureTextEntry
               autoCapitalize="none"
               editable={!loading}
@@ -79,7 +83,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </View>
 
           <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
+            style={[styles.button, { backgroundColor: colors.primary }, loading && styles.buttonDisabled]}
             onPress={handleSubmit}
             disabled={loading}
           >

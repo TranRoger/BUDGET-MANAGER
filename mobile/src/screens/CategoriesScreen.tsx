@@ -13,8 +13,10 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { categoryService, Category } from '../services/categoryService';
+import { useTheme } from '../context/ThemeContext';
 
 const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { colors } = useTheme();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -29,7 +31,7 @@ const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   });
 
   const icons = ['🍔', '🚗', '🏠', '💡', '🎬', '🛒', '💊', '📚', '✈️', '👕', '💰', '💼', '🎁', '📱', '💳', '🏥', '🎮', '☕', '🍕', '🚌'];
-  const colors = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#ec4899'];
+  const colorOptions = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#ec4899'];
 
   useEffect(() => {
     loadCategories();
@@ -122,8 +124,9 @@ const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2563eb" />
+      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải...</Text>
       </View>
     );
   }
@@ -132,10 +135,10 @@ const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const expenseCategories = categories.filter(c => c.type === 'expense');
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Danh Mục</Text>
-        <TouchableOpacity style={styles.addButton} onPress={() => setShowForm(true)}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.text }]}>Danh Mục</Text>
+        <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.primary }]} onPress={() => setShowForm(true)}>
           <Text style={styles.addButtonText}>+ Thêm</Text>
         </TouchableOpacity>
       </View>
@@ -146,15 +149,15 @@ const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       >
         {/* Income Categories */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>💰 Thu Nhập ({incomeCategories.length})</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>💰 Thu Nhập ({incomeCategories.length})</Text>
           {incomeCategories.map((category) => (
             <TouchableOpacity
               key={category.id}
-              style={[styles.categoryItem, { borderLeftColor: category.color }]}
+              style={[styles.categoryItem, { backgroundColor: colors.cardBg, borderColor: colors.border, borderLeftColor: category.color }]}
               onPress={() => handleEdit(category)}
             >
               <Text style={styles.categoryIcon}>{category.icon}</Text>
-              <Text style={styles.categoryName}>{category.name}</Text>
+              <Text style={[styles.categoryName, { color: colors.text }]}>{category.name}</Text>
               <TouchableOpacity onPress={() => handleDelete(category.id)} style={styles.deleteBtn}>
                 <Text style={styles.deleteText}>🗑️</Text>
               </TouchableOpacity>
@@ -164,15 +167,15 @@ const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
         {/* Expense Categories */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>💸 Chi Tiêu ({expenseCategories.length})</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>💸 Chi Tiêu ({expenseCategories.length})</Text>
           {expenseCategories.map((category) => (
             <TouchableOpacity
               key={category.id}
-              style={[styles.categoryItem, { borderLeftColor: category.color }]}
+              style={[styles.categoryItem, { backgroundColor: colors.cardBg, borderColor: colors.border, borderLeftColor: category.color }]}
               onPress={() => handleEdit(category)}
             >
               <Text style={styles.categoryIcon}>{category.icon}</Text>
-              <Text style={styles.categoryName}>{category.name}</Text>
+              <Text style={[styles.categoryName, { color: colors.text }]}>{category.name}</Text>
               <TouchableOpacity onPress={() => handleDelete(category.id)} style={styles.deleteBtn}>
                 <Text style={styles.deleteText}>🗑️</Text>
               </TouchableOpacity>
@@ -184,33 +187,33 @@ const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       {/* Form Modal */}
       <Modal visible={showForm} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: colors.cardBg }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
                 {editingCategory ? 'Sửa Danh Mục' : 'Thêm Danh Mục'}
               </Text>
               <TouchableOpacity onPress={resetForm}>
-                <Text style={styles.closeButton}>✕</Text>
+                <Text style={[styles.closeButton, { color: colors.textSecondary }]}>✕</Text>
               </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.form}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Loại *</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Loại *</Text>
                 <View style={styles.typeSelector}>
                   <TouchableOpacity
-                    style={[styles.typeButton, formData.type === 'expense' && styles.typeButtonActive]}
+                    style={[styles.typeButton, { borderColor: colors.border }, formData.type === 'expense' && { borderColor: colors.primary, backgroundColor: colors.primaryLight }]}
                     onPress={() => setFormData({ ...formData, type: 'expense' })}
                   >
-                    <Text style={[styles.typeButtonText, formData.type === 'expense' && styles.typeButtonTextActive]}>
+                    <Text style={[styles.typeButtonText, { color: colors.textSecondary }, formData.type === 'expense' && { color: colors.primary, fontWeight: '600' }]}>
                       💸 Chi Tiêu
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.typeButton, formData.type === 'income' && styles.typeButtonActive]}
+                    style={[styles.typeButton, { borderColor: colors.border }, formData.type === 'income' && { borderColor: colors.primary, backgroundColor: colors.primaryLight }]}
                     onPress={() => setFormData({ ...formData, type: 'income' })}
                   >
-                    <Text style={[styles.typeButtonText, formData.type === 'income' && styles.typeButtonTextActive]}>
+                    <Text style={[styles.typeButtonText, { color: colors.textSecondary }, formData.type === 'income' && { color: colors.primary, fontWeight: '600' }]}>
                       💰 Thu Nhập
                     </Text>
                   </TouchableOpacity>
@@ -218,17 +221,18 @@ const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Tên Danh Mục *</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Tên Danh Mục *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
                   value={formData.name}
                   onChangeText={(text) => setFormData({ ...formData, name: text })}
                   placeholder="Ví dụ: Lương, Ăn uống, Đi lại..."
+                  placeholderTextColor={colors.textSecondary}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Biểu Tượng</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Biểu Tượng</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.iconScroll}>
                   {icons.map((icon) => (
                     <TouchableOpacity
@@ -243,9 +247,9 @@ const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Màu Sắc</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Màu Sắc</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorScroll}>
-                  {colors.map((color) => (
+                  {colorOptions.map((color) => (
                     <TouchableOpacity
                       key={color}
                       style={[
@@ -261,7 +265,7 @@ const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
               <View style={styles.formButtons}>
                 <TouchableOpacity
-                  style={[styles.submitButton, submitting && styles.submitButtonDisabled]}
+                  style={[styles.submitButton, { backgroundColor: colors.primary }, submitting && styles.submitButtonDisabled]}
                   onPress={handleSubmit}
                   disabled={submitting}
                 >
@@ -273,8 +277,8 @@ const CategoriesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     </Text>
                   )}
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.cancelButton} onPress={resetForm}>
-                  <Text style={styles.cancelButtonText}>Hủy</Text>
+                <TouchableOpacity style={[styles.cancelButton, { backgroundColor: colors.border }]} onPress={resetForm}>
+                  <Text style={[styles.cancelButtonText, { color: colors.text }]}>Hủy</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -294,6 +298,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
   },
   header: {
     flexDirection: 'row',

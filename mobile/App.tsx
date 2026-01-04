@@ -1,8 +1,9 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
 
 // Screens
@@ -24,22 +25,28 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Loading Screen
-const LoadingScreen = () => (
-  <View style={styles.centered}>
-    <ActivityIndicator size="large" color="#2563eb" />
-    <Text style={styles.loadingText}>Đang tải...</Text>
-  </View>
-);
+const LoadingScreen = () => {
+  const { colors } = useTheme();
+  return (
+    <View style={[styles.centered, { backgroundColor: colors.background }]}>
+      <ActivityIndicator size="large" color={colors.primary} />
+      <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải...</Text>
+    </View>
+  );
+};
 
 // Main Tab Navigator (after login)
 const MainTabs = () => {
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#2563eb',
-        tabBarInactiveTintColor: '#6b7280',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
+          backgroundColor: colors.cardBg,
+          borderTopColor: colors.border,
           paddingBottom: 5,
           paddingTop: 5,
           height: 60,
@@ -113,13 +120,37 @@ const AppNavigator = () => {
   );
 };
 
+// Navigation Wrapper with theme
+const NavigationWrapper = () => {
+  const { colors, isDarkMode } = useTheme();
+
+  // Custom navigation theme
+  const navigationTheme = {
+    ...(!isDarkMode ? DefaultTheme : DarkTheme),
+    colors: {
+      ...(!isDarkMode ? DefaultTheme.colors : DarkTheme.colors),
+      background: colors.background,
+      card: colors.cardBg,
+      text: colors.text,
+      border: colors.border,
+      primary: colors.primary,
+    },
+  };
+
+  return (
+    <NavigationContainer theme={navigationTheme}>
+      <AppNavigator />
+    </NavigationContainer>
+  );
+};
+
 export default function App() {
   return (
-    <AuthProvider>
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <NavigationWrapper />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

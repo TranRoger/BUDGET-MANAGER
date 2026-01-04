@@ -11,16 +11,19 @@ import {
   Modal,
   RefreshControl,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { useTransactions } from '../hooks/useTransactions';
 import { categoryService, Category } from '../services/categoryService';
 import { Transaction } from '../services/transactionService';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { useTheme } from '../context/ThemeContext';
 
 const TransactionsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { colors } = useTheme();
   const { transactions, loading, createTransaction, updateTransaction, deleteTransaction, refetch } = useTransactions();
   const [categories, setCategories] = useState<Category[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [formData, setFormData] = useState({
@@ -127,16 +130,16 @@ const TransactionsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   if (loading && !refreshing) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2563eb" />
+      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Giao Dịch</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.text }]}>Giao Dịch</Text>
         <TouchableOpacity style={styles.addButton} onPress={() => setShowForm(true)}>
           <Text style={styles.addButtonText}>+ Thêm</Text>
         </TouchableOpacity>
@@ -152,21 +155,24 @@ const TransactionsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               key={transaction.id}
               style={[
                 styles.transactionItem,
-                transaction.type === 'income' ? styles.incomeItem : styles.expenseItem,
+                { backgroundColor: colors.cardBg, borderColor: colors.border },
+                transaction.type === 'income' 
+                  ? { backgroundColor: colors.successLight, borderLeftColor: colors.success } 
+                  : { backgroundColor: colors.dangerLight, borderLeftColor: colors.danger },
               ]}
               onPress={() => handleEdit(transaction)}
             >
               <View style={styles.transactionInfo}>
-                <Text style={styles.transactionDescription}>
+                <Text style={[styles.transactionDescription, { color: colors.text }]}>
                   {transaction.description || 'Không có mô tả'}
                 </Text>
-                <Text style={styles.transactionDate}>{formatDate(transaction.date)}</Text>
+                <Text style={[styles.transactionDate, { color: colors.textSecondary }]}>{formatDate(transaction.date)}</Text>
               </View>
               <View style={styles.transactionRight}>
                 <Text
                   style={[
                     styles.transactionAmount,
-                    transaction.type === 'income' ? styles.incomeAmount : styles.expenseAmount,
+                    { color: transaction.type === 'income' ? colors.success : colors.danger },
                   ]}
                 >
                   {transaction.type === 'income' ? '+' : '-'}
@@ -182,19 +188,27 @@ const TransactionsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </TouchableOpacity>
           ))
         ) : (
-          <Text style={styles.emptyText}>Chưa có giao dịch nào</Text>
+          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Chưa có giao dịch nào</Text>
         )}
       </ScrollView>
 
       {/* Form Modal */}
       <Modal visible={showForm} animationType="slide" transparent={true}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1}
+          onPress={resetForm}
+        >
+          <TouchableOpacity 
+            style={[styles.modalContent, { backgroundColor: colors.cardBg }]}
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
                 {editingTransaction ? 'Sửa Giao Dịch' : 'Thêm Giao Dịch'}
               </Text>
-              <TouchableOpacity onPress={resetForm}>
+              <TouchableOpacity onPress={resetForm} activeOpacity={0.7}>
                 <Text style={styles.closeButton}>✕</Text>
               </TouchableOpacity>
             </View>
@@ -205,6 +219,7 @@ const TransactionsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <TouchableOpacity
                   style={[styles.typeButton, formData.type === 'expense' && styles.typeButtonActive]}
                   onPress={() => setFormData({ ...formData, type: 'expense', category_id: 0 })}
+                  activeOpacity={0.7}
                 >
                   <Text
                     style={[
@@ -218,6 +233,7 @@ const TransactionsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <TouchableOpacity
                   style={[styles.typeButton, formData.type === 'income' && styles.typeButtonActive]}
                   onPress={() => setFormData({ ...formData, type: 'income', category_id: 0 })}
+                  activeOpacity={0.7}
                 >
                   <Text
                     style={[
@@ -231,57 +247,67 @@ const TransactionsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Số Tiền *</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Số Tiền *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
                   value={formData.amount}
                   onChangeText={(text) => setFormData({ ...formData, amount: text })}
                   placeholder="0"
+                  placeholderTextColor={colors.textSecondary}
                   keyboardType="numeric"
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Danh Mục *</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={formData.category_id}
-                    onValueChange={(value) => setFormData({ ...formData, category_id: value })}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="Chọn danh mục" value={0} />
-                    {filteredCategories.map((cat) => (
-                      <Picker.Item key={cat.id} label={cat.name} value={cat.id} />
-                    ))}
-                  </Picker>
-                </View>
+                <Text style={[styles.label, { color: colors.text }]}>Danh Mục *</Text>
+                <TouchableOpacity
+                  style={[styles.categorySelector, { backgroundColor: colors.inputBg, borderColor: colors.border }]}
+                  onPress={() => {
+                    console.log('Category selector pressed');
+                    setShowCategoryPicker(true);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.categorySelectorText, { color: formData.category_id === 0 ? colors.textSecondary : colors.text }]}>
+                    {formData.category_id === 0
+                      ? 'Chọn danh mục'
+                      : categories.find(c => c.id === formData.category_id)?.name || 'Chọn danh mục'}
+                  </Text>
+                  <Text style={[styles.dropdownIcon, { color: colors.textSecondary }]}>▼</Text>
+                </TouchableOpacity>
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Mô Tả *</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Mô Tả *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
                   value={formData.description}
                   onChangeText={(text) => setFormData({ ...formData, description: text })}
                   placeholder="Mô tả giao dịch"
+                  placeholderTextColor={colors.textSecondary}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Ngày *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.date}
-                  onChangeText={(text) => setFormData({ ...formData, date: text })}
-                  placeholder="YYYY-MM-DD"
-                />
+                <Text style={[styles.label, { color: colors.text }]}>Ngày *</Text>
+                <TouchableOpacity
+                  style={[styles.categorySelector, { backgroundColor: colors.inputBg, borderColor: colors.border }]}
+                  onPress={() => setShowDatePicker(true)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.categorySelectorText, { color: colors.text }]}>
+                    {formData.date || 'Chọn ngày'}
+                  </Text>
+                  <Text style={[styles.dropdownIcon, { color: colors.textSecondary }]}>📅</Text>
+                </TouchableOpacity>
               </View>
 
               <View style={styles.formButtons}>
                 <TouchableOpacity
-                  style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]}
+                  style={[styles.submitButton, { backgroundColor: colors.primary }, isSubmitting && styles.submitButtonDisabled]}
                   onPress={handleSubmit}
                   disabled={isSubmitting}
+                  activeOpacity={0.7}
                 >
                   {isSubmitting ? (
                     <ActivityIndicator color="#fff" />
@@ -291,13 +317,142 @@ const TransactionsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     </Text>
                   )}
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.cancelButton} onPress={resetForm}>
-                  <Text style={styles.cancelButtonText}>Hủy</Text>
+                <TouchableOpacity 
+                  style={[styles.cancelButton, { backgroundColor: colors.border }]} 
+                  onPress={resetForm}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.cancelButtonText, { color: colors.text }]}>Hủy</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
-          </View>
-        </View>
+
+            {/* Category Picker Overlay - Inside Form Modal */}
+            {showCategoryPicker && (
+              <View style={styles.categoryPickerOverlay}>
+                <TouchableOpacity
+                  style={styles.categoryPickerBackdrop}
+                  activeOpacity={1}
+                  onPress={() => setShowCategoryPicker(false)}
+                />
+                <View style={[styles.categoryPickerModal, { backgroundColor: colors.cardBg }]}>
+                  <View style={[styles.categoryPickerHeader, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.categoryPickerTitle, { color: colors.text }]}>Chọn Danh Mục</Text>
+                    <TouchableOpacity 
+                      onPress={() => setShowCategoryPicker(false)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.categoryPickerCloseButton, { color: colors.text }]}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <ScrollView style={styles.categoryList}>
+                    {filteredCategories.map((category) => (
+                      <TouchableOpacity
+                        key={category.id}
+                        style={[
+                          styles.categoryOption,
+                          { borderBottomColor: colors.border },
+                          formData.category_id === category.id && [styles.categoryOptionSelected, { backgroundColor: colors.primaryLight }],
+                        ]}
+                        onPress={() => {
+                          console.log('Category selected:', category.name);
+                          setFormData({ ...formData, category_id: category.id });
+                          setShowCategoryPicker(false);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.categoryOptionContent}>
+                          {Boolean(category.icon) && <Text style={styles.categoryIcon}>{category.icon}</Text>}
+                          <Text
+                            style={[
+                              styles.categoryOptionText,
+                              { color: colors.text },
+                              formData.category_id === category.id && [styles.categoryOptionTextSelected, { color: colors.primary }],
+                            ]}
+                          >
+                            {category.name}
+                          </Text>
+                        </View>
+                        {formData.category_id === category.id && (
+                          <Text style={[styles.checkmark, { color: colors.primary }]}>✓</Text>
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              </View>
+            )}
+
+            {/* Date Picker Overlay */}
+            {showDatePicker && (
+              <View style={styles.pickerOverlay}>
+                <TouchableOpacity
+                  style={styles.pickerBackdrop}
+                  activeOpacity={1}
+                  onPress={() => setShowDatePicker(false)}
+                />
+                <View style={[styles.pickerModal, { backgroundColor: colors.cardBg }]}>
+                  <View style={[styles.pickerHeader, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.pickerTitle, { color: colors.text }]}>Chọn Ngày</Text>
+                    <TouchableOpacity 
+                      onPress={() => setShowDatePicker(false)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[styles.categoryPickerCloseButton, { color: colors.text }]}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.datePickerContent}>
+                    <View style={styles.dateInputRow}>
+                      <TextInput
+                        style={[styles.dateInput, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
+                        value={formData.date}
+                        onChangeText={(text) => setFormData({ ...formData, date: text })}
+                        placeholder="YYYY-MM-DD"
+                        placeholderTextColor={colors.textSecondary}
+                      />
+                    </View>
+                    <View style={styles.quickDateButtons}>
+                      <TouchableOpacity
+                        style={[styles.quickDateButton, { backgroundColor: colors.primary }]}
+                        onPress={() => {
+                          setFormData({ ...formData, date: new Date().toISOString().split('T')[0] });
+                          setShowDatePicker(false);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.quickDateButtonText}>Hôm nay</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.quickDateButton, { backgroundColor: colors.primary }]}
+                        onPress={() => {
+                          const yesterday = new Date();
+                          yesterday.setDate(yesterday.getDate() - 1);
+                          setFormData({ ...formData, date: yesterday.toISOString().split('T')[0] });
+                          setShowDatePicker(false);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.quickDateButtonText}>Hôm qua</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.quickDateButton, { backgroundColor: colors.primary }]}
+                        onPress={() => {
+                          const lastWeek = new Date();
+                          lastWeek.setDate(lastWeek.getDate() - 7);
+                          setFormData({ ...formData, date: lastWeek.toISOString().split('T')[0] });
+                          setShowDatePicker(false);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={styles.quickDateButtonText}>7 ngày trước</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            )}
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
@@ -468,14 +623,180 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
   },
-  pickerContainer: {
+  categorySelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e5e7eb',
     borderRadius: 8,
-    overflow: 'hidden',
+    padding: 12,
+    backgroundColor: '#fff',
   },
-  picker: {
-    height: 50,
+  categorySelectorText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  dropdownIcon: {
+    fontSize: 12,
+    color: '#9ca3af',
+  },
+  categoryPickerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  categoryPickerBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  categoryPickerModal: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    width: '90%',
+    maxHeight: '70%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  categoryPickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  categoryPickerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  categoryPickerCloseButton: {
+    fontSize: 24,
+    color: '#6b7280',
+    fontWeight: 'bold',
+  },
+  categoryList: {
+    maxHeight: 400,
+  },
+  categoryOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  categoryOptionSelected: {
+    backgroundColor: '#eff6ff',
+  },
+  categoryOptionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  categoryIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  categoryOptionText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  categoryOptionTextSelected: {
+    color: '#2563eb',
+    fontWeight: '600',
+  },
+  checkmark: {
+    fontSize: 20,
+    color: '#2563eb',
+    fontWeight: 'bold',
+  },
+  pickerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  pickerBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  pickerModal: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    width: '90%',
+    maxHeight: '70%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  pickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
+  },
+  pickerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  datePickerContent: {
+    padding: 20,
+  },
+  dateInputRow: {
+    marginBottom: 16,
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  quickDateButtons: {
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
+  },
+  quickDateButton: {
+    flex: 1,
+    backgroundColor: '#eff6ff',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2563eb',
+    alignItems: 'center',
+  },
+  quickDateButtonText: {
+    color: '#2563eb',
+    fontSize: 14,
+    fontWeight: '600',
   },
   formButtons: {
     gap: 12,

@@ -6,8 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
 
 const FinanceMenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { colors } = useTheme();
   const menuItems = [
     {
       id: 'transactions',
@@ -60,17 +62,17 @@ const FinanceMenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   ];
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>💼 Quản Lý Tài Chính</Text>
-        <Text style={styles.subtitle}>Chọn chức năng bạn muốn sử dụng</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.text }]}>💼 Quản Lý Tài Chính</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Chọn chức năng bạn muốn sử dụng</Text>
       </View>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         {menuItems.map((item) => (
           <TouchableOpacity
             key={item.id}
-            style={[styles.menuCard, { borderLeftColor: item.color }]}
+            style={[styles.menuCard, { backgroundColor: colors.cardBg, borderColor: colors.border, borderLeftColor: item.color }]}
             onPress={() => navigation.navigate(item.screen)}
             activeOpacity={0.7}
           >
@@ -78,10 +80,10 @@ const FinanceMenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               <Text style={styles.icon}>{item.icon}</Text>
             </View>
             <View style={styles.textContainer}>
-              <Text style={styles.menuTitle}>{item.title}</Text>
-              <Text style={styles.menuDescription}>{item.description}</Text>
+              <Text style={[styles.menuTitle, { color: colors.text }]}>{item.title}</Text>
+              <Text style={[styles.menuDescription, { color: colors.textSecondary }]}>{item.description}</Text>
             </View>
-            <Text style={styles.arrow}>›</Text>
+            <Text style={[styles.arrow, { color: colors.textSecondary }]}>›</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>

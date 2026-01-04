@@ -11,12 +11,14 @@ import {
 import { reportService, FinancialSummary } from '../services/reportService';
 import { transactionService, Transaction } from '../services/transactionService';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { useTheme } from '../context/ThemeContext';
 
 const DashboardScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { colors, isDarkMode, toggleDarkMode } = useTheme();
 
   useEffect(() => {
     fetchSummary();
@@ -50,20 +52,20 @@ const DashboardScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2563eb" />
-        <Text style={styles.loadingText}>Đang tải...</Text>
+      <View style={[styles.centered, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải...</Text>
       </View>
     );
   }
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      <View style={styles.header}>
-        <Text style={styles.title}>Tổng Quan</Text>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.text }]}>Tổng Quan</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Text style={{ fontSize: 24 }}>⚙️</Text>
         </TouchableOpacity>
@@ -71,29 +73,29 @@ const DashboardScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
       {/* Summary Cards */}
       <View style={styles.summaryGrid}>
-        <View style={[styles.card, styles.incomeCard]}>
+        <View style={[styles.card, { backgroundColor: colors.successLight }]}>
           <Text style={styles.cardIcon}>💵</Text>
-          <Text style={styles.cardLabel}>Tổng Thu Nhập</Text>
-          <Text style={[styles.cardValue, styles.incomeValue]}>
+          <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>Tổng Thu Nhập</Text>
+          <Text style={[styles.cardValue, { color: colors.success }]}>
             {formatCurrency(summary?.totalIncome || 0)}
           </Text>
         </View>
 
-        <View style={[styles.card, styles.expenseCard]}>
+        <View style={[styles.card, { backgroundColor: colors.dangerLight }]}>
           <Text style={styles.cardIcon}>💸</Text>
-          <Text style={styles.cardLabel}>Tổng Chi Tiêu</Text>
-          <Text style={[styles.cardValue, styles.expenseValue]}>
+          <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>Tổng Chi Tiêu</Text>
+          <Text style={[styles.cardValue, { color: colors.danger }]}>
             {formatCurrency(summary?.totalExpense || 0)}
           </Text>
         </View>
 
-        <View style={[styles.card, styles.savingsCard]}>
+        <View style={[styles.card, { backgroundColor: colors.primaryLight }]}>
           <Text style={styles.cardIcon}>💰</Text>
-          <Text style={styles.cardLabel}>Tiết Kiệm Ròng</Text>
+          <Text style={[styles.cardLabel, { color: colors.textSecondary }]}>Tiết Kiệm Ròng</Text>
           <Text
             style={[
               styles.cardValue,
-              (summary?.netSavings || 0) >= 0 ? styles.savingsPositive : styles.savingsNegative,
+              { color: (summary?.netSavings || 0) >= 0 ? colors.success : colors.danger },
             ]}
           >
             {formatCurrency(summary?.netSavings || 0)}
@@ -103,22 +105,22 @@ const DashboardScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
       {/* AI Spending Plan Button */}
       <TouchableOpacity
-        style={styles.aiPlanButton}
+        style={[styles.aiPlanButton, { backgroundColor: colors.cardBg, borderColor: colors.border }]}
         onPress={() => navigation.navigate('AISpendingPlan')}
       >
         <Text style={styles.aiPlanIcon}>🤖</Text>
         <View style={styles.aiPlanContent}>
-          <Text style={styles.aiPlanTitle}>Kế Hoạch Chi Tiêu AI</Text>
-          <Text style={styles.aiPlanSubtitle}>Tạo kế hoạch tài chính thông minh →</Text>
+          <Text style={[styles.aiPlanTitle, { color: colors.text }]}>Kế Hoạch Chi Tiêu AI</Text>
+          <Text style={[styles.aiPlanSubtitle, { color: colors.textSecondary }]}>Tạo kế hoạch tài chính thông minh →</Text>
         </View>
       </TouchableOpacity>
 
       {/* Recent Transactions */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Giao Dịch Gần Đây</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Giao Dịch Gần Đây</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Transactions')}>
-            <Text style={styles.seeAllText}>Xem tất cả →</Text>
+            <Text style={[styles.seeAllText, { color: colors.primary }]}>Xem tất cả →</Text>
           </TouchableOpacity>
         </View>
 
@@ -129,23 +131,22 @@ const DashboardScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 key={transaction.id}
                 style={[
                   styles.transactionItem,
+                  { backgroundColor: colors.cardBg, borderColor: colors.border },
                   transaction.type === 'income'
-                    ? styles.transactionIncome
-                    : styles.transactionExpense,
+                    ? { borderLeftColor: colors.success, backgroundColor: colors.successLight }
+                    : { borderLeftColor: colors.danger, backgroundColor: colors.dangerLight },
                 ]}
               >
                 <View style={styles.transactionInfo}>
-                  <Text style={styles.transactionDescription}>
+                  <Text style={[styles.transactionDescription, { color: colors.text }]}>
                     {transaction.description || 'Không có mô tả'}
                   </Text>
-                  <Text style={styles.transactionDate}>{formatDate(transaction.date)}</Text>
+                  <Text style={[styles.transactionDate, { color: colors.textSecondary }]}>{formatDate(transaction.date)}</Text>
                 </View>
                 <Text
                   style={[
                     styles.transactionAmount,
-                    transaction.type === 'income'
-                      ? styles.transactionAmountIncome
-                      : styles.transactionAmountExpense,
+                    { color: transaction.type === 'income' ? colors.success : colors.danger },
                   ]}
                 >
                   {transaction.type === 'income' ? '+' : '-'}
@@ -155,34 +156,34 @@ const DashboardScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             ))}
           </View>
         ) : (
-          <Text style={styles.emptyText}>Chưa có giao dịch nào</Text>
+          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Chưa có giao dịch nào</Text>
         )}
       </View>
 
       {/* Category Breakdown */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Phân Loại Chi Tiêu</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Phân Loại Chi Tiêu</Text>
         {summary?.categoryBreakdown && summary.categoryBreakdown.length > 0 ? (
           <View style={styles.categoryList}>
-            {summary.categoryBreakdown
-              .filter((cat) => cat.total > 0)
-              .slice(0, 6)
-              .map((cat, index) => (
-                <View key={index} style={styles.categoryItem}>
-                  <Text style={styles.categoryName}>{cat.name}</Text>
-                  <Text
-                    style={[
-                      styles.categoryAmount,
-                      cat.type === 'expense' ? styles.expenseValue : styles.incomeValue,
-                    ]}
-                  >
-                    {formatCurrency(cat.total)}
-                  </Text>
-                </View>
-              ))}
+        {summary.categoryBreakdown
+          .filter((cat) => cat.total > 0)
+          .slice(0, 6)
+          .map((cat, index) => (
+            <View key={cat.name + index} style={[styles.categoryItem, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
+          <Text style={[styles.categoryName, { color: colors.text }]}>{cat.name}</Text>
+          <Text
+            style={[
+              styles.categoryAmount,
+              { color: cat.type === 'expense' ? colors.danger : colors.success },
+            ]}
+          >
+            {formatCurrency(cat.total)}
+          </Text>
+            </View>
+          ))}
           </View>
         ) : (
-          <Text style={styles.emptyText}>Chưa có dữ liệu phân loại</Text>
+          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Chưa có dữ liệu phân loại</Text>
         )}
       </View>
     </ScrollView>

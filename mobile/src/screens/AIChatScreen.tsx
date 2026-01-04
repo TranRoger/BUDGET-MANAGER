@@ -11,8 +11,10 @@ import {
   Platform,
 } from 'react-native';
 import { aiService, ChatMessage } from '../services/aiService';
+import { useTheme } from '../context/ThemeContext';
 
 const AIChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { colors } = useTheme();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -55,15 +57,15 @@ const AIChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={0}
     >
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>← Quay lại</Text>
+          <Text style={[styles.backButton, { color: colors.primary }]}>← Quay lại</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>🤖 AI Trợ Lý</Text>
+        <Text style={[styles.title, { color: colors.text }]}>🤖 AI Trợ Lý</Text>
         <View style={{ width: 60 }} />
       </View>
 
@@ -75,23 +77,23 @@ const AIChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         {messages.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>👋 Xin chào!</Text>
-            <Text style={styles.emptySubtitle}>Tôi là trợ lý tài chính AI. Hỏi tôi về:</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>Tôi là trợ lý tài chính AI. Hỏi tôi về:</Text>
             <View style={styles.suggestionsList}>
-              <View style={styles.suggestionItem}>
+              <View style={[styles.suggestionItem, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
                 <Text style={styles.suggestionIcon}>💰</Text>
-                <Text style={styles.suggestionText}>Lời khuyên về ngân sách</Text>
+                <Text style={[styles.suggestionText, { color: colors.text }]}>Lời khuyên về ngân sách</Text>
               </View>
-              <View style={styles.suggestionItem}>
+              <View style={[styles.suggestionItem, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
                 <Text style={styles.suggestionIcon}>📊</Text>
-                <Text style={styles.suggestionText}>Phân tích chi tiêu</Text>
+                <Text style={[styles.suggestionText, { color: colors.text }]}>Phân tích chi tiêu</Text>
               </View>
-              <View style={styles.suggestionItem}>
+              <View style={[styles.suggestionItem, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
                 <Text style={styles.suggestionIcon}>💡</Text>
-                <Text style={styles.suggestionText}>Mẹo tiết kiệm</Text>
+                <Text style={[styles.suggestionText, { color: colors.text }]}>Mẹo tiết kiệm</Text>
               </View>
-              <View style={styles.suggestionItem}>
+              <View style={[styles.suggestionItem, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
                 <Text style={styles.suggestionIcon}>📈</Text>
-                <Text style={styles.suggestionText}>Kế hoạch tài chính</Text>
+                <Text style={[styles.suggestionText, { color: colors.text }]}>Kế hoạch tài chính</Text>
               </View>
             </View>
           </View>
@@ -104,19 +106,19 @@ const AIChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 msg.role === 'user' ? styles.userMessageWrapper : styles.assistantMessageWrapper,
               ]}
             >
-              <View style={styles.avatarContainer}>
+              <View style={[styles.avatarContainer, { backgroundColor: colors.border }]}>
                 <Text style={styles.avatar}>{msg.role === 'user' ? '👤' : '🤖'}</Text>
               </View>
               <View
                 style={[
                   styles.messageBubble,
-                  msg.role === 'user' ? styles.userBubble : styles.assistantBubble,
+                  msg.role === 'user' ? [styles.userBubble, { backgroundColor: colors.primary }] : [styles.assistantBubble, { backgroundColor: colors.cardBg, borderColor: colors.border }],
                 ]}
               >
                 <Text
                   style={[
                     styles.messageText,
-                    msg.role === 'user' ? styles.userText : styles.assistantText,
+                    msg.role === 'user' ? styles.userText : { color: colors.text },
                   ]}
                 >
                   {msg.content}
@@ -127,29 +129,30 @@ const AIChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         )}
         {loading && (
           <View style={styles.messageWrapper}>
-            <View style={styles.avatarContainer}>
+            <View style={[styles.avatarContainer, { backgroundColor: colors.border }]}>
               <Text style={styles.avatar}>🤖</Text>
             </View>
-            <View style={[styles.messageBubble, styles.assistantBubble]}>
-              <ActivityIndicator color="#6b7280" />
-              <Text style={styles.loadingText}>Đang suy nghĩ...</Text>
+            <View style={[styles.messageBubble, styles.assistantBubble, { backgroundColor: colors.cardBg, borderColor: colors.border }]}>
+              <ActivityIndicator color={colors.primary} />
+              <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang suy nghĩ...</Text>
             </View>
           </View>
         )}
       </ScrollView>
 
-      <View style={styles.inputContainer}>
+      <View style={[styles.inputContainer, { backgroundColor: colors.cardBg, borderTopColor: colors.border }]}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.inputBg, color: colors.text }]}
           value={input}
           onChangeText={setInput}
           placeholder="Nhập câu hỏi của bạn..."
+          placeholderTextColor={colors.textSecondary}
           multiline
           maxLength={500}
           editable={!loading}
         />
         <TouchableOpacity
-          style={[styles.sendButton, (!input.trim() || loading) && styles.sendButtonDisabled]}
+          style={[styles.sendButton, { backgroundColor: colors.primary }, (!input.trim() || loading) && { backgroundColor: colors.border }]}
           onPress={handleSend}
           disabled={!input.trim() || loading}
         >

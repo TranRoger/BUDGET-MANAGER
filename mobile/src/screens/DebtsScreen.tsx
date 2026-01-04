@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import { debtService, Debt, CreateDebtData, DebtTransaction } from '../services/debtService';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { useTheme } from '../context/ThemeContext';
 
 const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { colors } = useTheme();
   const [debts, setDebts] = useState<Debt[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -179,34 +181,34 @@ const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2563eb" />
-        <Text style={styles.loadingText}>Đang tải...</Text>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>← Quay lại</Text>
+          <Text style={[styles.backButton, { color: colors.primary }]}>← Quay lại</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>💸 Quản Lý Nợ</Text>
+        <Text style={[styles.title, { color: colors.text }]}>💸 Quản Lý Nợ</Text>
         <TouchableOpacity onPress={() => { resetForm(); setEditingDebt(null); setShowForm(true); }}>
-          <Text style={styles.addButton}>+</Text>
+          <Text style={[styles.addButton, { color: colors.primary }]}>+</Text>
         </TouchableOpacity>
       </View>
 
       {/* Stats Cards */}
       {stats && (
         <View style={styles.statsContainer}>
-          <View style={[styles.statCard, { backgroundColor: '#fef2f2' }]}>
-            <Text style={styles.statLabel}>Tổng Khoản Nợ</Text>
-            <Text style={[styles.statValue, { color: '#ef4444' }]}>{stats.total_debts}</Text>
+          <View style={[styles.statCard, { backgroundColor: colors.dangerLight }]}>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Tổng Khoản Nợ</Text>
+            <Text style={[styles.statValue, { color: colors.danger }]}>{stats.total_debts}</Text>
           </View>
-          <View style={[styles.statCard, { backgroundColor: '#fef2f2' }]}>
-            <Text style={styles.statLabel}>Tổng Số Tiền</Text>
-            <Text style={[styles.statValue, { color: '#ef4444' }]}>
+          <View style={[styles.statCard, { backgroundColor: colors.dangerLight }]}>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Tổng Số Tiền</Text>
+            <Text style={[styles.statValue, { color: colors.danger }]}>
               {formatCurrency(stats.total_amount)}
             </Text>
           </View>
@@ -216,10 +218,10 @@ const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <ScrollView style={styles.content}>
         {debts.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>💸</Text>
-            <Text style={styles.emptyText}>Chưa có khoản nợ nào</Text>
+            <Text style={[styles.emptyIcon, { color: colors.textSecondary }]}>💸</Text>
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Chưa có khoản nợ nào</Text>
             <TouchableOpacity
-              style={styles.emptyButton}
+              style={[styles.emptyButton, { backgroundColor: colors.primary }]}
               onPress={() => { resetForm(); setShowForm(true); }}
             >
               <Text style={styles.emptyButtonText}>Thêm Khoản Nợ</Text>
@@ -227,49 +229,49 @@ const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </View>
         ) : (
           debts.map((debt) => (
-            <View key={debt.id} style={styles.debtCard}>
+            <View key={debt.id} style={[styles.debtCard, { backgroundColor: colors.cardBg }]}>
               <TouchableOpacity onPress={() => toggleExpand(debt.id)}>
                 <View style={styles.debtHeader}>
                   <View style={styles.debtInfo}>
-                    <Text style={styles.debtName}>{debt.name}</Text>
-                    <Text style={styles.debtAmount}>{formatCurrency(debt.amount)}</Text>
+                    <Text style={[styles.debtName, { color: colors.text }]}>{debt.name}</Text>
+                    <Text style={[styles.debtAmount, { color: colors.danger }]}>{formatCurrency(debt.amount)}</Text>
                     {debt.remaining_amount !== undefined && (
-                      <Text style={styles.debtRemaining}>
+                      <Text style={[styles.debtRemaining, { color: colors.textSecondary }]}>
                         Còn lại: {formatCurrency(debt.remaining_amount)}
                       </Text>
                     )}
                   </View>
-                  <Text style={styles.expandIcon}>{expandedDebtId === debt.id ? '▼' : '▶'}</Text>
+                  <Text style={[styles.expandIcon, { color: colors.textSecondary }]}>{expandedDebtId === debt.id ? '▼' : '▶'}</Text>
                 </View>
               </TouchableOpacity>
 
               {expandedDebtId === debt.id && (
-                <View style={styles.debtDetails}>
+                <View style={[styles.debtDetails, { borderTopColor: colors.border }]}>
                   {debt.interest_rate && (
-                    <Text style={styles.detailText}>Lãi suất: {debt.interest_rate}%</Text>
+                    <Text style={[styles.detailText, { color: colors.textSecondary }]}>Lãi suất: {debt.interest_rate}%</Text>
                   )}
                   {debt.due_date && (
-                    <Text style={styles.detailText}>Hạn trả: {formatDate(debt.due_date)}</Text>
+                    <Text style={[styles.detailText, { color: colors.textSecondary }]}>Hạn trả: {formatDate(debt.due_date)}</Text>
                   )}
                   {debt.description && (
-                    <Text style={styles.detailText}>Ghi chú: {debt.description}</Text>
+                    <Text style={[styles.detailText, { color: colors.textSecondary }]}>Ghi chú: {debt.description}</Text>
                   )}
 
                   <View style={styles.actionButtons}>
                     <TouchableOpacity
-                      style={[styles.actionButton, { backgroundColor: '#10b981' }]}
+                      style={[styles.actionButton, { backgroundColor: colors.success }]}
                       onPress={() => setShowTransactionForm(debt.id)}
                     >
                       <Text style={styles.actionButtonText}>Thanh Toán</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.actionButton, { backgroundColor: '#3b82f6' }]}
+                      style={[styles.actionButton, { backgroundColor: colors.primary }]}
                       onPress={() => openEditForm(debt)}
                     >
                       <Text style={styles.actionButtonText}>Sửa</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.actionButton, { backgroundColor: '#ef4444' }]}
+                      style={[styles.actionButton, { backgroundColor: colors.danger }]}
                       onPress={() => handleDelete(debt.id)}
                     >
                       <Text style={styles.actionButtonText}>Xóa</Text>
@@ -278,20 +280,20 @@ const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
                   {/* Transactions */}
                   {debtTransactions[debt.id] && debtTransactions[debt.id].length > 0 && (
-                    <View style={styles.transactionsSection}>
-                      <Text style={styles.transactionsTitle}>Lịch Sử Giao Dịch</Text>
+                    <View style={[styles.transactionsSection, { borderTopColor: colors.border }]}>
+                      <Text style={[styles.transactionsTitle, { color: colors.text }]}>Lịch Sử Giao Dịch</Text>
                       {debtTransactions[debt.id].map((trans) => (
-                        <View key={trans.id} style={styles.transactionItem}>
+                        <View key={trans.id} style={[styles.transactionItem, { borderBottomColor: colors.border }]}>
                           <View>
-                            <Text style={styles.transactionType}>
+                            <Text style={[styles.transactionType, { color: colors.text }]}>
                               {trans.type === 'payment' ? '💰 Thanh toán' : '📈 Tăng nợ'}
                             </Text>
-                            <Text style={styles.transactionDate}>{formatDate(trans.date)}</Text>
+                            <Text style={[styles.transactionDate, { color: colors.textSecondary }]}>{formatDate(trans.date)}</Text>
                           </View>
                           <Text
                             style={[
                               styles.transactionAmount,
-                              trans.type === 'payment' ? { color: '#10b981' } : { color: '#ef4444' },
+                              trans.type === 'payment' ? { color: colors.success } : { color: colors.danger },
                             ]}
                           >
                             {trans.type === 'payment' ? '-' : '+'}
@@ -311,44 +313,49 @@ const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       {/* Form Modal */}
       <Modal visible={showForm} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
+          <View style={[styles.modalContent, { backgroundColor: colors.cardBg }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
               {editingDebt ? 'Sửa Khoản Nợ' : 'Thêm Khoản Nợ'}
             </Text>
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
               placeholder="Tên khoản nợ *"
+              placeholderTextColor={colors.textSecondary}
               value={formData.name}
               onChangeText={(text) => setFormData({ ...formData, name: text })}
             />
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
               placeholder="Số tiền *"
+              placeholderTextColor={colors.textSecondary}
               keyboardType="numeric"
               value={formData.amount?.toString()}
               onChangeText={(text) => setFormData({ ...formData, amount: Number(text) || 0 })}
             />
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
               placeholder="Lãi suất (%)"
+              placeholderTextColor={colors.textSecondary}
               keyboardType="numeric"
               value={formData.interest_rate?.toString() || ''}
               onChangeText={(text) => setFormData({ ...formData, interest_rate: Number(text) || undefined })}
             />
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
               placeholder="Hạn trả (YYYY-MM-DD)"
+              placeholderTextColor={colors.textSecondary}
               value={formData.due_date}
               onChangeText={(text) => setFormData({ ...formData, due_date: text })}
             />
 
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[styles.input, styles.textArea, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
               placeholder="Ghi chú"
+              placeholderTextColor={colors.textSecondary}
               multiline
               numberOfLines={3}
               value={formData.description}
@@ -357,13 +364,13 @@ const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
+                style={[styles.modalButton, styles.cancelButton, { backgroundColor: colors.cardBg }]}
                 onPress={() => { setShowForm(false); setEditingDebt(null); }}
               >
-                <Text style={styles.cancelButtonText}>Hủy</Text>
+                <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, styles.saveButton]}
+                style={[styles.modalButton, styles.saveButton, { backgroundColor: colors.primary }]}
                 onPress={handleSubmit}
               >
                 <Text style={styles.saveButtonText}>Lưu</Text>
@@ -376,21 +383,23 @@ const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       {/* Transaction Form Modal */}
       <Modal visible={showTransactionForm !== null} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Thêm Giao Dịch</Text>
+          <View style={[styles.modalContent, { backgroundColor: colors.cardBg }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Thêm Giao Dịch</Text>
 
             <View style={styles.typeSelector}>
               <TouchableOpacity
                 style={[
                   styles.typeButton,
-                  transactionFormData.type === 'payment' && styles.typeButtonActive,
+                  { borderColor: colors.border },
+                  transactionFormData.type === 'payment' && [styles.typeButtonActive, { borderColor: colors.primary, backgroundColor: colors.primaryLight }],
                 ]}
                 onPress={() => setTransactionFormData({ ...transactionFormData, type: 'payment' })}
               >
                 <Text
                   style={[
                     styles.typeButtonText,
-                    transactionFormData.type === 'payment' && styles.typeButtonTextActive,
+                    { color: colors.textSecondary },
+                    transactionFormData.type === 'payment' && [styles.typeButtonTextActive, { color: colors.primary }],
                   ]}
                 >
                   💰 Thanh Toán
@@ -399,14 +408,16 @@ const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               <TouchableOpacity
                 style={[
                   styles.typeButton,
-                  transactionFormData.type === 'increase' && styles.typeButtonActive,
+                  { borderColor: colors.border },
+                  transactionFormData.type === 'increase' && [styles.typeButtonActive, { borderColor: colors.primary, backgroundColor: colors.primaryLight }],
                 ]}
                 onPress={() => setTransactionFormData({ ...transactionFormData, type: 'increase' })}
               >
                 <Text
                   style={[
                     styles.typeButtonText,
-                    transactionFormData.type === 'increase' && styles.typeButtonTextActive,
+                    { color: colors.textSecondary },
+                    transactionFormData.type === 'increase' && [styles.typeButtonTextActive, { color: colors.primary }],
                   ]}
                 >
                   📈 Tăng Nợ
@@ -415,23 +426,26 @@ const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </View>
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
               placeholder="Số tiền *"
+              placeholderTextColor={colors.textSecondary}
               keyboardType="numeric"
               value={transactionFormData.amount}
               onChangeText={(text) => setTransactionFormData({ ...transactionFormData, amount: text })}
             />
 
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
               placeholder="Ngày giao dịch"
+              placeholderTextColor={colors.textSecondary}
               value={transactionFormData.date}
               onChangeText={(text) => setTransactionFormData({ ...transactionFormData, date: text })}
             />
 
             <TextInput
-              style={[styles.input, styles.textArea]}
+              style={[styles.input, styles.textArea, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
               placeholder="Ghi chú"
+              placeholderTextColor={colors.textSecondary}
               multiline
               numberOfLines={3}
               value={transactionFormData.description}
@@ -440,13 +454,13 @@ const DebtsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
+                style={[styles.modalButton, styles.cancelButton, { backgroundColor: colors.cardBg }]}
                 onPress={() => { setShowTransactionForm(null); resetTransactionForm(); }}
               >
-                <Text style={styles.cancelButtonText}>Hủy</Text>
+                <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, styles.saveButton]}
+                style={[styles.modalButton, styles.saveButton, { backgroundColor: colors.primary }]}
                 onPress={() => showTransactionForm && handleTransactionSubmit(showTransactionForm)}
               >
                 <Text style={styles.saveButtonText}>Lưu</Text>

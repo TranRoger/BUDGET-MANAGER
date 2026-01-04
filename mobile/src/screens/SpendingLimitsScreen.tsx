@@ -14,8 +14,10 @@ import { Picker } from '@react-native-picker/picker';
 import { spendingLimitService, SpendingLimit, CreateSpendingLimitDto } from '../services/spendingLimitService';
 import { categoryService, Category } from '../services/categoryService';
 import { formatCurrency } from '../utils/formatters';
+import { useTheme } from '../context/ThemeContext';
 
 const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { colors } = useTheme();
   const [limits, setLimits] = useState<SpendingLimit[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,9 +105,9 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
   };
 
   const getStatusColor = (percentage: number) => {
-    if (percentage >= 90) return '#ef4444';
-    if (percentage >= 70) return '#f59e0b';
-    return '#10b981';
+    if (percentage >= 90) return colors.danger;
+    if (percentage >= 70) return colors.warning;
+    return colors.success;
   };
 
   const getStatusText = (percentage: number) => {
@@ -118,31 +120,31 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#2563eb" />
-        <Text style={styles.loadingText}>Đang tải...</Text>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải...</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>← Quay lại</Text>
+          <Text style={[styles.backButton, { color: colors.primary }]}>← Quay lại</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>🚨 Giới Hạn Chi Tiêu</Text>
+        <Text style={[styles.title, { color: colors.text }]}>🚨 Giới Hạn Chi Tiêu</Text>
         <TouchableOpacity onPress={() => { resetForm(); setShowForm(true); }}>
-          <Text style={styles.addButton}>+</Text>
+          <Text style={[styles.addButton, { color: colors.primary }]}>+</Text>
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content}>
         {limits.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>🚨</Text>
-            <Text style={styles.emptyText}>Chưa có giới hạn chi tiêu nào</Text>
+            <Text style={[styles.emptyIcon, { color: colors.textSecondary }]}>🚨</Text>
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Chưa có giới hạn chi tiêu nào</Text>
             <TouchableOpacity
-              style={styles.emptyButton}
+              style={[styles.emptyButton, { backgroundColor: colors.primary }]}
               onPress={() => { resetForm(); setShowForm(true); }}
             >
               <Text style={styles.emptyButtonText}>Thêm Giới Hạn</Text>
@@ -155,13 +157,13 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
             const statusText = getStatusText(percentage);
 
             return (
-              <View key={limit.id} style={styles.limitCard}>
+              <View key={limit.id} style={[styles.limitCard, { backgroundColor: colors.cardBg }]}>
                 <View style={styles.limitHeader}>
                   <View style={styles.categoryInfo}>
                     {limit.icon && <Text style={styles.categoryIcon}>{limit.icon}</Text>}
                     <View>
-                      <Text style={styles.categoryName}>{limit.category_name}</Text>
-                      <Text style={styles.periodText}>
+                      <Text style={[styles.categoryName, { color: colors.text }]}>{limit.category_name}</Text>
+                      <Text style={[styles.periodText, { color: colors.textSecondary }]}>
                         {limit.period === 'daily' && 'Hàng ngày'}
                         {limit.period === 'weekly' && 'Hàng tuần'}
                         {limit.period === 'monthly' && 'Hàng tháng'}
@@ -175,7 +177,7 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                 </View>
 
                 <View style={styles.amountRow}>
-                  <Text style={styles.spentText}>
+                  <Text style={[styles.spentText, { color: colors.text }]}>
                     {formatCurrency(limit.spent || 0)} / {formatCurrency(limit.amount)}
                   </Text>
                   <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
@@ -183,7 +185,7 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                   </View>
                 </View>
 
-                <View style={styles.progressBarContainer}>
+                <View style={[styles.progressBarContainer, { backgroundColor: colors.border }]}>
                   <View
                     style={[
                       styles.progressBar,
@@ -192,7 +194,7 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
                   />
                 </View>
 
-                <Text style={styles.percentageText}>{percentage.toFixed(1)}% đã sử dụng</Text>
+                <Text style={[styles.percentageText, { color: colors.textSecondary }]}>{percentage.toFixed(1)}% đã sử dụng</Text>
               </View>
             );
           })
@@ -202,12 +204,12 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
       {/* Form Modal */}
       <Modal visible={showForm} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Thêm Giới Hạn Chi Tiêu</Text>
+          <View style={[styles.modalContent, { backgroundColor: colors.cardBg }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Thêm Giới Hạn Chi Tiêu</Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Danh mục chi tiêu</Text>
-              <View style={styles.pickerContainer}>
+              <Text style={[styles.label, { color: colors.text }]}>Danh mục chi tiêu</Text>
+              <View style={[styles.pickerContainer, { borderColor: colors.border }]}>
                 <Picker
                   selectedValue={formData.category_id}
                   onValueChange={(value) => setFormData({ ...formData, category_id: value })}
@@ -226,10 +228,11 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Số tiền giới hạn</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Số tiền giới hạn</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
                 placeholder="0"
+                placeholderTextColor={colors.textSecondary}
                 keyboardType="numeric"
                 value={formData.amount?.toString()}
                 onChangeText={(text) => setFormData({ ...formData, amount: Number(text) || 0 })}
@@ -237,8 +240,8 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Chu kỳ</Text>
-              <View style={styles.pickerContainer}>
+              <Text style={[styles.label, { color: colors.text }]}>Chu kỳ</Text>
+              <View style={[styles.pickerContainer, { borderColor: colors.border }]}>
                 <Picker
                   selectedValue={formData.period}
                   onValueChange={(value) => setFormData({ ...formData, period: value })}
@@ -254,19 +257,21 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 
             <View style={styles.dateRow}>
               <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                <Text style={styles.label}>Ngày bắt đầu</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Ngày bắt đầu</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
                   placeholder="YYYY-MM-DD"
+                  placeholderTextColor={colors.textSecondary}
                   value={formData.start_date}
                   onChangeText={(text) => setFormData({ ...formData, start_date: text })}
                 />
               </View>
               <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
-                <Text style={styles.label}>Ngày kết thúc</Text>
+                <Text style={[styles.label, { color: colors.text }]}>Ngày kết thúc</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { borderColor: colors.border, backgroundColor: colors.inputBg, color: colors.text }]}
                   placeholder="YYYY-MM-DD"
+                  placeholderTextColor={colors.textSecondary}
                   value={formData.end_date}
                   onChangeText={(text) => setFormData({ ...formData, end_date: text })}
                 />
@@ -275,13 +280,13 @@ const SpendingLimitsScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
+                style={[styles.modalButton, styles.cancelButton, { backgroundColor: colors.cardBg }]}
                 onPress={() => setShowForm(false)}
               >
-                <Text style={styles.cancelButtonText}>Hủy</Text>
+                <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalButton, styles.saveButton]}
+                style={[styles.modalButton, styles.saveButton, { backgroundColor: colors.primary }]}
                 onPress={handleSubmit}
               >
                 <Text style={styles.saveButtonText}>Lưu</Text>

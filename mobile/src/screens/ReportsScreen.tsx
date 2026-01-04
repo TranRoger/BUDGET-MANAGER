@@ -10,8 +10,10 @@ import {
 } from 'react-native';
 import { reportService, FinancialSummary, SpendingTrend, BudgetPerformance } from '../services/reportService';
 import { formatCurrency } from '../utils/formatters';
+import { useTheme } from '../context/ThemeContext';
 
 const ReportsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { colors } = useTheme();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
   const [trends, setTrends] = useState<SpendingTrend[]>([]);
@@ -86,35 +88,35 @@ const ReportsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const totalCategoryExpense = expenseCategories.reduce((sum, c) => sum + Number(c.total), 0);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>📊 Báo Cáo & Phân Tích</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.cardBg, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.text }]}>📊 Báo Cáo & Phân Tích</Text>
       </View>
 
       <ScrollView style={styles.content}>
         {/* Date Filter */}
-        <View style={styles.filterCard}>
+        <View style={[styles.filterCard, { backgroundColor: colors.cardBg }]}>
           <View style={styles.presetButtons}>
             <TouchableOpacity
-              style={styles.presetButton}
+              style={[styles.presetButton, { backgroundColor: colors.primary }]}
               onPress={() => setPresetRange('week')}
             >
               <Text style={styles.presetButtonText}>7 ngày</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.presetButton}
+              style={[styles.presetButton, { backgroundColor: colors.primary }]}
               onPress={() => setPresetRange('month')}
             >
               <Text style={styles.presetButtonText}>Tháng này</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.presetButton}
+              style={[styles.presetButton, { backgroundColor: colors.primary }]}
               onPress={() => setPresetRange('3months')}
             >
               <Text style={styles.presetButtonText}>3 tháng</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.presetButton}
+              style={[styles.presetButton, { backgroundColor: colors.primary }]}
               onPress={() => setPresetRange('year')}
             >
               <Text style={styles.presetButtonText}>Năm nay</Text>
@@ -123,19 +125,21 @@ const ReportsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
           <View style={styles.dateInputs}>
             <View style={styles.dateGroup}>
-              <Text style={styles.label}>Từ ngày</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Từ ngày</Text>
               <TextInput
-                style={styles.dateInput}
+                style={[styles.dateInput, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
                 value={dateRange.startDate}
                 onChangeText={(text) => setDateRange({ ...dateRange, startDate: text })}
+                placeholderTextColor={colors.textSecondary}
               />
             </View>
             <View style={styles.dateGroup}>
-              <Text style={styles.label}>Đến ngày</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Đến ngày</Text>
               <TextInput
-                style={styles.dateInput}
+                style={[styles.dateInput, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
                 value={dateRange.endDate}
                 onChangeText={(text) => setDateRange({ ...dateRange, endDate: text })}
+                placeholderTextColor={colors.textSecondary}
               />
             </View>
           </View>
@@ -143,36 +147,36 @@ const ReportsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#2563eb" />
-            <Text style={styles.loadingText}>Đang tải báo cáo...</Text>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải báo cáo...</Text>
           </View>
         ) : (
           <>
             {/* Summary Cards */}
             <View style={styles.summaryCards}>
-              <View style={[styles.summaryCard, { backgroundColor: '#ecfdf5' }]}>
+              <View style={[styles.summaryCard, { backgroundColor: colors.successLight }]}>
                 <Text style={styles.summaryIcon}>📥</Text>
-                <Text style={styles.summaryLabel}>Tổng Thu Nhập</Text>
-                <Text style={[styles.summaryValue, { color: '#10b981' }]}>
+                <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Tổng Thu Nhập</Text>
+                <Text style={[styles.summaryValue, { color: colors.success }]}>
                   {formatCurrency(summary?.totalIncome || 0)}
                 </Text>
               </View>
 
-              <View style={[styles.summaryCard, { backgroundColor: '#fef2f2' }]}>
+              <View style={[styles.summaryCard, { backgroundColor: colors.dangerLight }]}>
                 <Text style={styles.summaryIcon}>📤</Text>
-                <Text style={styles.summaryLabel}>Tổng Chi Tiêu</Text>
-                <Text style={[styles.summaryValue, { color: '#ef4444' }]}>
+                <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Tổng Chi Tiêu</Text>
+                <Text style={[styles.summaryValue, { color: colors.danger }]}>
                   {formatCurrency(summary?.totalExpense || 0)}
                 </Text>
               </View>
 
-              <View style={[styles.summaryCard, { backgroundColor: '#eff6ff' }]}>
+              <View style={[styles.summaryCard, { backgroundColor: colors.primaryLight }]}>
                 <Text style={styles.summaryIcon}>💰</Text>
-                <Text style={styles.summaryLabel}>Tiết Kiệm Ròng</Text>
+                <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Tiết Kiệm Ròng</Text>
                 <Text
                   style={[
                     styles.summaryValue,
-                    { color: (summary?.netSavings || 0) >= 0 ? '#3b82f6' : '#ef4444' },
+                    { color: (summary?.netSavings || 0) >= 0 ? colors.success : colors.danger },
                   ]}
                 >
                   {formatCurrency(summary?.netSavings || 0)}
@@ -183,35 +187,35 @@ const ReportsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             {/* Spending Trends */}
             {processedTrends().length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>📈 Xu Hướng Chi Tiêu</Text>
-                <View style={styles.trendsCard}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>📈 Xu Hướng Chi Tiêu</Text>
+                <View style={[styles.trendsCard, { backgroundColor: colors.cardBg }]}>
                   {processedTrends().map((trend, index) => (
                     <View key={index} style={styles.trendItem}>
-                      <Text style={styles.trendPeriod}>{trend.period}</Text>
+                      <Text style={[styles.trendPeriod, { color: colors.text }]}>{trend.period}</Text>
                       <View style={styles.trendBars}>
                         <View style={styles.trendRow}>
-                          <Text style={styles.trendLabel}>Thu</Text>
-                          <View style={styles.trendBarContainer}>
+                          <Text style={[styles.trendLabel, { color: colors.textSecondary }]}>Thu</Text>
+                          <View style={[styles.trendBarContainer, { backgroundColor: colors.border }]}>
                             <View
                               style={[
                                 styles.trendBar,
-                                { width: `${Math.min(100, (trend.income / Math.max(trend.income, trend.expense)) * 100)}%`, backgroundColor: '#10b981' },
+                                { width: `${Math.min(100, (trend.income / Math.max(trend.income, trend.expense)) * 100)}%`, backgroundColor: colors.success },
                               ]}
                             />
                           </View>
-                          <Text style={styles.trendValue}>{formatCurrency(trend.income)}</Text>
+                          <Text style={[styles.trendValue, { color: colors.textSecondary }]}>{formatCurrency(trend.income)}</Text>
                         </View>
                         <View style={styles.trendRow}>
-                          <Text style={styles.trendLabel}>Chi</Text>
-                          <View style={styles.trendBarContainer}>
+                          <Text style={[styles.trendLabel, { color: colors.textSecondary }]}>Chi</Text>
+                          <View style={[styles.trendBarContainer, { backgroundColor: colors.border }]}>
                             <View
                               style={[
                                 styles.trendBar,
-                                { width: `${Math.min(100, (trend.expense / Math.max(trend.income, trend.expense)) * 100)}%`, backgroundColor: '#ef4444' },
+                                { width: `${Math.min(100, (trend.expense / Math.max(trend.income, trend.expense)) * 100)}%`, backgroundColor: colors.danger },
                               ]}
                             />
                           </View>
-                          <Text style={styles.trendValue}>{formatCurrency(trend.expense)}</Text>
+                          <Text style={[styles.trendValue, { color: colors.textSecondary }]}>{formatCurrency(trend.expense)}</Text>
                         </View>
                       </View>
                     </View>
@@ -223,27 +227,27 @@ const ReportsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             {/* Category Breakdown */}
             {expenseCategories.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>🏷️ Chi Tiêu Theo Danh Mục</Text>
-                <View style={styles.categoryCard}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>🏷️ Chi Tiêu Theo Danh Mục</Text>
+                <View style={[styles.categoryCard, { backgroundColor: colors.cardBg }]}>
                   {expenseCategories.map((category, index) => {
                     const percentage = (Number(category.total) / totalCategoryExpense) * 100;
                     return (
                       <View key={index} style={styles.categoryItem}>
                         <View style={styles.categoryHeader}>
-                          <Text style={styles.categoryName}>{category.name}</Text>
-                          <Text style={styles.categoryAmount}>
+                          <Text style={[styles.categoryName, { color: colors.text }]}>{category.name}</Text>
+                          <Text style={[styles.categoryAmount, { color: colors.danger }]}>
                             {formatCurrency(Number(category.total))}
                           </Text>
                         </View>
-                        <View style={styles.categoryBarContainer}>
+                        <View style={[styles.categoryBarContainer, { backgroundColor: colors.border }]}>
                           <View
                             style={[
                               styles.categoryBar,
-                              { width: `${percentage}%`, backgroundColor: '#3b82f6' },
+                              { width: `${percentage}%`, backgroundColor: colors.primary },
                             ]}
                           />
                         </View>
-                        <Text style={styles.categoryPercentage}>{percentage.toFixed(1)}%</Text>
+                        <Text style={[styles.categoryPercentage, { color: colors.textSecondary }]}>{percentage.toFixed(1)}%</Text>
                       </View>
                     );
                   })}
@@ -254,21 +258,21 @@ const ReportsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             {/* Budget Performance */}
             {budgetPerformance.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>🎯 Hiệu Suất Ngân Sách</Text>
-                <View style={styles.budgetCard}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>🎯 Hiệu Suất Ngân Sách</Text>
+                <View style={[styles.budgetCard, { backgroundColor: colors.cardBg }]}>
                   {budgetPerformance.map((budget) => {
                     const percentage = budget.percentage;
-                    const statusColor = percentage >= 90 ? '#ef4444' : percentage >= 70 ? '#f59e0b' : '#10b981';
+                    const statusColor = percentage >= 90 ? colors.danger : percentage >= 70 ? colors.warning : colors.success;
                     
                     return (
                       <View key={budget.id} style={styles.budgetItem}>
                         <View style={styles.budgetHeader}>
-                          <Text style={styles.budgetCategory}>{budget.category_name}</Text>
-                          <Text style={styles.budgetAmount}>
+                          <Text style={[styles.budgetCategory, { color: colors.text }]}>{budget.category_name}</Text>
+                          <Text style={[styles.budgetAmount, { color: colors.textSecondary }]}>
                             {formatCurrency(budget.spent)} / {formatCurrency(budget.budget_amount)}
                           </Text>
                         </View>
-                        <View style={styles.budgetBarContainer}>
+                        <View style={[styles.budgetBarContainer, { backgroundColor: colors.border }]}>
                           <View
                             style={[
                               styles.budgetBar,
