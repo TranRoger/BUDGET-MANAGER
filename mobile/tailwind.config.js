@@ -1,27 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // Đảm bảo đường dẫn này trỏ đúng vào các file code của bạn
   content: [
-    "./App.{js,jsx,ts,tsx}",
-    "./src/**/*.{js,jsx,ts,tsx}"
+    "./App.{js,jsx,ts,tsx}", 
+    "./components/**/*.{js,jsx,ts,tsx}",
+    "./screens/**/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}" 
   ],
-  presets: [require("nativewind/preset")],
+  presets: [require("nativewind/preset")], // <--- ĐÂY LÀ DÒNG BẠN ĐANG THIẾU
   theme: {
-    extend: {
-      colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-        },
-      },
-    },
+    extend: {},
   },
   plugins: [],
-}
+};

@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Cấu hình API URL - sử dụng IP máy local hoặc backend URL
 const API_URL = __DEV__ 
   ? 'http://10.0.250.188:5000/api'  // IP máy local - thay đổi nếu IP thay đổi
-  : 'https://your-production-api.com/api';
+  : 'https://budman.roger.works/api'; // URL production
 
 const api = axios.create({
   baseURL: API_URL,
@@ -14,10 +14,13 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Request interceptor - không cần token vì đang ở single-user mode
+// Request interceptor - thêm token vào header
 api.interceptors.request.use(
   async (config) => {
-    // Có thể thêm header khác nếu cần
+    const token = await AsyncStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {

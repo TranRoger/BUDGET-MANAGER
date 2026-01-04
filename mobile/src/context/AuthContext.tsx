@@ -1,46 +1,84 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { User } from '../types';
 import { authService } from '../services/authService';
 
 interface AuthContextType {
   user: User | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
   loading: boolean;
-  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    loadUser();
+    // Check if user is already logged in
+    checkAuth();
   }, []);
 
-  const loadUser = async () => {
+  const checkAuth = async () => {
     try {
-      const userData = await authService.getUser();
-      setUser(userData);
+      const token = await authService.getToken();
+      if (token) {
+        await loadCurrentUser();
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
     } catch (error) {
-      console.error('Error loading user:', error);
-      // Set default user in single-user mode
-      setUser({
-        id: 1,
-        email: 'user@budgetmanager.local',
-        name: 'Budget Manager User',
-      });
+      console.error('Failed to check auth:', error);
+      setUser(null);
+      setIsAuthenticated(false);
     } finally {
       setLoading(false);
     }
   };
 
-  const updateUser = (updatedUser: User) => {
-    setUser(updatedUser);
+  const loadCurrentUser = async () => {
+    try {
+      const currentUser = await authService.getCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      console.error('Failed to load user:', error);
+      await authService.logout();
+      setUser(null);
+      setIsAuthenticated(false);
+    }
   };
 
+  const login = async (email: string, password: string) => {
+    const response = await authService.login({ email, password });
+    setUser(response.user);
+    setIsAuthenticated(true);
+  };
+
+  const logout = () => {
+    authService.logout().then(() => {
+      setUser(null);
+      setIsAuthenticated(false);
+    });
+  };
+
+  const contextValue = useMemo(
+    () => ({
+      user,
+      isAuthenticated,
+      login,
+      logout,
+      loading,
+    }),
+    [user, isAuthenticated, loading]
+  );
+
   return (
-    <AuthContext.Provider value={{ user, loading, updateUser }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
