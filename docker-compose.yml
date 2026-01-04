@@ -40,8 +40,8 @@ services:
       JWT_SECRET: your_jwt_secret_key_change_in_production
       GOOGLE_AI_API_KEY: ${GOOGLE_AI_API_KEY}
     env_file: ./backend/.env
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -60,9 +60,10 @@ services:
       dockerfile: Dockerfile
     container_name: budget-manager-frontend
     environment:
-      REACT_APP_API_URL: http://localhost:5000/api
-    ports:
-      - "3000:3000"
+      REACT_APP_API_URL: http://localhost/api
+      WDS_SOCKET_PORT: 0
+    expose:
+      - "3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -71,6 +72,21 @@ services:
     networks:
       - budget-manager-network
     command: npm start
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: budget-manager-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - budget-manager-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
