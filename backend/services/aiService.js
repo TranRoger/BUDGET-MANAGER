@@ -94,17 +94,17 @@ async function generateFinancialInsights(userId) {
     };
 
     // Create prompt for AI
-    const prompt = `Analyze the following financial data and provide insights:
+    const prompt = `Phân tích dữ liệu tài chính và đưa ra nhận xét NGẮN GỌN:
     
 ${JSON.stringify(dataSummary, null, 2)}
 
-Please provide:
-1. Spending pattern analysis
-2. Budget adherence insights
-3. Recommendations for improvement
-4. Potential savings opportunities
+Trả lời bằng tiếng Việt, tối đa 200 từ:
+1. Xu hướng chi tiêu (2-3 câu)
+2. Đánh giá ngân sách (1-2 câu)  
+3. 3 khuyến nghị cụ thể (dạng bullet points)
+4. 1 cơ hội tiết kiệm nổi bật
 
-Format the response as JSON with these sections.`;
+Format: Markdown, rõ ràng, súc tích.`;
 
     const result = await model.generateContent(prompt);
     const response = result.response;
@@ -163,39 +163,31 @@ async function chatWithAssistant(userId, message, conversationHistory = []) {
     ]);
 
     const planInfo = currentPlan.rows.length > 0 
-      ? `\n\nKẾ HOẠCH CHI TIÊU HIỆN TẠI:\n- Thu nhập hàng tháng: ${Number.parseFloat(currentPlan.rows[0].monthly_income).toLocaleString('vi-VN')} VNĐ\n- Ngày kết thúc: ${currentPlan.rows[0].target_date}\n- Ghi chú: ${currentPlan.rows[0].notes || 'Không có'}\n\nNỘI DUNG KẾ HOẠCH:\n${currentPlan.rows[0].plan_content}\n\n---`
-      : '\n\nChưa có kế hoạch chi tiêu. Người dùng có thể yêu cầu tạo kế hoạch mới.';
+      ? `\n\nKẾ HOẠCH CHI TIÊU:\n- Thu nhập: ${Number.parseFloat(currentPlan.rows[0].monthly_income).toLocaleString('vi-VN')} VNĐ/tháng\n- Đến: ${currentPlan.rows[0].target_date}\n${currentPlan.rows[0].notes ? `- Note: ${currentPlan.rows[0].notes}` : ''}`
+      : '\n\nChưa có kế hoạch chi tiêu.';
 
-    const context = `Bạn là trợ lý tài chính thông minh có quyền truy cập vào dữ liệu tài chính của người dùng.
+    const context = `Bạn là trợ lý tài chính AI. Giúp người dùng quản lý tài chính một cách NGẮN GỌN và HIỆU QUẢ.
 
-Tổng quan tài chính hiện tại:
-- Giao dịch gần đây: ${recentTransactions.rows.length} giao dịch
-- Ngân sách đang hoạt động: ${budgets.rows.length}
-- Tổng nợ: ${debts.rows.length}
-- Mục tiêu tài chính: ${goals.rows.length}
-- Giới hạn chi tiêu: ${spendingLimits.rows.length}${planInfo}
+TÌNH HÌNH:
+- ${recentTransactions.rows.length} giao dịch gần đây
+- ${budgets.rows.length} ngân sách
+- ${debts.rows.length} khoản nợ
+- ${goals.rows.length} mục tiêu
+- ${spendingLimits.rows.length} giới hạn chi tiêu${planInfo}
 
-Danh mục có sẵn:
-${categories.rows.map(c => `- ${c.name} (ID: ${c.id}, loại: ${c.type})`).join('\n')}
+DANH MỤC (top 10):
+${categories.rows.slice(0, 10).map(c => `${c.id}:${c.name}(${c.type})`).join(', ')}
 
-Bạn có thể giúp người dùng:
-1. Thêm giao dịch khi họ đề cập đến chi tiêu hoặc thu nhập
-2. Tạo khoản nợ khi họ nói về các khoản vay hoặc tiền nợ
-3. Đặt mục tiêu tài chính khi họ đề cập đến mục tiêu tiết kiệm
-4. Tạo danh mục mới nếu danh mục hiện tại không phù hợp
-5. Tạo giới hạn chi tiêu cho các danh mục (dựa trên kế hoạch chi tiêu nếu có)
-6. Tạo mục tiêu tài chính dựa trên kế hoạch chi tiêu
-7. Phân tích và đưa ra khuyến nghị dựa trên kế hoạch chi tiêu hiện tại
-8. Cung cấp lời khuyên và phân tích tài chính
+BẠN CÓ THỂ:
+1. Thêm giao dịch/nợ/mục tiêu/giới hạn chi
+2. Tạo danh mục mới
+3. Phân tích & khuyên nghị
 
-LƯU Ý QUAN TRỌNG:
-- Nếu người dùng yêu cầu tạo giới hạn chi tiêu hoặc mục tiêu dựa trên KẾ HOẠCH CHI TIÊU, hãy đọc kỹ nội dung kế hoạch ở trên và phân tích các khuyến nghị trong đó.
-- Sử dụng thông tin về thu nhập hàng tháng và các đề xuất trong kế hoạch để tạo spending limits và goals phù hợp.
-- Khi tạo spending limit, cần chọn đúng category_id từ danh sách danh mục có sẵn.
-
-Khi người dùng đề cập đến giao dịch, nợ, mục tiêu tài chính, hoặc giới hạn chi tiêu, bạn nên sử dụng chức năng phù hợp để thêm vào cơ sở dữ liệu của họ.
-
-Hãy trả lời bằng tiếng Việt một cách tự nhiên và thân thiện.`;
+YÊU CẦU TRẢ LỜI:
+- Ngắn gọn (2-4 câu)
+- Hành động cụ thể
+- Tiếng Việt thân thiện
+- Dùng function khi cần thêm dữ liệu`;
 
     // Define available functions for AI
     const functions = [
@@ -362,7 +354,10 @@ Hãy trả lời bằng tiếng Việt một cách tự nhiên và thân thiện
 
     // Build conversation
     const chat = modelWithTools.startChat({
-      generationConfig: { temperature: 0.7 },
+      generationConfig: { 
+        temperature: 0.7,
+        maxOutputTokens: 500  // Giới hạn độ dài câu trả lời
+      },
       history: [
         {
           role: 'user',
@@ -370,7 +365,7 @@ Hãy trả lời bằng tiếng Việt một cách tự nhiên và thân thiện
         },
         {
           role: 'model',
-          parts: [{ text: 'Tôi hiểu rồi. Tôi là trợ lý tài chính của bạn và tôi có thể giúp bạn theo dõi giao dịch, nợ và mục tiêu. Hãy cho tôi biết về các hoạt động tài chính của bạn và tôi sẽ giúp bạn quản lý chúng.' }]
+          parts: [{ text: 'OK! Tôi sẽ giúp bạn quản lý tài chính ngắn gọn và hiệu quả. Bạn cần gì?' }]
         },
         ...conversationHistory.map(msg => ({
           role: msg.role === 'user' ? 'user' : 'model',
@@ -840,51 +835,30 @@ async function generateSpendingPlan(userId, monthlyIncome, targetDate, notes = '
     const totalFixedExpenses = fixed.reduce((sum, f) => sum + Number.parseFloat(f.monthly_amount), 0);
     const totalDebt = debts.reduce((sum, d) => sum + Number.parseFloat(d.amount), 0);
 
-    const prompt = `Bạn là chuyên gia tư vấn tài chính cá nhân. Hãy tạo một kế hoạch chi tiêu CHI TIẾT và THỰC TẾ cho người dùng.
+    const prompt = `Bạn là chuyên gia tư vấn tài chính. Tạo kế hoạch chi tiêu NGẮN GỌN, TRỌNG ĐIỂM cho người dùng.
 
-THÔNG TIN TÀI CHÍNH:
-Thu nhập hàng tháng: ${monthlyIncome.toLocaleString('vi-VN')} VNĐ
-Tổng chi tiêu hàng tháng hiện tại: ${totalMonthlyExpenses.toLocaleString('vi-VN')} VNĐ
-Khoản chi cố định: ${totalFixedExpenses.toLocaleString('vi-VN')} VNĐ
-Tổng nợ: ${totalDebt.toLocaleString('vi-VN')} VNĐ
+THÔNG TIN:
+• Thu nhập: ${monthlyIncome.toLocaleString('vi-VN')} VNĐ/tháng
+• Chi tiêu: ${totalMonthlyExpenses.toLocaleString('vi-VN')} VNĐ/tháng
+• Chi cố định: ${totalFixedExpenses.toLocaleString('vi-VN')} VNĐ
+• Tổng nợ: ${totalDebt.toLocaleString('vi-VN')} VNĐ
+• Thời gian: ${timeframeText}
+${notes ? `• Ghi chú: ${notes}` : ''}
 
-CHI TIẾT CHI TIÊU CỐ ĐỊNH:
-${fixed.map(f => `- ${f.category}: ${Number.parseFloat(f.monthly_amount).toLocaleString('vi-VN')} VNĐ`).join('\n')}
+CHI TIẾT CHI TIÊU TOP:
+${expenses.slice(0, 5).map(e => `• ${e.category}: ${Number.parseFloat(e.total).toLocaleString('vi-VN')} VNĐ`).join('\n')}
 
-CHI TIẾT CHI TIÊU BIẾN ĐỘNG:
-${expenses.filter(e => !fixed.some(f => f.category === e.category))
-  .map(e => `- ${e.category}: ${Number.parseFloat(e.total).toLocaleString('vi-VN')} VNĐ (${e.transaction_count} giao dịch)`).join('\n')}
+${debts.length > 0 ? `KHOẢN NỢ:\n${debts.slice(0, 3).map(d => `• ${d.name}: ${Number.parseFloat(d.amount).toLocaleString('vi-VN')} VNĐ (${d.interest_rate || 0}%)`).join('\n')}` : ''}
 
-CÁC KHOẢN NỢ:
-${debts.map(d => `- ${d.name}: ${Number.parseFloat(d.amount).toLocaleString('vi-VN')} VNĐ (Lãi suất: ${d.interest_rate || 0}%)`).join('\n')}
+${goals.length > 0 ? `MỤC TIÊU:\n${goals.slice(0, 3).map(g => `• ${g.name}: ${Number.parseFloat(g.target_amount).toLocaleString('vi-VN')} VNĐ`).join('\n')}` : ''}
 
-MỤC TIÊU TÀI CHÍNH:
-${goals.map(g => `- ${g.name}: Mục tiêu ${Number.parseFloat(g.target_amount).toLocaleString('vi-VN')} VNĐ, đã có ${Number.parseFloat(g.current_amount).toLocaleString('vi-VN')} VNĐ (Ưu tiên: ${g.priority})`).join('\n')}
+YÊU CẦU TRẢ LỜI:
+1. Phân tích tình hình (2-3 câu)
+2. Kế hoạch chi tiêu theo tháng (dạng bảng đơn giản)
+3. 3-5 hành động ưu tiên
+4. 1 lời khuyên quan trọng
 
-KHOẢNG THỜI GIAN LẬP KẾ HOẠCH: ${timeframeText} (từ ${currentDate.toLocaleDateString('vi-VN')} đến ${endDate.toLocaleDateString('vi-VN')})
-
-GHI CHÚ TỪ NGƯỜI DÙNG:
-${notes || 'Không có ghi chú bổ sung'}
-
-YÊU CẦU:
-1. Phân tích tình hình tài chính hiện tại
-2. Tính toán số tiền khả dụng sau khi trừ chi tiêu cố định và nhu cầu thiết yếu
-3. Đưa ra KẾ HOẠCH DUY NHẤT, CHI TIẾT theo ${timeframeText}:
-   - Phân bổ ngân sách cho từng tuần/tháng
-   - Ưu tiên trả nợ (nợ lãi suất cao trước)
-   - Kế hoạch tiết kiệm cho mục tiêu
-   - Khuyến nghị cắt giảm chi tiêu
-   - Kế hoạch dự phòng khẩn cấp (3-6 tháng chi tiêu)
-4. Đưa ra lộ trình cụ thể, TỪNG BƯỚC, dễ thực hiện
-5. Bao gồm các mốc kiểm tra tiến độ
-
-Hãy trả lời bằng TIẾNG VIỆT, sử dụng định dạng Markdown với:
-- Tiêu đề rõ ràng
-- Bảng số liệu
-- Danh sách check
-- Highlight các con số quan trọng
-
-Hãy thực tế, khả thi và động viên người dùng!`;
+Format: Markdown, ngắn gọn, dễ đọc. Tối đa 300 từ.`;
 
     const result = await model.generateContent(prompt);
     

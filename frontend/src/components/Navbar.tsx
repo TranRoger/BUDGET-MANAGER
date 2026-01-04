@@ -203,6 +203,10 @@ const Navbar: React.FC = () => {
                     <span className="text-xl">⚙️</span>
                     <span className="font-semibold">Cài Đặt</span>
                   </Link>
+                  <Link to="/change-password" className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 border-t border-gray-100" onClick={() => setShowUserMenu(false)}>
+                    <span className="text-xl">🔐</span>
+                    <span className="font-semibold">Đổi Mật Khẩu</span>
+                  </Link>
                   <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 border-t border-gray-100 font-semibold">
                     <span className="text-xl">🚪</span>
                     <span>Đăng Xuất</span>

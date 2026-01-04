@@ -15,6 +15,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
+import { userService } from '../services/userService';
 
 const AI_MODELS = [
   { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', description: 'Nhanh & ổn định', speed: '⚡⚡⚡', quality: '⭐⭐⭐⭐' },
@@ -104,6 +105,7 @@ const SettingsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const handleChangePassword = async () => {
     const { currentPassword, newPassword, confirmPassword } = passwordData;
 
+    // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
       Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
       return;
@@ -119,9 +121,14 @@ const SettingsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       return;
     }
 
+    if (currentPassword === newPassword) {
+      Alert.alert('Lỗi', 'Mật khẩu mới phải khác mật khẩu hiện tại');
+      return;
+    }
+
     try {
       setChangingPassword(true);
-      await api.put('/auth/change-password', {
+      await userService.changePassword({
         currentPassword,
         newPassword,
       });
@@ -432,80 +439,80 @@ const SettingsScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       {/* Change Password Modal */}
       <Modal visible={showChangePasswordModal} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.changePasswordModal}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>🔐 Đổi Mật Khẩu</Text>
-              <TouchableOpacity onPress={() => setShowChangePasswordModal(false)}>
-                <Text style={styles.modalClose}>✕</Text>
-              </TouchableOpacity>
+          <View style={[styles.changePasswordModal, { backgroundColor: colors.cardBg }]}>
+        <View style={[styles.modalHeader, { borderBottomColor: colors.border, backgroundColor: isDarkMode ? '#374151' : '#f9fafb' }]}>
+          <Text style={[styles.modalTitle, { color: colors.text }]}>🔐 Đổi Mật Khẩu</Text>
+          <TouchableOpacity onPress={() => setShowChangePasswordModal(false)}>
+            <Text style={[styles.modalClose, { color: colors.textSecondary }]}>✕</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.modalBody}>
+          <View style={styles.inputGroup}>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>Mật khẩu hiện tại</Text>
+            <TextInput
+          style={[styles.passwordInput, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
+          value={passwordData.currentPassword}
+          onChangeText={(text) => setPasswordData({ ...passwordData, currentPassword: text })}
+          placeholder="Nhập mật khẩu hiện tại"
+          placeholderTextColor="#9ca3af"
+          secureTextEntry
+          autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>Mật khẩu mới</Text>
+            <TextInput
+          style={[styles.passwordInput, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
+          value={passwordData.newPassword}
+          onChangeText={(text) => setPasswordData({ ...passwordData, newPassword: text })}
+          placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)"
+          placeholderTextColor="#9ca3af"
+          secureTextEntry
+          autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={[styles.inputLabel, { color: colors.text }]}>Xác nhận mật khẩu mới</Text>
+            <TextInput
+          style={[styles.passwordInput, { backgroundColor: colors.inputBg, borderColor: colors.border, color: colors.text }]}
+          value={passwordData.confirmPassword}
+          onChangeText={(text) => setPasswordData({ ...passwordData, confirmPassword: text })}
+          placeholder="Nhập lại mật khẩu mới"
+          placeholderTextColor="#9ca3af"
+          secureTextEntry
+          autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.modalButtons}>
+            <TouchableOpacity
+          style={[styles.modalCancelButton, { backgroundColor: isDarkMode ? '#4b5563' : '#f3f4f6' }]}
+          onPress={() => {
+            setShowChangePasswordModal(false);
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+          }}
+            >
+          <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Hủy</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+          style={[styles.modalSaveButton, changingPassword && styles.buttonDisabled]}
+          onPress={handleChangePassword}
+          disabled={changingPassword}
+            >
+          {changingPassword ? (
+            <View style={styles.buttonContent}>
+              <ActivityIndicator color="#fff" size="small" />
+              <Text style={styles.modalSaveText}> Đang lưu...</Text>
             </View>
-
-            <View style={styles.modalBody}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Mật khẩu hiện tại</Text>
-                <TextInput
-                  style={styles.passwordInput}
-                  value={passwordData.currentPassword}
-                  onChangeText={(text) => setPasswordData({ ...passwordData, currentPassword: text })}
-                  placeholder="Nhập mật khẩu hiện tại"
-                  placeholderTextColor="#9ca3af"
-                  secureTextEntry
-                  autoCapitalize="none"
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Mật khẩu mới</Text>
-                <TextInput
-                  style={styles.passwordInput}
-                  value={passwordData.newPassword}
-                  onChangeText={(text) => setPasswordData({ ...passwordData, newPassword: text })}
-                  placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)"
-                  placeholderTextColor="#9ca3af"
-                  secureTextEntry
-                  autoCapitalize="none"
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Xác nhận mật khẩu mới</Text>
-                <TextInput
-                  style={styles.passwordInput}
-                  value={passwordData.confirmPassword}
-                  onChangeText={(text) => setPasswordData({ ...passwordData, confirmPassword: text })}
-                  placeholder="Nhập lại mật khẩu mới"
-                  placeholderTextColor="#9ca3af"
-                  secureTextEntry
-                  autoCapitalize="none"
-                />
-              </View>
-
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={styles.modalCancelButton}
-                  onPress={() => {
-                    setShowChangePasswordModal(false);
-                    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-                  }}
-                >
-                  <Text style={styles.modalCancelText}>Hủy</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.modalSaveButton, changingPassword && styles.buttonDisabled]}
-                  onPress={handleChangePassword}
-                  disabled={changingPassword}
-                >
-                  {changingPassword ? (
-                    <View style={styles.buttonContent}>
-                      <ActivityIndicator color="#fff" size="small" />
-                      <Text style={styles.modalSaveText}> Đang lưu...</Text>
-                    </View>
-                  ) : (
-                    <Text style={styles.modalSaveText}>✓ Đổi Mật Khẩu</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
+          ) : (
+            <Text style={styles.modalSaveText}>✓ Đổi Mật Khẩu</Text>
+          )}
+            </TouchableOpacity>
+          </View>
+        </View>
           </View>
         </View>
       </Modal>
