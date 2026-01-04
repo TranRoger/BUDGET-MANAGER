@@ -100,7 +100,7 @@ const Debts: React.FC = () => {
   return (
     <div className="debts-page">
       <div className="page-header">
-        <h1 className="page-title">💳 Debt Management</h1>
+        <h1 className="page-title">💳 Quản Lý Công Nợ</h1>
         <button
           className="btn-primary"
           onClick={() => {
@@ -111,7 +111,7 @@ const Debts: React.FC = () => {
             }
           }}
         >
-          {showForm ? 'Cancel' : '+ Add Debt'}
+          {showForm ? '✕ Đóng' : '+ Thêm Công Nợ'}
         </button>
       </div>
 
@@ -247,13 +247,13 @@ const Debts: React.FC = () => {
       )}
 
       {/* Debts List */}
-      <Card title={`All Debts (${debts.length})`}>
+      <Card title={`Tất Cả Công Nợ (${debts.length})`}>
         {debts.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">💳</div>
-            <p>No debts tracked yet</p>
+            <p>Chưa có công nợ nào</p>
             <button className="btn-primary" onClick={() => setShowForm(true)}>
-              Add Your First Debt
+              + Thêm Công Nợ Đầu Tiên
             </button>
           </div>
         ) : (
@@ -285,10 +285,10 @@ const Debts: React.FC = () => {
                     <div className="debt-amount">{formatCurrency(debt.amount)}</div>
                     <div className="debt-actions">
                       <button onClick={() => handleEdit(debt)} className="btn-edit">
-                        Edit
+                        ✏️ Sửa
                       </button>
                       <button onClick={() => handleDelete(debt.id)} className="btn-delete">
-                        Delete
+                        🗑️ Xóa
                       </button>
                     </div>
                   </div>

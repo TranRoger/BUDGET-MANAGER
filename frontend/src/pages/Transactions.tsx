@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useTransactions } from '../hooks/useTransactions';
 import { categoryService, Category } from '../services/categoryService';
+import { Transaction } from '../services/transactionService';
 import Card from '../components/Card';
 import TransactionList from '../components/TransactionList';
 import './Transactions.css';
 
 const Transactions: React.FC = () => {
-  const { transactions, loading, createTransaction, deleteTransaction } = useTransactions();
+  const { transactions, loading, createTransaction, updateTransaction, deleteTransaction } = useTransactions();
   const [categories, setCategories] = useState<Category[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [formData, setFormData] = useState({
     amount: '',
     type: 'expense' as 'income' | 'expense',
@@ -33,32 +35,56 @@ const Transactions: React.FC = () => {
   // Filter categories by transaction type
   const filteredCategories = categories.filter(c => c.type === formData.type);
 
+  const resetForm = () => {
+    setFormData({
+      amount: '',
+      type: 'expense',
+      category_id: 0,
+      description: '',
+      date: new Date().toISOString().split('T')[0],
+    });
+    setEditingTransaction(null);
+    setShowForm(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await createTransaction({
-        ...formData,
-        amount: Number.parseFloat(formData.amount),
-      });
-      setShowForm(false);
-      setFormData({
-        amount: '',
-        type: 'expense',
-        category_id: 0,
-        description: '',
-        date: new Date().toISOString().split('T')[0],
-      });
+      if (editingTransaction) {
+        await updateTransaction(editingTransaction.id, {
+          ...formData,
+          amount: Number.parseFloat(formData.amount),
+        });
+      } else {
+        await createTransaction({
+          ...formData,
+          amount: Number.parseFloat(formData.amount),
+        });
+      }
+      resetForm();
     } catch (error) {
-      console.error('Failed to create transaction:', error);
-      alert('Failed to create transaction. Please try again.');
+      console.error('Failed to save transaction:', error);
+      alert('Không thể lưu giao dịch. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setFormData({
+      amount: transaction.amount.toString(),
+      type: transaction.type,
+      category_id: transaction.category_id,
+      description: transaction.description,
+      date: transaction.date.split('T')[0],
+    });
+    setShowForm(true);
+  };
+
   const handleDelete = async (id: number) => {
-    if (globalThis.confirm('Are you sure you want to delete this transaction?')) {
+    if (globalThis.confirm('Bạn có chắc muốn xóa giao dịch này?')) {
       try {
         await deleteTransaction(id);
       } catch (error) {
@@ -67,12 +93,33 @@ const Transactions: React.FC = () => {
     }
   };
 
+  const handleCancel = () => {
+    resetForm();
+  };
+
   return (
     <div className="transactions-page">
       <div className="page-header">
-        <h1 className="page-title">Transactions</h1>
-        <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? 'Cancel' : '+ Add Transaction'}
+        <h1 className="page-title">💳 Giao Dịch</h1>
+        <button 
+          className="btn-primary" 
+          onClick={() => {
+            if (showForm && !editingTransaction) {
+              resetForm();
+            } else {
+              setEditingTransaction(null);
+              setFormData({
+                amount: '',
+                type: 'expense',
+                category_id: 0,
+                description: '',
+                date: new Date().toISOString().split('T')[0],
+              });
+              setShowForm(true);
+            }
+          }}
+        >
+          {showForm && !editingTransaction ? '✕ Đóng' : '+ Thêm Giao Dịch'}
         </button>
       </div>
 
@@ -81,10 +128,10 @@ const Transactions: React.FC = () => {
           <Card className="form-card">
             <div className="form-header">
               <div className="form-header-content">
-                <div className="form-icon">💰</div>
+                <div className="form-icon">{editingTransaction ? '✏️' : '💰'}</div>
                 <div>
-                  <h2 className="form-title">Add New Transaction</h2>
-                  <p className="form-subtitle">Track your income or expenses</p>
+                  <h2 className="form-title">{editingTransaction ? 'Sửa Giao Dịch' : 'Thêm Giao Dịch Mới'}</h2>
+                  <p className="form-subtitle">{editingTransaction ? 'Cập nhật thông tin giao dịch' : 'Ghi lại thu nhập hoặc chi tiêu'}</p>
                 </div>
               </div>
             </div>
@@ -188,10 +235,10 @@ const Transactions: React.FC = () => {
                 <button 
                   type="button" 
                   className="btn-secondary"
-                  onClick={() => setShowForm(false)}
+                  onClick={handleCancel}
                   disabled={isSubmitting}
                 >
-                  Cancel
+                  ✕ Hủy
                 </button>
                 <button 
                   type="submit" 
@@ -201,12 +248,12 @@ const Transactions: React.FC = () => {
                   {isSubmitting ? (
                     <>
                       <span className="spinner"></span>
-                      Adding...
+                      Đang lưu...
                     </>
                   ) : (
                     <>
                       <span>✓</span>
-                      Add Transaction
+                      {editingTransaction ? 'Cập Nhật' : 'Thêm Giao Dịch'}
                     </>
                   )}
                 </button>
@@ -216,12 +263,13 @@ const Transactions: React.FC = () => {
         </div>
       )}
 
-      <Card title={`All Transactions (${transactions.length})`}>
+      <Card title={`Tất Cả Giao Dịch (${transactions.length})`}>
         {loading ? (
-          <div className="loading">Loading transactions...</div>
+          <div className="loading">Đang tải giao dịch...</div>
         ) : (
           <TransactionList
             transactions={transactions}
+            onEdit={handleEdit}
             onDelete={handleDelete}
           />
         )}

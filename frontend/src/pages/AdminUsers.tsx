@@ -236,7 +236,7 @@ const AdminUsers: React.FC = () => {
                 {editingUser ? '💾 Cập Nhật' : '✨ Tạo Mới'}
               </button>
               <button type="button" className="btn-cancel" onClick={cancelEdit}>
-                Hủy
+                ✕ Hủy
               </button>
             </div>
           </form>

@@ -99,36 +99,49 @@
 .transaction-actions {
   display: flex;
   gap: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.transaction-item:hover .transaction-actions {
+  opacity: 1;
 }
 
 .btn-edit,
 .btn-delete {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.875rem;
   border: none;
   border-radius: 8px;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .btn-edit {
-  background: #2d2d44;
-  color: white;
+  background: #e0f2fe;
+  color: #0369a1;
 }
 
 .btn-edit:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  background: #0ea5e9;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
 }
 
 .btn-delete {
-  background: #4a2d2d;
-  color: white;
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 .btn-delete:hover {
-  transform: scale(1.05);
+  background: #ef4444;
+  color: white;
+  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 

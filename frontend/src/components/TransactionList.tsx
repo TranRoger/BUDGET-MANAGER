@@ -38,12 +38,12 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions, onEdit,
             <div className="transaction-actions">
               {onEdit && (
                 <button onClick={() => onEdit(transaction)} className="btn-edit">
-                  Sửa
+                  ✏️ Sửa
                 </button>
               )}
               {onDelete && (
                 <button onClick={() => onDelete(transaction.id)} className="btn-delete">
-                  Xóa
+                  🗑️ Xóa
                 </button>
               )}
             </div>

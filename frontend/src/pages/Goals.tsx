@@ -123,7 +123,7 @@ const Goals: React.FC = () => {
   return (
     <div className="goals-page">
       <div className="page-header">
-        <h1 className="page-title">🎯 Financial Goals</h1>
+        <h1 className="page-title">🎯 Mục Tiêu Tài Chính</h1>
         <button
           className="btn-primary"
           onClick={() => {
@@ -134,7 +134,7 @@ const Goals: React.FC = () => {
             }
           }}
         >
-          {showForm ? 'Cancel' : '+ Add Goal'}
+          {showForm ? '✕ Đóng' : '+ Thêm Mục Tiêu'}
         </button>
       </div>
 
@@ -373,13 +373,13 @@ const Goals: React.FC = () => {
                     className="btn-progress"
                     onClick={() => setShowProgressModal(goal)}
                   >
-                    💰 Update Progress
+                    💰 Cập Nhật
                   </button>
                   <button onClick={() => handleEdit(goal)} className="btn-edit">
-                    Edit
+                    ✏️ Sửa
                   </button>
                   <button onClick={() => handleDelete(goal.id)} className="btn-delete">
-                    Delete
+                    🗑️ Xóa
                   </button>
                 </div>
               </Card>
