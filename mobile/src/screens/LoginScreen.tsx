@@ -28,7 +28,7 @@ const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     setLoading(true);
     try {
       await login(email, password);
-      navigation.replace('Main');
+      // Navigation will happen automatically via auth state
     } catch (err: any) {
       Alert.alert('Đăng nhập thất bại', err.response?.data?.message || 'Vui lòng thử lại');
     } finally {

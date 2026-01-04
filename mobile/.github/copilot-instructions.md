@@ -31,6 +31,9 @@ export const transactionService = {
 - [api.ts](../src/services/api.ts) - Axios instance with auth interceptor (uses AsyncStorage)
 - [authService.ts](../src/services/authService.ts) - **Now uses AsyncStorage** (mobile-native)
 - [aiService.ts](../src/services/aiService.ts) - AI chat, insights, and spending plan generation
+- [debtService.ts](../src/services/debtService.ts) - Debt management with transaction history
+- [spendingLimitService.ts](../src/services/spendingLimitService.ts) - Category spending limits
+- [reportService.ts](../src/services/reportService.ts) - Financial summaries, trends, and analytics
 
 ### Authentication Flow
 1. [AuthContext.tsx](../src/context/AuthContext.tsx) provides global auth state (async-aware)
@@ -41,7 +44,15 @@ export const transactionService = {
 ### Screen Components (React Native)
 All screens use React Native components (`View`, `Text`, `TouchableOpacity`, etc.):
 - **Login/Auth**: [LoginScreen.tsx](../src/screens/LoginScreen.tsx)
-- **Main tabs**: Dashboard, Transactions, Budgets, Settings
+- **Main tabs**: Dashboard, Finance Menu, Reports, AI Chat
+- **Finance Menu screens**: Transactions, Budgets, Debts, Spending Limits, Goals, Categories
+- **AI Features**: 
+  - [AIChatScreen.tsx](../src/screens/AIChatScreen.tsx) - Conversational AI assistant with chat bubbles
+  - [AISpendingPlanScreen.tsx](../src/screens/AISpendingPlanScreen.tsx) - AI-generated financial plans
+- **Financial Management**:
+  - [DebtsScreen.tsx](../src/screens/DebtsScreen.tsx) - Debt tracking with payment history
+  - [SpendingLimitsScreen.tsx](../src/screens/SpendingLimitsScreen.tsx) - Category spending limits with progress bars
+  - [ReportsScreen.tsx](../src/screens/ReportsScreen.tsx) - Financial reports and analytics
 - **Forms**: Modal-based with Picker component for selects
 - **Styling**: StyleSheet API (not Tailwind) with color scheme matching web
 

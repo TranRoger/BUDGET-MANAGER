@@ -8,8 +8,16 @@ import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
 // Screens
 import LoginScreen from './src/screens/LoginScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
+import FinanceMenuScreen from './src/screens/FinanceMenuScreen';
 import TransactionsScreen from './src/screens/TransactionsScreen';
 import BudgetsScreen from './src/screens/BudgetsScreen';
+import DebtsScreen from './src/screens/DebtsScreen';
+import SpendingLimitsScreen from './src/screens/SpendingLimitsScreen';
+import CategoriesScreen from './src/screens/CategoriesScreen';
+import GoalsScreen from './src/screens/GoalsScreen';
+import ReportsScreen from './src/screens/ReportsScreen';
+import AIChatScreen from './src/screens/AIChatScreen';
+import AISpendingPlanScreen from './src/screens/AISpendingPlanScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
@@ -47,27 +55,27 @@ const MainTabs = () => {
         }}
       />
       <Tab.Screen
-        name="Transactions"
-        component={TransactionsScreen}
+        name="FinanceMenu"
+        component={FinanceMenuScreen}
         options={{
-          tabBarLabel: 'Giao Dịch',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24 }}>💳</Text>,
+          tabBarLabel: 'Tài Chính',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24 }}>💼</Text>,
         }}
       />
       <Tab.Screen
-        name="Budgets"
-        component={BudgetsScreen}
+        name="Reports"
+        component={ReportsScreen}
         options={{
-          tabBarLabel: 'Ngân Sách',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24 }}>💰</Text>,
+          tabBarLabel: 'Báo Cáo',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24 }}>📊</Text>,
         }}
       />
       <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
+        name="AIChat"
+        component={AIChatScreen}
         options={{
-          tabBarLabel: 'Cài Đặt',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24 }}>⚙️</Text>,
+          tabBarLabel: 'AI Chat',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24 }}>🤖</Text>,
         }}
       />
     </Tab.Navigator>
@@ -87,7 +95,17 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {isLoggedIn ? (
-        <Stack.Screen name="Main" component={MainTabs} />
+        <>
+          <Stack.Screen name="Main" component={MainTabs} />
+          <Stack.Screen name="Transactions" component={TransactionsScreen} />
+          <Stack.Screen name="Budgets" component={BudgetsScreen} />
+          <Stack.Screen name="Debts" component={DebtsScreen} />
+          <Stack.Screen name="SpendingLimits" component={SpendingLimitsScreen} />
+          <Stack.Screen name="Categories" component={CategoriesScreen} />
+          <Stack.Screen name="Goals" component={GoalsScreen} />
+          <Stack.Screen name="AISpendingPlan" component={AISpendingPlanScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+        </>
       ) : (
         <Stack.Screen name="Login" component={LoginScreen} />
       )}

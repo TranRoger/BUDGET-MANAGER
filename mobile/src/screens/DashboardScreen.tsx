@@ -64,6 +64,9 @@ const DashboardScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     >
       <View style={styles.header}>
         <Text style={styles.title}>Tổng Quan</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+          <Text style={{ fontSize: 24 }}>⚙️</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Summary Cards */}
@@ -97,6 +100,18 @@ const DashboardScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </Text>
         </View>
       </View>
+
+      {/* AI Spending Plan Button */}
+      <TouchableOpacity
+        style={styles.aiPlanButton}
+        onPress={() => navigation.navigate('AISpendingPlan')}
+      >
+        <Text style={styles.aiPlanIcon}>🤖</Text>
+        <View style={styles.aiPlanContent}>
+          <Text style={styles.aiPlanTitle}>Kế Hoạch Chi Tiêu AI</Text>
+          <Text style={styles.aiPlanSubtitle}>Tạo kế hoạch tài chính thông minh →</Text>
+        </View>
+      </TouchableOpacity>
 
       {/* Recent Transactions */}
       <View style={styles.section}>
@@ -191,6 +206,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 20,
     paddingTop: 60,
     backgroundColor: '#fff',
@@ -253,6 +271,39 @@ const styles = StyleSheet.create({
   },
   savingsNegative: {
     color: '#f97316',
+  },
+  aiPlanButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#eff6ff',
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#2563eb',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  aiPlanIcon: {
+    fontSize: 36,
+    marginRight: 16,
+  },
+  aiPlanContent: {
+    flex: 1,
+  },
+  aiPlanTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2563eb',
+    marginBottom: 4,
+  },
+  aiPlanSubtitle: {
+    fontSize: 14,
+    color: '#1e40af',
   },
   section: {
     padding: 16,
