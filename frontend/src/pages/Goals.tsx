@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { goalService, FinancialGoal, CreateGoalData } from '../services/goalService';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import Card from '../components/Card';
-import './Goals.css';
 
 const Goals: React.FC = () => {
   const [goals, setGoals] = useState<FinancialGoal[]>([]);
@@ -111,21 +110,21 @@ const Goals: React.FC = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return '#ef4444';
-      case 'medium': return '#f59e0b';
-      case 'low': return '#10b981';
-      default: return '#6b7280';
+      case 'high': return 'bg-red-100 text-red-700';
+      case 'medium': return 'bg-yellow-100 text-yellow-700';
+      case 'low': return 'bg-green-100 text-green-700';
+      default: return 'bg-gray-100 text-gray-700';
     }
   };
 
-  if (loading) return <div className="loading">Loading goals...</div>;
+  if (loading) return <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-500">Loading goals...</div>;
 
   return (
-    <div className="goals-page">
-      <div className="page-header">
-        <h1 className="page-title">🎯 Mục Tiêu Tài Chính</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">🎯 Mục Tiêu Tài Chính</h1>
         <button
-          className="btn-primary"
+          className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 font-semibold"
           onClick={() => {
             setShowForm(!showForm);
             if (showForm) {
@@ -140,168 +139,178 @@ const Goals: React.FC = () => {
 
       {/* Stats Cards */}
       {stats && (
-        <div className="stats-grid">
-          <Card className="stat-card goal-total">
-            <div className="stat-icon">🎯</div>
-            <div className="stat-label">Total Target</div>
-            <div className="stat-value">{formatCurrency(parseFloat(stats.total_target))}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
+            <div className="text-4xl mb-2">🎯</div>
+            <div className="text-sm text-gray-600 mb-1">Total Target</div>
+            <div className="text-2xl font-bold text-blue-600">{formatCurrency(parseFloat(stats.total_target))}</div>
           </Card>
-          <Card className="stat-card goal-saved">
-            <div className="stat-icon">💰</div>
-            <div className="stat-label">Total Saved</div>
-            <div className="stat-value">{formatCurrency(parseFloat(stats.total_saved))}</div>
+          <Card className="bg-gradient-to-br from-green-50 to-green-100">
+            <div className="text-4xl mb-2">💰</div>
+            <div className="text-sm text-gray-600 mb-1">Total Saved</div>
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(parseFloat(stats.total_saved))}</div>
           </Card>
-          <Card className="stat-card goal-progress">
-            <div className="stat-icon">📊</div>
-            <div className="stat-label">Overall Progress</div>
-            <div className="stat-value">
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
+            <div className="text-4xl mb-2">📊</div>
+            <div className="text-sm text-gray-600 mb-1">Overall Progress</div>
+            <div className="text-2xl font-bold text-purple-600">
               {stats.total_target > 0 ? Math.round((parseFloat(stats.total_saved) / parseFloat(stats.total_target)) * 100) : 0}%
             </div>
           </Card>
-          <Card className="stat-card goal-completed">
-            <div className="stat-icon">✅</div>
-            <div className="stat-label">Completed</div>
-            <div className="stat-value">{stats.completed_goals}/{stats.total_goals}</div>
+          <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100">
+            <div className="text-4xl mb-2">✅</div>
+            <div className="text-sm text-gray-600 mb-1">Completed</div>
+            <div className="text-2xl font-bold text-yellow-600">{stats.completed_goals}/{stats.total_goals}</div>
           </Card>
         </div>
       )}
 
       {/* Add/Edit Form */}
       {showForm && (
-        <div className="form-card-wrapper">
-          <Card className="form-card">
-            <div className="form-header">
-              <div className="form-header-content">
-                <div className="form-icon">🎯</div>
-                <div>
-                  <h2 className="form-title">{editingGoal ? 'Edit Goal' : 'Create New Goal'}</h2>
-                  <p className="form-subtitle">Set and track your financial objectives</p>
-                </div>
+        <Card className="mb-8">
+          <div className="mb-6">
+            <div className="flex items-center gap-4">
+              <div className="text-4xl">🎯</div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">{editingGoal ? 'Edit Goal' : 'Create New Goal'}</h2>
+                <p className="text-gray-500 text-sm">Set and track your financial objectives</p>
               </div>
             </div>
-            <form onSubmit={handleSubmit} className="goal-form">
-              <div className="form-group">
-                <label htmlFor="name">
-                  <span className="label-icon">📌</span>
-                  Goal Name
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                <span className="mr-2">📌</span>
+                Goal Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g., Emergency Fund, New Car, Vacation"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="target_amount" className="block text-sm font-medium text-gray-700 mb-2">
+                  <span className="mr-2">🎯</span>
+                  Target Amount
                 </label>
                 <input
-                  id="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g., Emergency Fund, New Car, Vacation"
+                  id="target_amount"
+                  type="number"
+                  step="0.01"
+                  value={formData.target_amount}
+                  onChange={(e) => setFormData({ ...formData, target_amount: parseFloat(e.target.value) })}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   required
                 />
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="target_amount">
-                    <span className="label-icon">🎯</span>
-                    Target Amount
-                  </label>
-                  <input
-                    id="target_amount"
-                    type="number"
-                    step="0.01"
-                    value={formData.target_amount}
-                    onChange={(e) => setFormData({ ...formData, target_amount: parseFloat(e.target.value) })}
-                    placeholder="0.00"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="current_amount">
-                    <span className="label-icon">💵</span>
-                    Current Amount
-                  </label>
-                  <input
-                    id="current_amount"
-                    type="number"
-                    step="0.01"
-                    value={formData.current_amount}
-                    onChange={(e) => setFormData({ ...formData, current_amount: parseFloat(e.target.value) })}
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="priority">
-                    <span className="label-icon">⭐</span>
-                    Priority
-                  </label>
-                  <select
-                    id="priority"
-                    value={formData.priority}
-                    onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="deadline">
-                    <span className="label-icon">📅</span>
-                    Deadline
-                  </label>
-                  <input
-                    id="deadline"
-                    type="date"
-                    value={formData.deadline}
-                    onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="description">
-                  <span className="label-icon">📝</span>
-                  Description
+              <div>
+                <label htmlFor="current_amount" className="block text-sm font-medium text-gray-700 mb-2">
+                  <span className="mr-2">💵</span>
+                  Current Amount
                 </label>
-                <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Why is this goal important to you?"
-                  rows={3}
+                <input
+                  id="current_amount"
+                  type="number"
+                  step="0.01"
+                  value={formData.current_amount}
+                  onChange={(e) => setFormData({ ...formData, current_amount: parseFloat(e.target.value) })}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 />
               </div>
+            </div>
 
-              <div className="form-actions">
-                <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingGoal(null);
-                    resetForm();
-                  }}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-2">
+                  <span className="mr-2">⭐</span>
+                  Priority
+                </label>
+                <select
+                  id="priority"
+                  value={formData.priority}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 >
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary">
-                  {editingGoal ? 'Update Goal' : 'Create Goal'}
-                </button>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
               </div>
-            </form>
-          </Card>
-        </div>
+
+              <div>
+                <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 mb-2">
+                  <span className="mr-2">📅</span>
+                  Deadline
+                </label>
+                <input
+                  id="deadline"
+                  type="date"
+                  value={formData.deadline}
+                  onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                <span className="mr-2">📝</span>
+                Description
+              </label>
+              <textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Why is this goal important to you?"
+                rows={3}
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all"
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingGoal(null);
+                  resetForm();
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 font-semibold"
+              >
+                {editingGoal ? 'Update Goal' : 'Create Goal'}
+              </button>
+            </div>
+          </form>
+        </Card>
       )}
 
       {/* Goals List */}
-      <div className="goals-grid">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {goals.length === 0 ? (
-          <Card>
-            <div className="empty-state">
-              <div className="empty-icon">🎯</div>
-              <p>No financial goals set yet</p>
-              <button className="btn-primary" onClick={() => setShowForm(true)}>
+          <Card className="col-span-full">
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🎯</div>
+              <p className="text-gray-500 mb-6">No financial goals set yet</p>
+              <button 
+                className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 font-semibold"
+                onClick={() => setShowForm(true)}
+              >
                 Create Your First Goal
               </button>
             </div>
@@ -313,73 +322,75 @@ const Goals: React.FC = () => {
             const remaining = goal.target_amount - goal.current_amount;
 
             return (
-              <Card key={goal.id} className={`goal-card ${isCompleted ? 'completed' : ''}`}>
-                <div className="goal-header">
-                  <div className="goal-title-section">
-                    <h3 className="goal-name">{goal.name}</h3>
-                    <span 
-                      className="goal-priority" 
-                      style={{ backgroundColor: getPriorityColor(goal.priority) }}
-                    >
-                      {goal.priority}
-                    </span>
-                  </div>
-                  {isCompleted && <div className="goal-completed-badge">✓ Completed</div>}
+              <Card key={goal.id} className={isCompleted ? 'border-2 border-green-500' : ''}>
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">{goal.name}</h3>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getPriorityColor(goal.priority)}`}>
+                    {goal.priority}
+                  </span>
                 </div>
-
-                {goal.description && (
-                  <p className="goal-description">{goal.description}</p>
+                {isCompleted && (
+                  <div className="mb-4 px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-semibold text-center">
+                    ✓ Completed
+                  </div>
                 )}
 
-                <div className="goal-amounts">
-                  <div className="amount-item">
-                    <span className="amount-label">Current</span>
-                    <span className="amount-value current">{formatCurrency(goal.current_amount)}</span>
+                {goal.description && (
+                  <p className="text-gray-600 text-sm mb-4">{goal.description}</p>
+                )}
+
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="text-center">
+                    <div className="text-xs text-gray-500 mb-1">Current</div>
+                    <div className="text-sm font-semibold text-green-600">{formatCurrency(goal.current_amount)}</div>
                   </div>
-                  <div className="amount-item">
-                    <span className="amount-label">Target</span>
-                    <span className="amount-value target">{formatCurrency(goal.target_amount)}</span>
+                  <div className="text-center">
+                    <div className="text-xs text-gray-500 mb-1">Target</div>
+                    <div className="text-sm font-semibold text-blue-600">{formatCurrency(goal.target_amount)}</div>
                   </div>
-                  <div className="amount-item">
-                    <span className="amount-label">Remaining</span>
-                    <span className="amount-value remaining">{formatCurrency(Math.max(0, remaining))}</span>
+                  <div className="text-center">
+                    <div className="text-xs text-gray-500 mb-1">Remaining</div>
+                    <div className="text-sm font-semibold text-orange-600">{formatCurrency(Math.max(0, remaining))}</div>
                   </div>
                 </div>
 
-                <div className="goal-progress-section">
-                  <div className="progress-header">
-                    <span className="progress-label">Progress</span>
-                    <span className="progress-percentage">{progress}%</span>
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs text-gray-600">Progress</span>
+                    <span className="text-xs font-semibold text-gray-900">{progress}%</span>
                   </div>
-                  <div className="progress-bar">
+                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                     <div 
-                      className="progress-fill" 
-                      style={{ 
-                        width: `${progress}%`,
-                        backgroundColor: isCompleted ? '#10b981' : '#6366f1'
-                      }}
+                      className={`h-full rounded-full transition-all duration-500 ${isCompleted ? 'bg-green-500' : 'bg-primary-600'}`}
+                      style={{ width: `${progress}%` }}
                     />
                   </div>
                 </div>
 
                 {goal.deadline && (
-                  <div className="goal-deadline">
+                  <div className="text-xs text-gray-500 mb-4">
                     📅 Deadline: {formatDate(goal.deadline)}
                   </div>
                 )}
 
-                <div className="goal-actions">
+                <div className="flex gap-2">
                   <button 
-                    className="btn-progress"
+                    className="flex-1 px-4 py-2 bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-lg text-sm font-semibold transition-all"
                     onClick={() => setShowProgressModal(goal)}
                   >
                     💰 Cập Nhật
                   </button>
-                  <button onClick={() => handleEdit(goal)} className="btn-edit">
-                    ✏️ Sửa
+                  <button 
+                    onClick={() => handleEdit(goal)} 
+                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition-all"
+                  >
+                    ✏️
                   </button>
-                  <button onClick={() => handleDelete(goal.id)} className="btn-delete">
-                    🗑️ Xóa
+                  <button 
+                    onClick={() => handleDelete(goal.id)} 
+                    className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-sm font-semibold transition-all"
+                  >
+                    🗑️
                   </button>
                 </div>
               </Card>
@@ -390,14 +401,14 @@ const Goals: React.FC = () => {
 
       {/* Progress Modal */}
       {showProgressModal && (
-        <div className="modal-overlay" onClick={() => setShowProgressModal(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3 className="modal-title">Update Progress: {showProgressModal.name}</h3>
-            <p className="modal-subtitle">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowProgressModal(null)}>
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Update Progress: {showProgressModal.name}</h3>
+            <p className="text-gray-600 mb-6">
               Current: {formatCurrency(showProgressModal.current_amount)} / {formatCurrency(showProgressModal.target_amount)}
             </p>
-            <div className="modal-form">
-              <label htmlFor="progress-amount">Amount to Add/Subtract</label>
+            <div className="mb-6">
+              <label htmlFor="progress-amount" className="block text-sm font-medium text-gray-700 mb-2">Amount to Add/Subtract</label>
               <input
                 id="progress-amount"
                 type="number"
@@ -405,15 +416,16 @@ const Goals: React.FC = () => {
                 value={progressAmount}
                 onChange={(e) => setProgressAmount(e.target.value)}
                 placeholder="Enter positive or negative amount"
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 autoFocus
               />
-              <p className="modal-hint">
+              <p className="text-sm text-gray-500 mt-2">
                 Use positive values to add, negative to subtract
               </p>
             </div>
-            <div className="modal-actions">
+            <div className="flex gap-3">
               <button 
-                className="btn-secondary"
+                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all"
                 onClick={() => {
                   setShowProgressModal(null);
                   setProgressAmount('');
@@ -422,7 +434,7 @@ const Goals: React.FC = () => {
                 Cancel
               </button>
               <button 
-                className="btn-primary"
+                className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleUpdateProgress}
                 disabled={!progressAmount}
               >

@@ -4,7 +4,6 @@ import { categoryService, Category } from '../services/categoryService';
 import { Transaction } from '../services/transactionService';
 import Card from '../components/Card';
 import TransactionList from '../components/TransactionList';
-import './Transactions.css';
 
 const Transactions: React.FC = () => {
   const { transactions, loading, createTransaction, updateTransaction, deleteTransaction } = useTransactions();
@@ -98,11 +97,11 @@ const Transactions: React.FC = () => {
   };
 
   return (
-    <div className="transactions-page">
-      <div className="page-header">
-        <h1 className="page-title">💳 Giao Dịch</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">💳 Giao Dịch</h1>
         <button 
-          className="btn-primary" 
+          className="px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5" 
           onClick={() => {
             if (showForm && !editingTransaction) {
               resetForm();
@@ -124,44 +123,44 @@ const Transactions: React.FC = () => {
       </div>
 
       {showForm && (
-        <div className="form-card-wrapper">
-          <Card className="form-card">
-            <div className="form-header">
-              <div className="form-header-content">
-                <div className="form-icon">{editingTransaction ? '✏️' : '💰'}</div>
+        <div className="mb-8">
+          <Card>
+            <div className="border-b border-gray-200 pb-4 mb-6">
+              <div className="flex items-center gap-4">
+                <div className="text-4xl">{editingTransaction ? '✏️' : '💰'}</div>
                 <div>
-                  <h2 className="form-title">{editingTransaction ? 'Sửa Giao Dịch' : 'Thêm Giao Dịch Mới'}</h2>
-                  <p className="form-subtitle">{editingTransaction ? 'Cập nhật thông tin giao dịch' : 'Ghi lại thu nhập hoặc chi tiêu'}</p>
+                  <h2 className="text-2xl font-bold text-gray-900">{editingTransaction ? 'Sửa Giao Dịch' : 'Thêm Giao Dịch Mới'}</h2>
+                  <p className="text-gray-600 mt-1">{editingTransaction ? 'Cập nhật thông tin giao dịch' : 'Ghi lại thu nhập hoặc chi tiêu'}</p>
                 </div>
               </div>
             </div>
-            <form onSubmit={handleSubmit} className="transaction-form">
-              <div className="type-selector">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
-                  className={`type-btn ${formData.type === 'expense' ? 'active expense' : ''}`}
+                  className={`p-4 rounded-xl border-2 transition-all duration-200 ${formData.type === 'expense' ? 'border-red-500 bg-red-50 text-red-700 shadow-lg scale-105' : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400'}`}
                   onClick={() => setFormData({ ...formData, type: 'expense' })}
                 >
-                  <span className="type-icon">📤</span>
-                  <span>Expense</span>
+                  <span className="text-2xl block mb-1">📤</span>
+                  <span className="font-semibold">Chi Tiêu</span>
                 </button>
                 <button
                   type="button"
-                  className={`type-btn ${formData.type === 'income' ? 'active income' : ''}`}
+                  className={`p-4 rounded-xl border-2 transition-all duration-200 ${formData.type === 'income' ? 'border-green-500 bg-green-50 text-green-700 shadow-lg scale-105' : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400'}`}
                   onClick={() => setFormData({ ...formData, type: 'income' })}
                 >
-                  <span className="type-icon">📥</span>
-                  <span>Income</span>
+                  <span className="text-2xl block mb-1">📥</span>
+                  <span className="font-semibold">Thu Nhập</span>
                 </button>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="amount">
-                  <span className="label-icon">💵</span>
-                  Amount
+              <div>
+                <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
+                  <span className="mr-2">💵</span>
+                  Số Tiền
                 </label>
-                <div className="input-wrapper">
-                  <span className="input-prefix">$</span>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">₫</span>
                   <input
                     id="amount"
                     type="number"
@@ -171,14 +170,14 @@ const Transactions: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                     placeholder="0.00"
                     required
-                    className="amount-input"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-lg font-medium"
                   />
                 </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="category">
-                  <span className="label-icon">🏷️</span>
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                  <span className="mr-2">🏷️</span>
                   Danh Mục
                 </label>
                 <select
@@ -186,7 +185,7 @@ const Transactions: React.FC = () => {
                   value={formData.category_id}
                   onChange={(e) => setFormData({ ...formData, category_id: Number(e.target.value) })}
                   required
-                  className="category-select"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                 >
                   <option value={0} disabled>-- Chọn danh mục --</option>
                   {filteredCategories.map((cat) => (
@@ -196,13 +195,13 @@ const Transactions: React.FC = () => {
                   ))}
                 </select>
                 {filteredCategories.length === 0 && (
-                  <p className="no-category-hint">Chưa có danh mục cho {formData.type === 'expense' ? 'chi tiêu' : 'thu nhập'}. <a href="/categories">Tạo danh mục</a></p>
+                  <p className="mt-2 text-sm text-orange-600">Chưa có danh mục cho {formData.type === 'expense' ? 'chi tiêu' : 'thu nhập'}. <a href="/categories" className="underline font-medium hover:text-orange-700">Tạo danh mục</a></p>
                 )}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="description">
-                  <span className="label-icon">📝</span>
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                  <span className="mr-2">📝</span>
                   Mô Tả
                 </label>
                 <input
@@ -213,13 +212,14 @@ const Transactions: React.FC = () => {
                   placeholder="Giao dịch này là gì?"
                   required
                   maxLength={200}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="date">
-                  <span className="label-icon">📅</span>
-                  Date
+              <div>
+                <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-2">
+                  <span className="mr-2">📅</span>
+                  Ngày Giao Dịch
                 </label>
                 <input
                   id="date"
@@ -228,13 +228,14 @@ const Transactions: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   required
                   max={new Date().toISOString().split('T')[0]}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
 
-              <div className="form-actions">
+              <div className="flex gap-4 pt-4">
                 <button 
                   type="button" 
-                  className="btn-secondary"
+                  className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleCancel}
                   disabled={isSubmitting}
                 >
@@ -242,17 +243,20 @@ const Transactions: React.FC = () => {
                 </button>
                 <button 
                   type="submit" 
-                  className="btn-primary"
+                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="spinner"></span>
+                      <svg className="inline-block animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
                       Đang lưu...
                     </>
                   ) : (
                     <>
-                      <span>✓</span>
+                      <span className="mr-2">✓</span>
                       {editingTransaction ? 'Cập Nhật' : 'Thêm Giao Dịch'}
                     </>
                   )}
@@ -265,7 +269,12 @@ const Transactions: React.FC = () => {
 
       <Card title={`Tất Cả Giao Dịch (${transactions.length})`}>
         {loading ? (
-          <div className="loading">Đang tải giao dịch...</div>
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+              <p className="text-gray-600">Đang tải giao dịch...</p>
+            </div>
+          </div>
         ) : (
           <TransactionList
             transactions={transactions}

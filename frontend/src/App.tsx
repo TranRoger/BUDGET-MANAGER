@@ -14,13 +14,12 @@ import Debts from './pages/Debts';
 import Goals from './pages/Goals';
 import AdminUsers from './pages/AdminUsers';
 import Settings from './pages/Settings';
-import './App.css';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="App">
+        <div className="min-h-screen">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route

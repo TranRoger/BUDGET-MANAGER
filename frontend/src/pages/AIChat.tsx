@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { aiService, ChatMessage } from '../services/aiService';
 import Card from '../components/Card';
-import './AIChat.css';
 
 const AIChat: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -38,56 +37,84 @@ const AIChat: React.FC = () => {
   };
 
   return (
-    <div className="ai-chat-page">
-      <h1 className="page-title">🤖 AI Financial Assistant</h1>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">🤖 AI Financial Assistant</h1>
 
-      <Card className="chat-card">
-        <div className="chat-messages">
+      <Card className="flex flex-col h-[calc(100vh-200px)]">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {messages.length === 0 ? (
-            <div className="chat-welcome">
-              <h2>👋 Hello!</h2>
-              <p>I'm your AI financial assistant. Ask me anything about:</p>
-              <ul>
-                <li>💰 Budgeting advice</li>
-                <li>📊 Spending analysis</li>
-                <li>💡 Savings tips</li>
-                <li>📈 Financial planning</li>
+            <div className="text-center py-12">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">👋 Hello!</h2>
+              <p className="text-gray-600 mb-6">I'm your AI financial assistant. Ask me anything about:</p>
+              <ul className="space-y-2 text-left max-w-md mx-auto">
+                <li className="flex items-center gap-2 text-gray-700">
+                  <span>💰</span> Budgeting advice
+                </li>
+                <li className="flex items-center gap-2 text-gray-700">
+                  <span>📊</span> Spending analysis
+                </li>
+                <li className="flex items-center gap-2 text-gray-700">
+                  <span>💡</span> Savings tips
+                </li>
+                <li className="flex items-center gap-2 text-gray-700">
+                  <span>📈</span> Financial planning
+                </li>
               </ul>
             </div>
           ) : (
             messages.map((msg, index) => (
-              <div key={index} className={`chat-message ${msg.role}`}>
-                <div className="message-avatar">
-                  {msg.role === 'user' ? '👤' : '🤖'}
+              <div key={index} className={`flex gap-3 ${
+                msg.role === 'user' ? 'justify-end' : 'justify-start'
+              }`}>
+                <div className={`flex gap-3 max-w-3xl ${
+                  msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+                }`}>
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xl">
+                    {msg.role === 'user' ? '👤' : '🤖'}
+                  </div>
+                  <div className={`px-4 py-3 rounded-2xl ${
+                    msg.role === 'user' 
+                      ? 'bg-primary-600 text-white' 
+                      : 'bg-gray-100 text-gray-900'
+                  }`}>
+                    {msg.content}
+                  </div>
                 </div>
-                <div className="message-content">{msg.content}</div>
               </div>
             ))
           )}
           {loading && (
-            <div className="chat-message assistant">
-              <div className="message-avatar">🤖</div>
-              <div className="message-content typing">Thinking...</div>
+            <div className="flex gap-3 justify-start">
+              <div className="flex gap-3 max-w-3xl">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xl">
+                  🤖
+                </div>
+                <div className="px-4 py-3 rounded-2xl bg-gray-100 text-gray-600">
+                  Thinking...
+                </div>
+              </div>
             </div>
           )}
         </div>
 
-        <div className="chat-input-container">
-          <textarea
-            className="chat-input"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask me anything about your finances..."
-            rows={3}
-          />
-          <button
-            className="btn-send"
-            onClick={handleSend}
-            disabled={loading || !input.trim()}
-          >
-            Send
-          </button>
+        <div className="border-t border-gray-200 p-4">
+          <div className="flex gap-3">
+            <textarea
+              className="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all resize-none"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask me anything about your finances..."
+              rows={3}
+            />
+            <button
+              className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleSend}
+              disabled={loading || !input.trim()}
+            >
+              Send
+            </button>
+          </div>
         </div>
       </Card>
     </div>

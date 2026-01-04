@@ -180,62 +180,52 @@ const AdminUsers: React.FC = () => {
       </div>
 
       {(showCreateForm || editingUser) && (
-        <Card className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">{editingUser ? '✏️ Sửa Người Dùng' : '➕ Tạo Người Dùng Mới'}</h2>
-          <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email <span className="text-red-500">*</span>
-              </label>
+        <Card className="user-form-card">
+          <h2>{editingUser ? '✏️ Sửa Người Dùng' : '➕ Tạo Người Dùng Mới'}</h2>
+          <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser} className="user-form">
+            <div className="form-group">
+              <label htmlFor="email">Email <span className="required">*</span></label>
               <input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 required
               />
             </div>
 
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Tên <span className="text-red-500">*</span>
-              </label>
+            <div className="form-group">
+              <label htmlFor="name">Tên <span className="required">*</span></label>
               <input
                 id="name"
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 required
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-group">
+              <label htmlFor="password">
                 Mật khẩu {editingUser && '(để trống nếu không thay đổi)'}
-                {!editingUser && <span className="text-red-500">*</span>}
+                {!editingUser && <span className="required">*</span>}
               </label>
               <input
                 id="password"
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 required={!editingUser}
                 minLength={6}
               />
             </div>
 
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-                Vai trò <span className="text-red-500">*</span>
-              </label>
+            <div className="form-group">
+              <label htmlFor="role">Vai trò <span className="required">*</span></label>
               <select
                 id="role"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 required
               >
                 <option value="user">User</option>
@@ -243,18 +233,11 @@ const AdminUsers: React.FC = () => {
               </select>
             </div>
 
-            <div className="flex gap-3">
-              <button 
-                type="submit" 
-                className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 font-semibold"
-              >
+            <div className="form-buttons">
+              <button type="submit" className="btn-submit">
                 {editingUser ? '💾 Cập Nhật' : '✨ Tạo Mới'}
               </button>
-              <button 
-                type="button" 
-                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all"
-                onClick={cancelEdit}
-              >
+              <button type="button" className="btn-cancel" onClick={cancelEdit}>
                 ✕ Hủy
               </button>
             </div>

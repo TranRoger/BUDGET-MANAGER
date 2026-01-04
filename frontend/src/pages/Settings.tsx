@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../components/Card';
-import './Settings.css';
 
 interface AISettings {
   aiApiKey: string;
@@ -128,165 +127,171 @@ const Settings: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="settings-page">
-        <div className="loading">Đang tải...</div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center text-gray-500">Đang tải...</div>
       </div>
     );
   }
 
   return (
-    <div className="settings-page">
-      <div className="settings-header">
-        <h1>⚙️ Cài Đặt</h1>
-        <p className="settings-subtitle">Cấu hình Google AI cho tính năng thông minh</p>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">⚙️ Cài Đặt</h1>
+        <p className="text-gray-600">Cấu hình Google AI cho tính năng thông minh</p>
       </div>
 
       {message && (
-        <div className={`settings-message ${message.type}`}>
+        <div className={`mb-6 p-4 rounded-xl ${
+          message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+        }`}>
           {message.text}
         </div>
       )}
 
-      <Card className="settings-card">
-        <div className="settings-section">
-          <div className="section-header">
-            <h2>🤖 Google AI Configuration</h2>
+      <Card>
+        <div className="mb-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-gray-900">🤖 Google AI Configuration</h2>
             <a 
               href="https://aistudio.google.com/app/apikey" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="get-key-link"
+              className="text-primary-600 hover:text-primary-700 font-semibold text-sm"
             >
               🔑 Lấy API Key miễn phí
             </a>
           </div>
+        </div>
 
-          <form onSubmit={handleSave} className="settings-form">
-            <div className="form-group">
-              <label htmlFor="aiApiKey">
-                API Key <span className="required">*</span>
-              </label>
-              <div className="api-key-input-wrapper">
-                <input
-                  id="aiApiKey"
-                  type={showApiKey ? 'text' : 'password'}
-                  value={settings.aiApiKey}
-                  onChange={(e) => setSettings({ ...settings, aiApiKey: e.target.value })}
-                  placeholder="AIzaSy..."
-                  className="api-key-input"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowApiKey(!showApiKey)}
-                  className="toggle-visibility"
-                >
-                  {showApiKey ? '🙈' : '👁️'}
-                </button>
-              </div>
-              <p className="help-text">
-                Nhập Google AI API Key của bạn. API key được lưu trữ an toàn và chỉ bạn mới truy cập được.
-              </p>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="aiModel">
-                Model <span className="required">*</span>
-              </label>
-              <select
-                id="aiModel"
-                value={settings.aiModel}
-                onChange={(e) => setSettings({ ...settings, aiModel: e.target.value })}
-                className="model-select"
+        <form onSubmit={handleSave} className="space-y-6">
+          <div>
+            <label htmlFor="aiApiKey" className="block text-sm font-medium text-gray-700 mb-2">
+              API Key <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                id="aiApiKey"
+                type={showApiKey ? 'text' : 'password'}
+                value={settings.aiApiKey}
+                onChange={(e) => setSettings({ ...settings, aiApiKey: e.target.value })}
+                placeholder="AIzaSy..."
+                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowApiKey(!showApiKey)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
               >
-                {availableModels.map((model) => (
-                  <option key={model.value} value={model.value}>
-                    {model.label}
-                  </option>
-                ))}
-              </select>
-              <p className="help-text">
-                Chọn model phù hợp với nhu cầu. Flash nhanh hơn, Pro chất lượng cao hơn.
-              </p>
+                {showApiKey ? '🙈' : '👁️'}
+              </button>
             </div>
+            <p className="text-sm text-gray-500 mt-2">
+              Nhập Google AI API Key của bạn. API key được lưu trữ an toàn và chỉ bạn mới truy cập được.
+            </p>
+          </div>
 
-            <div className="model-comparison">
-              <h3>📊 So Sánh Models</h3>
-              <table className="comparison-table">
+          <div>
+            <label htmlFor="aiModel" className="block text-sm font-medium text-gray-700 mb-2">
+              Model <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="aiModel"
+              value={settings.aiModel}
+              onChange={(e) => setSettings({ ...settings, aiModel: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+            >
+              {availableModels.map((model) => (
+                <option key={model.value} value={model.value}>
+                  {model.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-sm text-gray-500 mt-2">
+              Chọn model phù hợp với nhu cầu. Flash nhanh hơn, Pro chất lượng cao hơn.
+            </p>
+          </div>
+
+          <div className="bg-gray-50 p-6 rounded-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 So Sánh Models</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
                 <thead>
-                  <tr>
-                    <th>Model</th>
-                    <th>Tốc Độ</th>
-                    <th>Chất Lượng</th>
-                    <th>Phù Hợp</th>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-2 px-4 text-sm font-semibold text-gray-700">Model</th>
+                    <th className="text-left py-2 px-4 text-sm font-semibold text-gray-700">Tốc Độ</th>
+                    <th className="text-left py-2 px-4 text-sm font-semibold text-gray-700">Chất Lượng</th>
+                    <th className="text-left py-2 px-4 text-sm font-semibold text-gray-700">Phù Hợp</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>Gemini 2.5 Flash</td>
-                    <td>⚡⚡⚡</td>
-                    <td>⭐⭐⭐⭐</td>
-                    <td>Nhanh, ổn định, phù hợp mọi tác vụ</td>
+                  <tr className="border-b border-gray-100">
+                    <td className="py-3 px-4 text-sm text-gray-900">Gemini 2.5 Flash</td>
+                    <td className="py-3 px-4 text-sm">⚡⚡⚡</td>
+                    <td className="py-3 px-4 text-sm">⭐⭐⭐⭐</td>
+                    <td className="py-3 px-4 text-sm text-gray-600">Nhanh, ổn định, phù hợp mọi tác vụ</td>
                   </tr>
                   <tr>
-                    <td>Gemini 3.0 Flash</td>
-                    <td>⚡⚡⚡</td>
-                    <td>⭐⭐⭐⭐⭐</td>
-                    <td>Model mới nhất, hiệu năng cao nhất</td>
+                    <td className="py-3 px-4 text-sm text-gray-900">Gemini 3.0 Flash</td>
+                    <td className="py-3 px-4 text-sm">⚡⚡⚡</td>
+                    <td className="py-3 px-4 text-sm">⭐⭐⭐⭐⭐</td>
+                    <td className="py-3 px-4 text-sm text-gray-600">Model mới nhất, hiệu năng cao nhất</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+          </div>
 
-            <div className="form-actions">
-              <button
-                type="button"
-                onClick={handleTestConnection}
-                className="btn-test"
-                disabled={saving || !settings.aiApiKey.trim()}
-              >
-                {saving ? '🔄 Đang kiểm tra...' : '🧪 Test Connection'}
-              </button>
-              <button
-                type="submit"
-                className="btn-save"
-                disabled={saving}
-              >
-                {saving ? '💾 Đang lưu...' : '💾 Lưu Cài Đặt'}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleTestConnection}
+              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={saving || !settings.aiApiKey.trim()}
+            >
+              {saving ? '🔄 Đang kiểm tra...' : '🧪 Test Connection'}
+            </button>
+            <button
+              type="submit"
+              className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-xl shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={saving}
+            >
+              {saving ? '💾 Đang lưu...' : '💾 Lưu Cài Đặt'}
+            </button>
+          </div>
+        </form>
       </Card>
 
-      <Card className="settings-card info-card">
-        <h2>ℹ️ Hướng Dẫn</h2>
-        <div className="info-content">
-          <div className="info-step">
-            <div className="step-number">1</div>
-            <div className="step-content">
-              <h3>Lấy API Key</h3>
-              <p>Truy cập <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a> và tạo API key miễn phí</p>
+      <Card className="mt-8 bg-blue-50">
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">ℹ️ Hướng Dẫn</h2>
+        <div className="space-y-4">
+          <div className="flex gap-4">
+            <div className="flex-shrink-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">1</div>
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-1">Lấy API Key</h3>
+              <p className="text-gray-600 text-sm">
+                Truy cập <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">Google AI Studio</a> và tạo API key miễn phí
+              </p>
             </div>
           </div>
-          <div className="info-step">
-            <div className="step-number">2</div>
-            <div className="step-content">
-              <h3>Nhập API Key</h3>
-              <p>Dán API key vào form trên và chọn model phù hợp</p>
+          <div className="flex gap-4">
+            <div className="flex-shrink-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">2</div>
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-1">Nhập API Key</h3>
+              <p className="text-gray-600 text-sm">Dán API key vào form trên và chọn model phù hợp</p>
             </div>
           </div>
-          <div className="info-step">
-            <div className="step-number">3</div>
-            <div className="step-content">
-              <h3>Test & Lưu</h3>
-              <p>Nhấn "Test Connection" để kiểm tra, sau đó "Lưu Cài Đặt"</p>
+          <div className="flex gap-4">
+            <div className="flex-shrink-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">3</div>
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-1">Test & Lưu</h3>
+              <p className="text-gray-600 text-sm">Nhấn "Test Connection" để kiểm tra, sau đó "Lưu Cài Đặt"</p>
             </div>
           </div>
-          <div className="info-step">
-            <div className="step-number">4</div>
-            <div className="step-content">
-              <h3>Sử Dụng AI</h3>
-              <p>Tính năng AI Insights và Spending Plans sẽ sử dụng API key của bạn</p>
+          <div className="flex gap-4">
+            <div className="flex-shrink-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold">4</div>
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-1">Sử Dụng AI</h3>
+              <p className="text-gray-600 text-sm">Tính năng AI Insights và Spending Plans sẽ sử dụng API key của bạn</p>
             </div>
           </div>
         </div>
