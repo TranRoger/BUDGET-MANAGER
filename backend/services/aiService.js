@@ -131,7 +131,7 @@ async function chatWithAssistant(userId, message, conversationHistory = []) {
     const genAI = new GoogleGenerativeAI(apiKey);
     
     // Get user context
-    const [recentTransactions, budgets, debts, goals] = await Promise.all([
+    const [recentTransactions, budgets, debts, goals, categories, currentPlan, spendingLimits] = await Promise.all([
       db.query(
         'SELECT * FROM transactions WHERE user_id = $1 ORDER BY date DESC LIMIT 10',
         [userId]
@@ -147,8 +147,24 @@ async function chatWithAssistant(userId, message, conversationHistory = []) {
       db.query(
         'SELECT * FROM financial_goals WHERE user_id = $1',
         [userId]
+      ),
+      db.query(
+        'SELECT id, name, type FROM categories WHERE user_id IS NULL OR user_id = $1',
+        [userId]
+      ),
+      db.query(
+        'SELECT * FROM spending_plans WHERE user_id = $1 AND is_active = true ORDER BY created_at DESC LIMIT 1',
+        [userId]
+      ),
+      db.query(
+        'SELECT * FROM spending_limits WHERE user_id = $1',
+        [userId]
       )
     ]);
+
+    const planInfo = currentPlan.rows.length > 0 
+      ? `\n\nKẾ HOẠCH CHI TIÊU HIỆN TẠI:\n- Thu nhập hàng tháng: ${Number.parseFloat(currentPlan.rows[0].monthly_income).toLocaleString('vi-VN')} VNĐ\n- Ngày kết thúc: ${currentPlan.rows[0].target_date}\n- Ghi chú: ${currentPlan.rows[0].notes || 'Không có'}\n\nNỘI DUNG KẾ HOẠCH:\n${currentPlan.rows[0].plan_content}\n\n---`
+      : '\n\nChưa có kế hoạch chi tiêu. Người dùng có thể yêu cầu tạo kế hoạch mới.';
 
     const context = `Bạn là trợ lý tài chính thông minh có quyền truy cập vào dữ liệu tài chính của người dùng.
 
@@ -157,14 +173,27 @@ Tổng quan tài chính hiện tại:
 - Ngân sách đang hoạt động: ${budgets.rows.length}
 - Tổng nợ: ${debts.rows.length}
 - Mục tiêu tài chính: ${goals.rows.length}
+- Giới hạn chi tiêu: ${spendingLimits.rows.length}${planInfo}
+
+Danh mục có sẵn:
+${categories.rows.map(c => `- ${c.name} (ID: ${c.id}, loại: ${c.type})`).join('\n')}
 
 Bạn có thể giúp người dùng:
 1. Thêm giao dịch khi họ đề cập đến chi tiêu hoặc thu nhập
 2. Tạo khoản nợ khi họ nói về các khoản vay hoặc tiền nợ
 3. Đặt mục tiêu tài chính khi họ đề cập đến mục tiêu tiết kiệm
-4. Cung cấp lời khuyên và phân tích tài chính
+4. Tạo danh mục mới nếu danh mục hiện tại không phù hợp
+5. Tạo giới hạn chi tiêu cho các danh mục (dựa trên kế hoạch chi tiêu nếu có)
+6. Tạo mục tiêu tài chính dựa trên kế hoạch chi tiêu
+7. Phân tích và đưa ra khuyến nghị dựa trên kế hoạch chi tiêu hiện tại
+8. Cung cấp lời khuyên và phân tích tài chính
 
-Khi người dùng đề cập đến giao dịch, nợ hoặc mục tiêu tài chính, bạn nên sử dụng chức năng phù hợp để thêm vào cơ sở dữ liệu của họ.
+LƯU Ý QUAN TRỌNG:
+- Nếu người dùng yêu cầu tạo giới hạn chi tiêu hoặc mục tiêu dựa trên KẾ HOẠCH CHI TIÊU, hãy đọc kỹ nội dung kế hoạch ở trên và phân tích các khuyến nghị trong đó.
+- Sử dụng thông tin về thu nhập hàng tháng và các đề xuất trong kế hoạch để tạo spending limits và goals phù hợp.
+- Khi tạo spending limit, cần chọn đúng category_id từ danh sách danh mục có sẵn.
+
+Khi người dùng đề cập đến giao dịch, nợ, mục tiêu tài chính, hoặc giới hạn chi tiêu, bạn nên sử dụng chức năng phù hợp để thêm vào cơ sở dữ liệu của họ.
 
 Hãy trả lời bằng tiếng Việt một cách tự nhiên và thân thiện.`;
 
@@ -265,6 +294,64 @@ Hãy trả lời bằng tiếng Việt một cách tự nhiên và thân thiện
           },
           required: ['name', 'target_amount']
         }
+      },
+      {
+        name: 'add_spending_limit',
+        description: 'Tạo giới hạn chi tiêu cho một danh mục cụ thể',
+        parameters: {
+          type: 'object',
+          properties: {
+            category_id: {
+              type: 'number',
+              description: 'ID danh mục muốn đặt giới hạn'
+            },
+            amount: {
+              type: 'number',
+              description: 'Số tiền giới hạn'
+            },
+            period: {
+              type: 'string',
+              enum: ['daily', 'weekly', 'monthly', 'yearly'],
+              description: 'Kỳ hạn: daily (hàng ngày), weekly (hàng tuần), monthly (hàng tháng), yearly (hàng năm)'
+            },
+            start_date: {
+              type: 'string',
+              description: 'Ngày bắt đầu định dạng YYYY-MM-DD'
+            },
+            end_date: {
+              type: 'string',
+              description: 'Ngày kết thúc định dạng YYYY-MM-DD'
+            }
+          },
+          required: ['category_id', 'amount', 'period', 'start_date', 'end_date']
+        }
+      },
+      {
+        name: 'add_category',
+        description: 'Tạo danh mục mới cho thu nhập hoặc chi tiêu',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+              description: 'Tên danh mục (ví dụ: Tiền thưởng, Café, Gym)'
+            },
+            type: {
+              type: 'string',
+              enum: ['income', 'expense'],
+              description: 'Loại danh mục: income (thu nhập) hoặc expense (chi tiêu)'
+            },
+            icon: {
+              type: 'string',
+              description: 'Icon emoji cho danh mục (ví dụ: 💰, 🍕, 🎮)'
+            },
+            color: {
+              type: 'string',
+              description: 'Mã màu hex cho danh mục (ví dụ: #FF5722, #4CAF50)'
+            }
+          },
+          required: ['name', 'type']
+        }
       }
     ];
 
@@ -315,6 +402,12 @@ Hãy trả lời bằng tiếng Việt một cách tự nhiên và thân thiện
               break;
             case 'add_goal':
               functionResult = await addGoal(userId, args);
+              break;
+            case 'add_spending_limit':
+              functionResult = await addSpendingLimit(userId, args);
+              break;
+            case 'add_category':
+              functionResult = await addCategory(userId, args);
               break;
             default:
               functionResult = { error: 'Unknown function' };
@@ -409,6 +502,78 @@ async function addGoal(userId, args) {
     success: true,
     goal: result.rows[0],
     message: `Created goal: ${name} with target of $${target_amount}`
+  };
+}
+
+async function addSpendingLimit(userId, args) {
+  const { category_id, amount, period, start_date, end_date } = args;
+  
+  // Verify category exists and is expense type
+  const categoryCheck = await db.query(
+    'SELECT type, name FROM categories WHERE id = $1',
+    [category_id]
+  );
+  
+  if (categoryCheck.rows.length === 0) {
+    return {
+      success: false,
+      error: 'Category not found'
+    };
+  }
+  
+  if (categoryCheck.rows[0].type !== 'expense') {
+    return {
+      success: false,
+      error: 'Spending limits can only be set for expense categories'
+    };
+  }
+  
+  const result = await db.query(
+    `INSERT INTO spending_limits (user_id, category_id, amount, period, start_date, end_date)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING *`,
+    [userId, category_id, amount, period, start_date, end_date]
+  );
+  
+  return {
+    success: true,
+    spending_limit: result.rows[0],
+    message: `Created spending limit for ${categoryCheck.rows[0].name}: ${amount} per ${period}`
+  };
+}
+
+async function addCategory(userId, args) {
+  const { name, type, icon, color } = args;
+  
+  // Check if category already exists
+  const existingCategory = await db.query(
+    'SELECT id FROM categories WHERE LOWER(name) = LOWER($1) AND (user_id = $2 OR user_id IS NULL)',
+    [name, userId]
+  );
+  
+  if (existingCategory.rows.length > 0) {
+    return {
+      success: false,
+      error: `Category "${name}" already exists`,
+      existing_category_id: existingCategory.rows[0].id
+    };
+  }
+  
+  // Default icons and colors based on type
+  const defaultIcon = icon || (type === 'income' ? '💰' : '📌');
+  const defaultColor = color || (type === 'income' ? '#4CAF50' : '#9E9E9E');
+  
+  const result = await db.query(
+    `INSERT INTO categories (user_id, name, type, icon, color)
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING *`,
+    [userId, name, type, defaultIcon, defaultColor]
+  );
+  
+  return {
+    success: true,
+    category: result.rows[0],
+    message: `Created ${type} category: ${name} (ID: ${result.rows[0].id})`
   };
 }
 

@@ -22,17 +22,17 @@ export interface CreateBudgetData {
 export const budgetService = {
   async getAll(): Promise<Budget[]> {
     const response = await api.get('/budgets');
-    return response.data;
+    return response.data.data || response.data; // Support both formats
   },
 
   async create(data: CreateBudgetData): Promise<Budget> {
     const response = await api.post('/budgets', data);
-    return response.data;
+    return response.data.data || response.data;
   },
 
   async update(id: number, data: Partial<CreateBudgetData>): Promise<Budget> {
     const response = await api.put(`/budgets/${id}`, data);
-    return response.data;
+    return response.data.data || response.data;
   },
 
   async delete(id: number): Promise<void> {
