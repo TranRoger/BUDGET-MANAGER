@@ -36,15 +36,18 @@ export interface Recommendation {
   action: string;
 }
 
-export interface RecommendationsResponse {
-  recommendations: Recommendation[];
+export interface SpendingPlan {
+  plan: string; // Markdown content
+  targetDate: string;
+  monthlyIncome: number;
+  notes?: string;
   summary: {
-    monthlyIncome: number;
     totalMonthlyExpenses: number;
-    netMonthly: number;
+    totalFixedExpenses: number;
     totalDebt: number;
-    discretionarySpending: number;
-    savingsRate: number;
+    availableFunds: number;
+    goalCount: number;
+    debtCount: number;
   };
   generatedAt: string;
 }
@@ -63,8 +66,12 @@ export const aiService = {
     return response.data;
   },
 
-  async getRecommendations(): Promise<RecommendationsResponse> {
-    const response = await api.get('/ai/recommendations');
+  async generatePlan(monthlyIncome: number, targetDate: string, notes?: string): Promise<SpendingPlan> {
+    const response = await api.post('/ai/plan', {
+      monthlyIncome,
+      targetDate,
+      notes,
+    });
     return response.data;
   },
 };

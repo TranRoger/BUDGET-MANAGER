@@ -3,11 +3,45 @@ const db = require('../config/database');
 
 // Initialize Google AI with API Key
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+// Simple in-memory cache to reduce API calls
+const cache = {
+  recommendations: new Map(), // userId -> { data, timestamp }
+  insights: new Map(),
+  plan: new Map()
+};
+
+// Cache TTL (Time To Live) in milliseconds
+const CACHE_TTL = {
+  recommendations: 60 * 60 * 1000, // 1 hour
+  insights: 30 * 60 * 1000, // 30 minutes
+  plan: 24 * 60 * 60 * 1000 // 24 hours
+};
+
+// Helper function to check cache
+function getCached(cacheType, key) {
+  const cached = cache[cacheType].get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL[cacheType]) {
+    console.log(`Cache HIT for ${cacheType}:${key}`);
+    return cached.data;
+  }
+  console.log(`Cache MISS for ${cacheType}:${key}`);
+  return null;
+}
+
+// Helper function to set cache
+function setCache(cacheType, key, data) {
+  cache[cacheType].set(key, { data, timestamp: Date.now() });
+}
 
 // Generate financial insights using AI
 async function generateFinancialInsights(userId) {
   try {
+    // Check cache first
+    const cached = getCached('insights', userId);
+    if (cached) return cached;
+
     // Get user's financial data
     const transactions = await db.query(
       `SELECT * FROM transactions WHERE user_id = $1 ORDER BY date DESC LIMIT 100`,
@@ -45,10 +79,14 @@ Format the response as JSON with these sections.`;
     const result = await model.generateContent(prompt);
     const response = result.response;
     
-    return {
+    const insights = {
       insights: response.candidates[0].content.parts[0].text,
       generatedAt: new Date()
     };
+    
+    // Cache the result
+    setCache('insights', userId, insights);
+    return insights;
   } catch (error) {
     console.error('Error generating insights:', error);
     throw new Error('Failed to generate AI insights');
@@ -78,50 +116,52 @@ async function chatWithAssistant(userId, message, conversationHistory = []) {
       )
     ]);
 
-    const context = `You are a helpful financial assistant with access to the user's financial data.
+    const context = `Bạn là trợ lý tài chính thông minh có quyền truy cập vào dữ liệu tài chính của người dùng.
 
-Current Financial Overview:
-- Recent Transactions: ${recentTransactions.rows.length} transactions
-- Active Budgets: ${budgets.rows.length}
-- Total Debts: ${debts.rows.length}
-- Financial Goals: ${goals.rows.length}
+Tổng quan tài chính hiện tại:
+- Giao dịch gần đây: ${recentTransactions.rows.length} giao dịch
+- Ngân sách đang hoạt động: ${budgets.rows.length}
+- Tổng nợ: ${debts.rows.length}
+- Mục tiêu tài chính: ${goals.rows.length}
 
-You can help users:
-1. Add transactions when they mention spending or income
-2. Create debts when they talk about loans or money owed
-3. Set financial goals when they mention saving targets
-4. Provide financial advice and insights
+Bạn có thể giúp người dùng:
+1. Thêm giao dịch khi họ đề cập đến chi tiêu hoặc thu nhập
+2. Tạo khoản nợ khi họ nói về các khoản vay hoặc tiền nợ
+3. Đặt mục tiêu tài chính khi họ đề cập đến mục tiêu tiết kiệm
+4. Cung cấp lời khuyên và phân tích tài chính
 
-When the user mentions a financial transaction, debt, or goal, you should use the appropriate function to add it to their database.`;
+Khi người dùng đề cập đến giao dịch, nợ hoặc mục tiêu tài chính, bạn nên sử dụng chức năng phù hợp để thêm vào cơ sở dữ liệu của họ.
+
+Hãy trả lời bằng tiếng Việt một cách tự nhiên và thân thiện.`;
 
     // Define available functions for AI
     const functions = [
       {
         name: 'add_transaction',
-        description: 'Add a new income or expense transaction to the database',
+        description: 'Thêm giao dịch thu nhập hoặc chi tiêu mới vào cơ sở dữ liệu',
         parameters: {
           type: 'object',
           properties: {
             amount: {
               type: 'number',
-              description: 'The transaction amount (positive number)'
+              description: 'Số tiền giao dịch (số dương)'
             },
             type: {
               type: 'string',
               enum: ['income', 'expense'],
-              description: 'Whether this is income or expense'
+              description: 'Loại: thu nhập (income) hoặc chi tiêu (expense)'
             },
             description: {
               type: 'string',
-              description: 'Description of the transaction'
+              description: 'Mô tả giao dịch'
             },
             date: {
               type: 'string',
-              description: 'Transaction date in YYYY-MM-DD format. Use today if not specified.'
+              description: 'Ngày giao dịch định dạng YYYY-MM-DD. Dùng hôm nay nếu không chỉ định.'
             },
             category_id: {
               type: 'number',
-              description: 'Category ID (default: 1 for general)'
+              description: 'ID danh mục (mặc định: 1 cho chung)'
             }
           },
           required: ['amount', 'type', 'description']
@@ -129,29 +169,29 @@ When the user mentions a financial transaction, debt, or goal, you should use th
       },
       {
         name: 'add_debt',
-        description: 'Add a new debt/loan to track',
+        description: 'Thêm khoản nợ/vay mới để theo dõi',
         parameters: {
           type: 'object',
           properties: {
             name: {
               type: 'string',
-              description: 'Name of the debt (e.g., Credit Card, Car Loan)'
+              description: 'Tên khoản nợ (ví dụ: Thẻ tín dụng, Vay mua xe)'
             },
             amount: {
               type: 'number',
-              description: 'Total debt amount'
+              description: 'Tổng số tiền nợ'
             },
             interest_rate: {
               type: 'number',
-              description: 'Interest rate percentage (optional)'
+              description: 'Lãi suất phần trăm (tùy chọn)'
             },
             due_date: {
               type: 'string',
-              description: 'Due date in YYYY-MM-DD format (optional)'
+              description: 'Ngày đến hạn định dạng YYYY-MM-DD (tùy chọn)'
             },
             description: {
               type: 'string',
-              description: 'Additional notes about the debt'
+              description: 'Ghi chú bổ sung về khoản nợ'
             }
           },
           required: ['name', 'amount']
@@ -159,34 +199,34 @@ When the user mentions a financial transaction, debt, or goal, you should use th
       },
       {
         name: 'add_goal',
-        description: 'Create a new financial goal',
+        description: 'Tạo mục tiêu tài chính mới',
         parameters: {
           type: 'object',
           properties: {
             name: {
               type: 'string',
-              description: 'Name of the goal (e.g., Emergency Fund, Vacation)'
+              description: 'Tên mục tiêu (ví dụ: Quỹ khẩn cấp, Du lịch)'
             },
             target_amount: {
               type: 'number',
-              description: 'Target amount to save'
+              description: 'Số tiền mục tiêu cần tiết kiệm'
             },
             current_amount: {
               type: 'number',
-              description: 'Current saved amount (default: 0)'
+              description: 'Số tiền đã tiết kiệm hiện tại (mặc định: 0)'
             },
             priority: {
               type: 'string',
               enum: ['low', 'medium', 'high'],
-              description: 'Priority level'
+              description: 'Mức độ ưu tiên'
             },
             deadline: {
               type: 'string',
-              description: 'Target deadline in YYYY-MM-DD format (optional)'
+              description: 'Thời hạn mục tiêu định dạng YYYY-MM-DD (tùy chọn)'
             },
             description: {
               type: 'string',
-              description: 'Why this goal is important'
+              description: 'Tại sao mục tiêu này quan trọng'
             }
           },
           required: ['name', 'target_amount']
@@ -195,7 +235,7 @@ When the user mentions a financial transaction, debt, or goal, you should use th
     ];
 
     const modelWithTools = genAI.getGenerativeModel({
-      model: 'gemini-pro',
+      model: 'gemini-2.5-flash',
       tools: [{ functionDeclarations: functions }]
     });
 
@@ -209,7 +249,7 @@ When the user mentions a financial transaction, debt, or goal, you should use th
         },
         {
           role: 'model',
-          parts: [{ text: 'I understand. I\'m your financial assistant and I can help you track transactions, debts, and goals. Just tell me about your financial activities and I\'ll help you manage them.' }]
+          parts: [{ text: 'Tôi hiểu rồi. Tôi là trợ lý tài chính của bạn và tôi có thể giúp bạn theo dõi giao dịch, nợ và mục tiêu. Hãy cho tôi biết về các hoạt động tài chính của bạn và tôi sẽ giúp bạn quản lý chúng.' }]
         },
         ...conversationHistory.map(msg => ({
           role: msg.role === 'user' ? 'user' : 'model',
@@ -338,35 +378,43 @@ async function addGoal(userId, args) {
   };
 }
 
-// Get smart spending recommendations based on income, debts, and fixed expenses
-async function getSpendingRecommendations(userId) {
+// Tạo kế hoạch chi tiêu cá nhân hóa với input từ người dùng
+async function generateSpendingPlan(userId, monthlyIncome, targetDate, notes = '') {
   try {
-    // Gather comprehensive financial data
-    const [incomeData, debtData, expenseData, goalData, fixedExpenses] = await Promise.all([
-      // Monthly income (last 30 days)
+    // Calculate timeframe from current date to target date
+    const currentDate = new Date();
+    const endDate = new Date(targetDate);
+    const diffTime = Math.abs(endDate - currentDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffMonths = Math.round(diffDays / 30);
+    
+    let timeframeText = '';
+    if (diffDays <= 7) timeframeText = `${diffDays} ngày`;
+    else if (diffDays <= 30) timeframeText = `${Math.ceil(diffDays / 7)} tuần`;
+    else if (diffMonths <= 12) timeframeText = `${diffMonths} tháng`;
+    else timeframeText = `${Math.round(diffMonths / 12)} năm`;
+    
+    // Check cache first
+    const cacheKey = `${userId}_${monthlyIncome}_${targetDate}_${notes.substring(0, 50)}`;
+    const cached = getCached('plan', cacheKey);
+    if (cached) {
+      console.log('Cache HIT: Spending plan');
+      return cached;
+    }
+    
+    console.log('Cache MISS: Spending plan - generating new plan...');
+
+    // Gather user's financial data
+    const [debtData, expenseData, goalData, fixedExpenses] = await Promise.all([
       db.query(
-        `SELECT COALESCE(SUM(amount), 0) as total_income 
-         FROM transactions 
-         WHERE user_id = $1 AND type = 'income' AND date > NOW() - INTERVAL '30 days'`,
+        `SELECT * FROM debts WHERE user_id = $1 ORDER BY interest_rate DESC`,
         [userId]
       ),
-      // Total debts with interest
-      db.query(
-        `SELECT 
-          COALESCE(SUM(amount), 0) as total_debt,
-          COALESCE(AVG(interest_rate), 0) as avg_interest_rate,
-          COUNT(*) as debt_count
-         FROM debts 
-         WHERE user_id = $1`,
-        [userId]
-      ),
-      // Monthly expenses by category
       db.query(
         `SELECT 
           c.name as category,
           SUM(t.amount) as total,
-          COUNT(*) as transaction_count,
-          AVG(t.amount) as avg_amount
+          COUNT(*) as transaction_count
          FROM transactions t
          JOIN categories c ON t.category_id = c.id
          WHERE t.user_id = $1 AND t.type = 'expense' AND t.date > NOW() - INTERVAL '30 days'
@@ -374,17 +422,10 @@ async function getSpendingRecommendations(userId) {
          ORDER BY total DESC`,
         [userId]
       ),
-      // Financial goals
       db.query(
-        `SELECT 
-          COUNT(*) as total_goals,
-          COALESCE(SUM(target_amount - current_amount), 0) as remaining_amount,
-          COALESCE(SUM(target_amount), 0) as total_target
-         FROM financial_goals 
-         WHERE user_id = $1`,
+        `SELECT * FROM financial_goals WHERE user_id = $1 ORDER BY priority DESC, deadline ASC`,
         [userId]
       ),
-      // Get recurring/fixed expenses (categorized as Rent, Utilities, Insurance, etc.)
       db.query(
         `SELECT 
           c.name as category,
@@ -400,116 +441,105 @@ async function getSpendingRecommendations(userId) {
       )
     ]);
 
-    const monthlyIncome = parseFloat(incomeData.rows[0].total_income);
-    const totalDebt = parseFloat(debtData.rows[0].total_debt);
-    const avgInterestRate = parseFloat(debtData.rows[0].avg_interest_rate);
+    const debts = debtData.rows;
     const expenses = expenseData.rows;
-    const goals = goalData.rows[0];
+    const goals = goalData.rows;
     const fixed = fixedExpenses.rows;
 
-    const totalMonthlyExpenses = expenses.reduce((sum, e) => sum + parseFloat(e.total), 0);
-    const totalFixedExpenses = fixed.reduce((sum, f) => sum + parseFloat(f.monthly_amount), 0);
-    const discretionarySpending = totalMonthlyExpenses - totalFixedExpenses;
+    const totalMonthlyExpenses = expenses.reduce((sum, e) => sum + Number.parseFloat(e.total), 0);
+    const totalFixedExpenses = fixed.reduce((sum, f) => sum + Number.parseFloat(f.monthly_amount), 0);
+    const totalDebt = debts.reduce((sum, d) => sum + Number.parseFloat(d.amount), 0);
 
-    const prompt = `You are a financial advisor. Analyze this user's financial situation and provide smart, actionable spending recommendations.
+    const prompt = `Bạn là chuyên gia tư vấn tài chính cá nhân. Hãy tạo một kế hoạch chi tiêu CHI TIẾT và THỰC TẾ cho người dùng.
 
-FINANCIAL OVERVIEW:
-Monthly Income: $${monthlyIncome.toFixed(2)}
-Total Monthly Expenses: $${totalMonthlyExpenses.toFixed(2)}
-Net Monthly: $${(monthlyIncome - totalMonthlyExpenses).toFixed(2)}
+THÔNG TIN TÀI CHÍNH:
+Thu nhập hàng tháng: ${monthlyIncome.toLocaleString('vi-VN')} VNĐ
+Tổng chi tiêu hàng tháng hiện tại: ${totalMonthlyExpenses.toLocaleString('vi-VN')} VNĐ
+Khoản chi cố định: ${totalFixedExpenses.toLocaleString('vi-VN')} VNĐ
+Tổng nợ: ${totalDebt.toLocaleString('vi-VN')} VNĐ
 
-FIXED EXPENSES (${fixed.length} categories, Total: $${totalFixedExpenses.toFixed(2)}):
-${fixed.map(f => `- ${f.category}: $${parseFloat(f.monthly_amount).toFixed(2)}`).join('\n')}
+CHI TIẾT CHI TIÊU CỐ ĐỊNH:
+${fixed.map(f => `- ${f.category}: ${Number.parseFloat(f.monthly_amount).toLocaleString('vi-VN')} VNĐ`).join('\n')}
 
-VARIABLE EXPENSES (Discretionary: $${discretionarySpending.toFixed(2)}):
-${expenses.filter(e => !fixed.find(f => f.category === e.category))
-  .map(e => `- ${e.category}: $${parseFloat(e.total).toFixed(2)} (${e.transaction_count} transactions, avg $${parseFloat(e.avg_amount).toFixed(2)})`).join('\n')}
+CHI TIẾT CHI TIÊU BIẾN ĐỘNG:
+${expenses.filter(e => !fixed.some(f => f.category === e.category))
+  .map(e => `- ${e.category}: ${Number.parseFloat(e.total).toLocaleString('vi-VN')} VNĐ (${e.transaction_count} giao dịch)`).join('\n')}
 
-DEBTS:
-Total Debt: $${totalDebt.toFixed(2)}
-Average Interest Rate: ${avgInterestRate.toFixed(2)}%
-Number of Debts: ${debtData.rows[0].debt_count}
+CÁC KHOẢN NỢ:
+${debts.map(d => `- ${d.name}: ${Number.parseFloat(d.amount).toLocaleString('vi-VN')} VNĐ (Lãi suất: ${d.interest_rate || 0}%)`).join('\n')}
 
-FINANCIAL GOALS:
-Active Goals: ${goals.total_goals}
-Total Target: $${parseFloat(goals.total_target).toFixed(2)}
-Amount Needed: $${parseFloat(goals.remaining_amount).toFixed(2)}
+MỤC TIÊU TÀI CHÍNH:
+${goals.map(g => `- ${g.name}: Mục tiêu ${Number.parseFloat(g.target_amount).toLocaleString('vi-VN')} VNĐ, đã có ${Number.parseFloat(g.current_amount).toLocaleString('vi-VN')} VNĐ (Ưu tiên: ${g.priority})`).join('\n')}
 
-TASK: Provide exactly 5 specific, personalized recommendations. Each recommendation should:
-1. Target a specific spending category or financial behavior
-2. Include a concrete action the user can take
-3. Estimate potential monthly savings or financial benefit
-4. Be realistic and actionable
+KHOẢNG THỜI GIAN LẬP KẾ HOẠCH: ${timeframeText} (từ ${currentDate.toLocaleDateString('vi-VN')} đến ${endDate.toLocaleDateString('vi-VN')})
 
-Consider:
-- The 50/30/20 rule (50% needs, 30% wants, 20% savings)
-- Debt repayment priority (high interest first)
-- Emergency fund recommendations (3-6 months expenses)
-- Goal achievement timeline
-- Areas of overspending vs income
+GHI CHÚ TỪ NGƯỜI DÙNG:
+${notes || 'Không có ghi chú bổ sung'}
 
-Return ONLY a JSON array with this exact structure:
-[
-  {
-    "title": "Short recommendation title",
-    "description": "Detailed explanation of the recommendation",
-    "category": "Affected spending category or 'General'",
-    "potential_savings": 150.50,
-    "priority": "high|medium|low",
-    "action": "Specific action to take"
-  }
-]`;
+YÊU CẦU:
+1. Phân tích tình hình tài chính hiện tại
+2. Tính toán số tiền khả dụng sau khi trừ chi tiêu cố định và nhu cầu thiết yếu
+3. Đưa ra KẾ HOẠCH DUY NHẤT, CHI TIẾT theo ${timeframeText}:
+   - Phân bổ ngân sách cho từng tuần/tháng
+   - Ưu tiên trả nợ (nợ lãi suất cao trước)
+   - Kế hoạch tiết kiệm cho mục tiêu
+   - Khuyến nghị cắt giảm chi tiêu
+   - Kế hoạch dự phòng khẩn cấp (3-6 tháng chi tiêu)
+4. Đưa ra lộ trình cụ thể, TỪNG BƯỚC, dễ thực hiện
+5. Bao gồm các mốc kiểm tra tiến độ
 
-    const modelForRecommendations = genAI.getGenerativeModel({
-      model: 'gemini-pro',
-      generationConfig: {
-        temperature: 0.7,
-        responseMimeType: 'application/json'
-      }
-    });
+Hãy trả lời bằng TIẾNG VIỆT, sử dụng định dạng Markdown với:
+- Tiêu đề rõ ràng
+- Bảng số liệu
+- Danh sách check
+- Highlight các con số quan trọng
 
-    const result = await modelForRecommendations.generateContent(prompt);
-    const response = result.response;
-    let recommendations = [];
+Hãy thực tế, khả thi và động viên người dùng!`;
+
+    const result = await model.generateContent(prompt);
     
-    try {
-      const text = response.candidates[0].content.parts[0].text;
-      recommendations = JSON.parse(text);
-    } catch (parseError) {
-      // Fallback if JSON parsing fails
-      recommendations = [
-        {
-          title: "Review Your Spending",
-          description: "Track your expenses more carefully to identify savings opportunities",
-          category: "General",
-          potential_savings: 0,
-          priority: "medium",
-          action: "Use the AI assistant to log all transactions"
-        }
-      ];
-    }
-
-    return {
-      recommendations,
+    const plan = {
+      plan: result.response.candidates[0].content.parts[0].text,
+      targetDate,
+      monthlyIncome,
+      notes,
       summary: {
-        monthlyIncome,
         totalMonthlyExpenses,
-        netMonthly: monthlyIncome - totalMonthlyExpenses,
+        totalFixedExpenses,
         totalDebt,
-        discretionarySpending,
-        savingsRate: monthlyIncome > 0 ? ((monthlyIncome - totalMonthlyExpenses) / monthlyIncome * 100) : 0
+        availableFunds: monthlyIncome - totalFixedExpenses,
+        goalCount: goals.length,
+        debtCount: debts.length
       },
       generatedAt: new Date()
     };
+    
+    // Cache the result
+    setCache('plan', cacheKey, plan);
+    return plan;
+  } catch (error) {
+    console.error('Error generating plan:', error);
+    throw new Error('Failed to generate spending plan');
+  }
+}
+
+// Deprecated - Keep for backward compatibility
+async function getSpendingRecommendations(userId) {
+  try {
+    return await generateSpendingPlan(userId, 10000000, '1 tháng');
   } catch (error) {
     console.error('Error generating recommendations:', error);
     throw new Error('Failed to generate recommendations');
   }
 }
 
-// Thêm hàm mới để AI lập lộ trình
+// Deprecated - Keep for backward compatibility
 async function generatePersonalizedPlan(userId) {
   try {
+    // Check cache first
+    const cached = getCached('plan', userId);
+    if (cached) return cached;
+
     // 1. Lấy dữ liệu Thu nhập (Income) - Lấy trung bình 3 tháng gần nhất hoặc cấu hình cứng
     const incomeData = await db.query(
       `SELECT SUM(amount) as total_income FROM transactions 
@@ -561,10 +591,14 @@ async function generatePersonalizedPlan(userId) {
 
     const result = await model.generateContent(prompt);
     
-    return {
+    const plan = {
       roadmap: result.response.candidates[0].content.parts[0].text,
       generatedAt: new Date()
     };
+    
+    // Cache the result
+    setCache('plan', userId, plan);
+    return plan;
 
   } catch (error) {
     console.error('Error generating plan:', error);
@@ -575,6 +609,7 @@ async function generatePersonalizedPlan(userId) {
 module.exports = {
   generateFinancialInsights,
   chatWithAssistant,
-  getSpendingRecommendations,
-  generatePersonalizedPlan
+  generateSpendingPlan,
+  getSpendingRecommendations, // Deprecated
+  generatePersonalizedPlan // Deprecated
 };

@@ -27,25 +27,23 @@ router.post('/chat', authenticate, async (req, res) => {
   }
 });
 
-// Get spending recommendations
-router.get('/recommendations', authenticate, async (req, res) => {
+// Generate spending plan with user input
+router.post('/plan', authenticate, async (req, res) => {
   try {
     const { userId } = req;
-    const recommendations = await aiService.getSpendingRecommendations(userId);
-    res.json(recommendations);
+    const { monthlyIncome, targetDate, notes } = req.body;
+    
+    if (!monthlyIncome || !targetDate) {
+      return res.status(400).json({ 
+        message: 'Vui lòng cung cấp thu nhập hàng tháng và ngày kết thúc kế hoạch' 
+      });
+    }
+    
+    const plan = await aiService.generateSpendingPlan(userId, monthlyIncome, targetDate, notes);
+    res.json(plan);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
 module.exports = router;
-
-// Generate personalized financial plan!!!!!!!
-router.get('/plan', authenticate, async (req, res) => {
-  try {
-    const plan = await aiService.generatePersonalizedPlan(req.userId);
-    res.json(plan);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});

@@ -37,12 +37,12 @@ export const transactionService = {
 
   async create(data: CreateTransactionData): Promise<Transaction> {
     const response = await api.post('/transactions', data);
-    return response.data;
+    return response.data.data; // Backend returns { success: true, data: transaction }
   },
 
   async update(id: number, data: Partial<CreateTransactionData>): Promise<Transaction> {
     const response = await api.put(`/transactions/${id}`, data);
-    return response.data;
+    return response.data.data; // Backend returns { success: true, data: transaction }
   },
 
   async delete(id: number): Promise<void> {
