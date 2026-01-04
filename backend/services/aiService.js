@@ -1,9 +1,36 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const db = require('../config/database');
 
-// Initialize Google AI with API Key
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+// Helper function to get user's AI configuration
+async function getUserAIConfig(userId) {
+  const result = await db.query(
+    'SELECT ai_api_key, ai_model FROM users WHERE id = $1',
+    [userId]
+  );
+  
+  if (result.rows.length === 0) {
+    throw new Error('User not found');
+  }
+  
+  const { ai_api_key, ai_model } = result.rows[0];
+  
+  // Use user's API key if available, otherwise use system default
+  const apiKey = ai_api_key || process.env.GOOGLE_AI_API_KEY;
+  const modelName = ai_model || 'gemini-2.5-flash';
+  
+  if (!apiKey) {
+    throw new Error('No API key configured. Please set your API key in Settings.');
+  }
+  
+  return { apiKey, modelName };
+}
+
+// Helper function to get AI model instance for a user
+async function getModelForUser(userId) {
+  const { apiKey, modelName } = await getUserAIConfig(userId);
+  const genAI = new GoogleGenerativeAI(apiKey);
+  return genAI.getGenerativeModel({ model: modelName });
+}
 
 // Simple in-memory cache to reduce API calls
 const cache = {
@@ -41,6 +68,9 @@ async function generateFinancialInsights(userId) {
     // Check cache first
     const cached = getCached('insights', userId);
     if (cached) return cached;
+
+    // Get AI model for this user
+    const model = await getModelForUser(userId);
 
     // Get user's financial data
     const transactions = await db.query(
@@ -96,6 +126,9 @@ Format the response as JSON with these sections.`;
 // Chat with AI assistant with function calling
 async function chatWithAssistant(userId, message, conversationHistory = []) {
   try {
+    // Get AI model for this user
+    const model = await getModelForUser(userId);
+    
     // Get user context
     const [recentTransactions, budgets, debts, goals] = await Promise.all([
       db.query(
@@ -414,6 +447,9 @@ async function getCurrentPlan(userId) {
 // Update existing plan with new requirements
 async function updateSpendingPlan(userId, planId, updateRequest) {
   try {
+    // Get AI model for this user
+    const model = await getModelForUser(userId);
+    
     // Get existing plan
     const existingPlan = await db.query(
       'SELECT * FROM spending_plans WHERE id = $1 AND user_id = $2',
@@ -570,6 +606,9 @@ Hãy trả lời bằng TIẾNG VIỆT, sử dụng định dạng Markdown. B�
 
 async function generateSpendingPlan(userId, monthlyIncome, targetDate, notes = '') {
   try {
+    // Get AI model for this user
+    const model = await getModelForUser(userId);
+    
     // Deactivate old plans
     await db.query(
       'UPDATE spending_plans SET is_active = false WHERE user_id = $1',

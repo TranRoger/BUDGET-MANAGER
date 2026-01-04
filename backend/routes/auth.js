@@ -213,4 +213,74 @@ router.delete('/admin/users/:id', authenticate, requireAdmin, asyncHandler(async
   res.json({ success: true, message: 'Đã xóa người dùng' });
 }));
 
+// Get user AI settings
+router.get('/settings', authenticate, asyncHandler(async (req, res) => {
+  const result = await db.query(
+    'SELECT ai_api_key, ai_model FROM users WHERE id = $1',
+    [req.userId]
+  );
+
+  if (result.rows.length === 0) {
+    return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+  }
+
+  res.json({
+    aiApiKey: result.rows[0].ai_api_key || '',
+    aiModel: result.rows[0].ai_model || 'gemini-2.5-flash'
+  });
+}));
+
+// Update user AI settings
+router.put('/settings', authenticate, asyncHandler(async (req, res) => {
+  const { aiApiKey, aiModel } = req.body;
+
+  // Validate model
+  const validModels = ['gemini-2.5-flash', 'gemini-3-flash'];
+  if (aiModel && !validModels.includes(aiModel)) {
+    return res.status(400).json({ message: 'Model không hợp lệ' });
+  }
+
+  const result = await db.query(
+    'UPDATE users SET ai_api_key = $1, ai_model = $2, updated_at = NOW() WHERE id = $3 RETURNING id',
+    [aiApiKey || null, aiModel || 'gemini-2.5-flash', req.userId]
+  );
+
+  if (result.rows.length === 0) {
+    return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+  }
+
+  res.json({ success: true, message: 'Đã cập nhật cài đặt AI' });
+}));
+
+// Test AI API key
+router.post('/test-ai-key', authenticate, asyncHandler(async (req, res) => {
+  const { aiApiKey, aiModel } = req.body;
+
+  if (!aiApiKey) {
+    return res.status(400).json({ message: 'Vui lòng nhập API key' });
+  }
+
+  try {
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(aiApiKey);
+    const model = genAI.getGenerativeModel({ model: aiModel || 'gemini-2.5-flash' });
+
+    // Test with a simple prompt
+    const result = await model.generateContent('Xin chào');
+    const response = await result.response;
+    const text = response.text();
+
+    if (text) {
+      res.json({ success: true, message: 'API key hợp lệ và hoạt động tốt!' });
+    } else {
+      res.status(400).json({ message: 'API key không hoạt động đúng' });
+    }
+  } catch (error) {
+    console.error('AI key test error:', error);
+    res.status(400).json({ 
+      message: 'API key không hợp lệ hoặc có lỗi: ' + error.message 
+    });
+  }
+}));
+
 module.exports = router;

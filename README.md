@@ -9,6 +9,7 @@ Chào mừng bạn đến với dự án Budget Manager! Đây là một ứng d
 - **Reports and Analytics**: Tạo báo cáo để trực quan hóa dữ liệu tài chính của bạn và xác định các xu hướng.
 - **AI Insights**: Nhận lời khuyên và phân tích tài chính cá nhân hóa được hỗ trợ bởi AI.
 - **AI Chatbot**: Tương tác với chatbot được hỗ trợ bởi AI để nhận câu trả lời ngay lập tức cho các câu hỏi tài chính của bạn.
+- **⚙️ User-Configurable AI Settings**: Mỗi người dùng có thể cấu hình API key riêng của Google AI và chọn model phù hợp (gemini-2.0-flash-exp, gemini-1.5-flash, gemini-1.5-pro).
 
 ## Architecture
 
@@ -37,6 +38,13 @@ Google AI Studio (Gemini API) được sử dụng để cung cấp các tính n
 - **AI Chatbot**: Tích hợp chatbot sử dụng mô hình ngôn ngữ tự nhiên để trả lời các câu hỏi tài chính của người dùng và cung cấp hỗ trợ tức thì
 - **Function Calling**: AI có thể tự động thêm transactions, debts, và goals vào database khi người dùng nói chuyện
 - **Smart Recommendations**: Phân tích thu nhập, nợ, và chi tiêu để đưa ra gợi ý tiết kiệm thông minh
+- **⚙️ User-Specific API Keys**: Mỗi người dùng có thể cấu hình API key riêng, không chia sẻ quota với người khác. Xem [AI Settings Guide](AI-SETTINGS-GUIDE.md) để biết chi tiết.
+
+### Supported AI Models
+
+- **gemini-2.0-flash-exp** (Mặc định) - Nhanh nhất, phù hợp sử dụng hàng ngày
+- **gemini-1.5-flash** - Cân bằng giữa tốc độ và chất lượng
+- **gemini-1.5-pro** - Chất lượng cao nhất, phân tích sâu
 
 ## Quick Start
 
@@ -81,7 +89,10 @@ npm start
 
 ### Access the Application
 
-- **Frontend**: http://localhost:3000
+- **I Settings Guide](AI-SETTINGS-GUIDE.md) - **NEW!** Configure your own Google AI API key
+- [AI Settings Implementation](AI-SETTINGS-IMPLEMENTATION.md) - Technical documentation
+- [AI Settings Test](AI-SETTINGS-TEST.md) - Testing guide
+- [AFrontend**: http://localhost:3000
 - **Backend API**: http://localhost:5000
 - **Database**: localhost:5432
 

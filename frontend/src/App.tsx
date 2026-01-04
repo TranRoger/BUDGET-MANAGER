@@ -12,6 +12,7 @@ import Reports from './pages/Reports';
 import Debts from './pages/Debts';
 import Goals from './pages/Goals';
 import AdminUsers from './pages/AdminUsers';
+import Settings from './pages/Settings';
 import './App.css';
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
                     <Route path="/debts" element={<Debts />} />
                     <Route path="/goals" element={<Goals />} />
                     <Route path="/reports" element={<Reports />} />
+                    <Route path="/settings" element={<Settings />} />
                     <Route path="/admin/users" element={<AdminUsers />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
