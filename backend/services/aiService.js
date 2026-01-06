@@ -137,7 +137,11 @@ async function chatWithAssistant(userId, message, conversationHistory = []) {
         [userId]
       ),
       db.query(
-        'SELECT * FROM budgets WHERE user_id = $1',
+        `SELECT b.*, c.name as category_name
+         FROM budgets b
+         LEFT JOIN categories c ON b.category_id = c.id
+         WHERE b.user_id = $1
+         ORDER BY b.period, b.amount DESC`,
         [userId]
       ),
       db.query(
@@ -162,6 +166,21 @@ async function chatWithAssistant(userId, message, conversationHistory = []) {
       )
     ]);
 
+    // Group budgets by period
+    const budgetsByPeriod = budgets.rows.reduce((acc, b) => {
+      if (!acc[b.period]) acc[b.period] = [];
+      acc[b.period].push(b);
+      return acc;
+    }, {});
+
+    // Format budget info for context
+    const budgetInfo = Object.keys(budgetsByPeriod).length > 0 
+      ? `\n\nNGÂN SÁCH:\n${Object.entries(budgetsByPeriod).map(([period, items]) => {
+          const periodName = { daily: 'Ngày', weekly: 'Tuần', monthly: 'Tháng', yearly: 'Năm' }[period] || period;
+          return `${periodName}: ${items.map(b => `${b.category_name || 'Tổng'}=${Number.parseFloat(b.amount).toLocaleString('vi-VN')}`).join(', ')}`;
+        }).join('\n')}`
+      : '';
+
     const planInfo = currentPlan.rows.length > 0 
       ? `\n\nKẾ HOẠCH CHI TIÊU:\n- Thu nhập: ${Number.parseFloat(currentPlan.rows[0].monthly_income).toLocaleString('vi-VN')} VNĐ/tháng\n- Đến: ${currentPlan.rows[0].target_date}\n${currentPlan.rows[0].notes ? `- Note: ${currentPlan.rows[0].notes}` : ''}`
       : '\n\nChưa có kế hoạch chi tiêu.';
@@ -173,7 +192,7 @@ TÌNH HÌNH:
 - ${budgets.rows.length} ngân sách
 - ${debts.rows.length} khoản nợ
 - ${goals.rows.length} mục tiêu
-- ${spendingLimits.rows.length} giới hạn chi tiêu${planInfo}
+- ${spendingLimits.rows.length} giới hạn chi tiêu${budgetInfo}${planInfo}
 
 DANH MỤC (top 10):
 ${categories.rows.slice(0, 10).map(c => `${c.id}:${c.name}(${c.type})`).join(', ')}
@@ -573,6 +592,61 @@ async function addCategory(userId, args) {
 }
 
 // Tạo kế hoạch chi tiêu cá nhân hóa với input từ người dùng
+// Calculate monthly income from active income budgets
+async function calculateMonthlyIncome(userId) {
+  try {
+    // Get budgets that are active in the current month (not just current date)
+    const result = await db.query(
+      `SELECT b.*, c.type as category_type
+       FROM budgets b
+       LEFT JOIN categories c ON b.category_id = c.id
+       WHERE b.user_id = $1
+       AND c.type = 'income'
+       AND (
+         -- Budget is currently active
+         (b.start_date <= CURRENT_DATE AND b.end_date >= CURRENT_DATE)
+         OR
+         -- Budget starts within current month
+         (
+           EXTRACT(YEAR FROM b.start_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+           AND EXTRACT(MONTH FROM b.start_date) = EXTRACT(MONTH FROM CURRENT_DATE)
+         )
+       )`,
+      [userId]
+    );
+
+    const activeBudgets = result.rows;
+    let monthlyTotal = 0;
+
+    activeBudgets.forEach(budget => {
+      let amount = Number.parseFloat(budget.amount);
+      
+      // Convert to monthly based on period
+      switch(budget.period) {
+        case 'daily':
+          amount = amount * 30; // 30 days per month
+          break;
+        case 'weekly':
+          amount = amount * 4.33; // ~4.33 weeks per month
+          break;
+        case 'yearly':
+          amount = amount / 12; // 12 months per year
+          break;
+        case 'monthly':
+          // monthly stays the same
+          break;
+      }
+      
+      monthlyTotal += amount;
+    });
+
+    return Math.round(monthlyTotal);
+  } catch (error) {
+    console.error('Error calculating monthly income:', error);
+    return 0;
+  }
+}
+
 // Get current active plan from database
 async function getCurrentPlan(userId) {
   try {
@@ -624,7 +698,7 @@ async function updateSpendingPlan(userId, planId, updateRequest) {
     const oldPlan = existingPlan.rows[0];
     
     // Get fresh financial data
-    const [debtData, expenseData, goalData, fixedExpenses] = await Promise.all([
+    const [debtData, expenseData, goalData, fixedExpenses, budgetData] = await Promise.all([
       db.query(
         `SELECT * FROM debts WHERE user_id = $1 ORDER BY interest_rate DESC`,
         [userId]
@@ -657,6 +731,14 @@ async function updateSpendingPlan(userId, planId, updateRequest) {
          AND t.date > NOW() - INTERVAL '30 days'
          GROUP BY c.name`,
         [userId]
+      ),
+      db.query(
+        `SELECT b.*, c.name as category_name
+         FROM budgets b
+         LEFT JOIN categories c ON b.category_id = c.id
+         WHERE b.user_id = $1
+         ORDER BY b.period, b.amount DESC`,
+        [userId]
       )
     ]);
     
@@ -664,10 +746,26 @@ async function updateSpendingPlan(userId, planId, updateRequest) {
     const expenses = expenseData.rows;
     const goals = goalData.rows;
     const fixed = fixedExpenses.rows;
+    const budgets = budgetData.rows;
     
     const totalMonthlyExpenses = expenses.reduce((sum, e) => sum + Number.parseFloat(e.total), 0);
     const totalFixedExpenses = fixed.reduce((sum, f) => sum + Number.parseFloat(f.monthly_amount), 0);
     const totalDebt = debts.reduce((sum, d) => sum + Number.parseFloat(d.amount), 0);
+    
+    // Group budgets by period
+    const budgetsByPeriod = budgets.reduce((acc, b) => {
+      if (!acc[b.period]) acc[b.period] = [];
+      acc[b.period].push(b);
+      return acc;
+    }, {});
+
+    // Format budget info
+    const budgetInfo = Object.keys(budgetsByPeriod).length > 0 
+      ? `\n\nNGÂN SÁCH HIỆN TẠI:\n${Object.entries(budgetsByPeriod).map(([period, items]) => {
+          const periodName = { daily: 'Ngày', weekly: 'Tuần', monthly: 'Tháng', yearly: 'Năm' }[period] || period;
+          return `${periodName}:\n${items.map(b => `  • ${b.category_name || 'Tổng'}: ${Number.parseFloat(b.amount).toLocaleString('vi-VN')} VNĐ`).join('\n')}`;
+        }).join('\n')}`
+      : '';
     
     const currentDate = new Date();
     const endDate = new Date(oldPlan.target_date);
@@ -690,7 +788,7 @@ DỮ LIỆU TÀI CHÍNH MỚI NHẤT:
 Thu nhập hàng tháng: ${Number.parseFloat(oldPlan.monthly_income).toLocaleString('vi-VN')} VNĐ
 Tổng chi tiêu hàng tháng hiện tại: ${totalMonthlyExpenses.toLocaleString('vi-VN')} VNĐ
 Khoản chi cố định: ${totalFixedExpenses.toLocaleString('vi-VN')} VNĐ
-Tổng nợ: ${totalDebt.toLocaleString('vi-VN')} VNĐ
+Tổng nợ: ${totalDebt.toLocaleString('vi-VN')} VNĐ${budgetInfo}
 
 CHI TIẾT CHI TIÊU CỐ ĐỊNH:
 ${fixed.map(f => `- ${f.category}: ${Number.parseFloat(f.monthly_amount).toLocaleString('vi-VN')} VNĐ`).join('\n')}
@@ -770,6 +868,14 @@ async function generateSpendingPlan(userId, monthlyIncome, targetDate, notes = '
     // Get AI model for this user
     const model = await getModelForUser(userId);
     
+    // Auto-calculate monthly income from budgets if not provided
+    if (!monthlyIncome || monthlyIncome === 0) {
+      monthlyIncome = await calculateMonthlyIncome(userId);
+      if (monthlyIncome === 0) {
+        throw new Error('Không tìm thấy thu nhập. Vui lòng thêm ngân sách thu nhập trước.');
+      }
+    }
+    
     // Deactivate old plans
     await db.query(
       'UPDATE spending_plans SET is_active = false WHERE user_id = $1',
@@ -790,7 +896,7 @@ async function generateSpendingPlan(userId, monthlyIncome, targetDate, notes = '
     else timeframeText = `${Math.round(diffMonths / 12)} năm`;
 
     // Gather user's financial data
-    const [debtData, expenseData, goalData, fixedExpenses] = await Promise.all([
+    const [debtData, expenseData, goalData, fixedExpenses, budgetData] = await Promise.all([
       db.query(
         `SELECT * FROM debts WHERE user_id = $1 ORDER BY interest_rate DESC`,
         [userId]
@@ -823,6 +929,14 @@ async function generateSpendingPlan(userId, monthlyIncome, targetDate, notes = '
          AND t.date > NOW() - INTERVAL '30 days'
          GROUP BY c.name`,
         [userId]
+      ),
+      db.query(
+        `SELECT b.*, c.name as category_name
+         FROM budgets b
+         LEFT JOIN categories c ON b.category_id = c.id
+         WHERE b.user_id = $1
+         ORDER BY b.period, b.amount DESC`,
+        [userId]
       )
     ]);
 
@@ -830,10 +944,26 @@ async function generateSpendingPlan(userId, monthlyIncome, targetDate, notes = '
     const expenses = expenseData.rows;
     const goals = goalData.rows;
     const fixed = fixedExpenses.rows;
+    const budgets = budgetData.rows;
 
     const totalMonthlyExpenses = expenses.reduce((sum, e) => sum + Number.parseFloat(e.total), 0);
     const totalFixedExpenses = fixed.reduce((sum, f) => sum + Number.parseFloat(f.monthly_amount), 0);
     const totalDebt = debts.reduce((sum, d) => sum + Number.parseFloat(d.amount), 0);
+
+    // Group budgets by period
+    const budgetsByPeriod = budgets.reduce((acc, b) => {
+      if (!acc[b.period]) acc[b.period] = [];
+      acc[b.period].push(b);
+      return acc;
+    }, {});
+
+    // Format budget info
+    const budgetInfo = Object.keys(budgetsByPeriod).length > 0 
+      ? `\n\nNGÂN SÁCH HIỆN TẠI:\n${Object.entries(budgetsByPeriod).map(([period, items]) => {
+          const periodName = { daily: 'Ngày', weekly: 'Tuần', monthly: 'Tháng', yearly: 'Năm' }[period] || period;
+          return `${periodName}:\n${items.map(b => `  • ${b.category_name || 'Tổng'}: ${Number.parseFloat(b.amount).toLocaleString('vi-VN')} VNĐ`).join('\n')}`;
+        }).join('\n')}`
+      : '';
 
     const prompt = `Bạn là chuyên gia tư vấn tài chính. Tạo kế hoạch chi tiêu NGẮN GỌN, TRỌNG ĐIỂM cho người dùng.
 
@@ -843,7 +973,7 @@ THÔNG TIN:
 • Chi cố định: ${totalFixedExpenses.toLocaleString('vi-VN')} VNĐ
 • Tổng nợ: ${totalDebt.toLocaleString('vi-VN')} VNĐ
 • Thời gian: ${timeframeText}
-${notes ? `• Ghi chú: ${notes}` : ''}
+${notes ? `• Ghi chú: ${notes}` : ''}${budgetInfo}
 
 CHI TIẾT CHI TIÊU TOP:
 ${expenses.slice(0, 5).map(e => `• ${e.category}: ${Number.parseFloat(e.total).toLocaleString('vi-VN')} VNĐ`).join('\n')}
@@ -986,6 +1116,7 @@ module.exports = {
   generateSpendingPlan,
   getCurrentPlan,
   updateSpendingPlan,
+  calculateMonthlyIncome,
   getSpendingRecommendations, // Deprecated
   generatePersonalizedPlan // Deprecated
 };

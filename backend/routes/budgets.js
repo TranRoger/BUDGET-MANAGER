@@ -19,7 +19,11 @@ const budgetValidation = [
 // Get all budgets
 router.get('/', authenticate, asyncHandler(async (req, res) => {
   const result = await db.query(
-    'SELECT * FROM budgets WHERE user_id = $1 ORDER BY created_at DESC',
+    `SELECT b.*, c.name as category_name, c.type as category_type, c.icon as category_icon, c.color as category_color
+     FROM budgets b
+     LEFT JOIN categories c ON b.category_id = c.id
+     WHERE b.user_id = $1 
+     ORDER BY b.created_at DESC`,
     [req.userId]
   );
   res.json({ success: true, data: result.rows });

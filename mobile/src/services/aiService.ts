@@ -77,6 +77,16 @@ export const aiService = {
     }
   },
 
+  async calculateMonthlyIncome(): Promise<number> {
+    try {
+      const response = await api.get('/ai/calculate-income');
+      return response.data.monthlyIncome || 0;
+    } catch (error) {
+      console.error('Failed to calculate monthly income:', error);
+      return 0;
+    }
+  },
+
   async generatePlan(monthlyIncome: number, targetDate: string, notes?: string): Promise<SpendingPlan> {
     const response = await api.post('/ai/plan', {
       monthlyIncome,

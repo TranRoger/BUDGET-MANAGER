@@ -39,19 +39,41 @@ router.get('/plan/current', authenticate, async (req, res) => {
   }
 });
 
+// Calculate monthly income from active budgets
+router.get('/calculate-income', authenticate, async (req, res) => {
+  try {
+    const { userId } = req;
+    const monthlyIncome = await aiService.calculateMonthlyIncome(userId);
+    res.json({ 
+      success: true, 
+      monthlyIncome,
+      message: monthlyIncome > 0 
+        ? 'Đã tính thu nhập từ ngân sách' 
+        : 'Không tìm thấy ngân sách thu nhập nào đang hoạt động'
+    });
+  } catch (error) {
+    console.error('Error calculating monthly income:', error);
+    res.status(500).json({ 
+      success: false,
+      message: error.message 
+    });
+  }
+});
+
 // Generate spending plan with user input
 router.post('/plan', authenticate, async (req, res) => {
   try {
     const { userId } = req;
     const { monthlyIncome, targetDate, notes } = req.body;
     
-    if (!monthlyIncome || !targetDate) {
+    if (!targetDate) {
       return res.status(400).json({ 
-        message: 'Vui lòng cung cấp thu nhập hàng tháng và ngày kết thúc kế hoạch' 
+        message: 'Vui lòng cung cấp ngày kết thúc kế hoạch' 
       });
     }
     
-    const plan = await aiService.generateSpendingPlan(userId, monthlyIncome, targetDate, notes);
+    // monthlyIncome is now optional - will be auto-calculated if not provided
+    const plan = await aiService.generateSpendingPlan(userId, monthlyIncome || 0, targetDate, notes);
     res.json(plan);
   } catch (error) {
     res.status(500).json({ message: error.message });

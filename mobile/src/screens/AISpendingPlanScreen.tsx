@@ -34,37 +34,11 @@ const AISpendingPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 
   const calculateMonthlyIncome = async () => {
     try {
-      const budgets = await budgetService.getAll();
-      const now = new Date();
-      
-      const activeBudgets = budgets.filter(budget => {
-        const startDate = new Date(budget.start_date);
-        const endDate = new Date(budget.end_date);
-        return now >= startDate && now <= endDate;
-      });
-      
-      let monthlyTotal = 0;
-      activeBudgets.forEach(budget => {
-        let amount = budget.amount;
-        
-        switch(budget.period) {
-          case 'daily':
-            amount = amount * 30;
-            break;
-          case 'weekly':
-            amount = amount * 4;
-            break;
-          case 'yearly':
-            amount = amount / 12;
-            break;
-        }
-        
-        monthlyTotal += amount;
-      });
-      
-      setCalculatedIncome(monthlyTotal);
+      const income = await aiService.calculateMonthlyIncome();
+      setCalculatedIncome(income);
     } catch (error) {
       console.error('Failed to calculate monthly income:', error);
+      setCalculatedIncome(0);
     }
   };
 

@@ -9,6 +9,10 @@ export interface Budget {
   start_date: string;
   end_date: string;
   created_at: string;
+  category_name?: string;
+  category_type?: 'income' | 'expense';
+  category_icon?: string;
+  category_color?: string;
 }
 
 export interface CreateBudgetData {

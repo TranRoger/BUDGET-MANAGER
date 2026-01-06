@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { reportService, FinancialSummary } from '../services/reportService';
 import { transactionService, Transaction } from '../services/transactionService';
-import { budgetService } from '../services/budgetService';
 import { aiService, SpendingPlan } from '../services/aiService';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import Card from '../components/Card';
@@ -31,41 +30,11 @@ const Dashboard: React.FC = () => {
 
   const calculateMonthlyIncome = async () => {
     try {
-      const budgets = await budgetService.getAll();
-      const now = new Date();
-      
-      // Filter active budgets (within date range)
-      const activeBudgets = budgets.filter(budget => {
-        const startDate = new Date(budget.start_date);
-        const endDate = new Date(budget.end_date);
-        return now >= startDate && now <= endDate;
-      });
-      
-      // Calculate monthly income
-      let monthlyTotal = 0;
-      activeBudgets.forEach(budget => {
-        let amount = budget.amount;
-        
-        // Convert to monthly based on period
-        switch(budget.period) {
-          case 'daily':
-            amount = amount * 30;
-            break;
-          case 'weekly':
-            amount = amount * 4;
-            break;
-          case 'yearly':
-            amount = amount / 12;
-            break;
-          // monthly stays the same
-        }
-        
-        monthlyTotal += amount;
-      });
-      
-      setCalculatedIncome(monthlyTotal);
+      const income = await aiService.calculateMonthlyIncome();
+      setCalculatedIncome(income);
     } catch (error) {
       console.error('Failed to calculate monthly income:', error);
+      setCalculatedIncome(0);
     }
   };
 
