@@ -74,6 +74,27 @@ services:
       - budget-manager-network
     command: npm start
 
+  # Mobile Expo App
+  mobile:
+    build:
+      context: ./mobile
+      dockerfile: Dockerfile
+    container_name: budget-manager-mobile
+    environment:
+      EXPO_DEVTOOLS_LISTEN_ADDRESS: 0.0.0.0
+      REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-localhost}
+    ports:
+      - "19000:19000"
+      - "19001:19001"
+      - "19002:19002"
+    volumes:
+      - ./mobile:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - budget-manager-network
+
   # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
