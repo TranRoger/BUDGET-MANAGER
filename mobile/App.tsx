@@ -10,6 +10,7 @@ import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
 import LoginScreen from './src/screens/LoginScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import FinanceMenuScreen from './src/screens/FinanceMenuScreen';
+import QuickTransactionScreen from './src/screens/QuickTransactionScreen';
 import TransactionsScreen from './src/screens/TransactionsScreen';
 import BudgetsScreen from './src/screens/BudgetsScreen';
 import DebtsScreen from './src/screens/DebtsScreen';
@@ -53,6 +54,14 @@ const MainTabs = () => {
         },
       }}
     >
+      <Tab.Screen
+        name="QuickTransaction"
+        component={QuickTransactionScreen}
+        options={{
+          tabBarLabel: 'Tạo Nhanh',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24 }}>⚡</Text>,
+        }}
+      />
       <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
