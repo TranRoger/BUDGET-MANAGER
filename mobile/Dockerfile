@@ -28,6 +28,9 @@ RUN chmod +x start-expo.sh
 # Create a non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 
+# Create necessary directories for Expo
+RUN mkdir -p /app/.expo /app/node_modules/.cache
+
 # Change ownership of the app directory
 RUN chown -R nodejs:nodejs /app
 
