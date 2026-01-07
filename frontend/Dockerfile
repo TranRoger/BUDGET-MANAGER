@@ -1,17 +1,30 @@
-FROM node:20-alpine
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-COPY --chown=node:node package*.json ./
+COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
-COPY --chown=node:node . .
+COPY . .
 
-RUN chown -R node:node /app
+RUN npm run build
 
-EXPOSE 3000
+FROM nginx:alpine
 
-USER node
+COPY --from=build /app/build /usr/share/nginx/html
 
-CMD ["npm", "start"]
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+	chown -R nginx:nginx /var/cache/nginx && \
+	chown -R nginx:nginx /var/log/nginx && \
+	chown -R nginx:nginx /etc/nginx/conf.d && \
+	touch /var/run/nginx.pid && \
+	chown -R nginx:nginx /var/run/nginx.pid
+
+USER nginx
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

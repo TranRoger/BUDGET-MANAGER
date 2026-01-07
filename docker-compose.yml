@@ -41,22 +41,20 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres123
       PORT: 5000
-      NODE_ENV: development
+      NODE_ENV: production
       JWT_SECRET: your_jwt_secret_key_change_in_production
       GOOGLE_AI_API_KEY: ${GOOGLE_AI_API_KEY}
     env_file: ./backend/.env
     expose:
       - "5000"
     volumes:
-      - ./backend:/app
-      - /app/node_modules
       - ./credentials:/app/credentials:ro
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - budget-manager-network
-    command: npm run dev
+    restart: unless-stopped
 
   # Frontend React App
   frontend:
@@ -67,17 +65,13 @@ services:
     env_file: ./frontend/.env
     environment:
       REACT_APP_API_URL: /api
-      WDS_SOCKET_PORT: 0
     expose:
-      - "3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "80"
     depends_on:
       - backend
     networks:
       - budget-manager-network
-    command: npm start
+    restart: unless-stopped
 
   # Mobile Expo App
   mobile:
