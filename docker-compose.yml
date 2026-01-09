@@ -84,13 +84,16 @@ services:
       REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-localhost}
     ports:
       - "8081:8081"
-    volumes:
-      - ./mobile:/app
-      - /app/node_modules
+      - "19000:19000"
+      - "19001:19001"
+      - "19002:19002"
+    # Remove volume mounts to prevent inode usage issues
+    # For development, rebuild the image when code changes
     depends_on:
       - backend
     networks:
       - budget-manager-network
+    restart: unless-stopped
 
   # Nginx Reverse Proxy
   nginx:
