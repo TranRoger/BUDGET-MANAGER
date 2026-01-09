@@ -1,11 +1,18 @@
 #!/bin/bash
 
 echo "========================================="
-echo "Starting Expo with Tunnel Mode"
+echo "Starting Expo (CPU Optimized for 1 vCPU)"
 echo "========================================="
 
-# Start Expo in the background
-npx expo start --tunnel --non-interactive 2>&1 | tee /tmp/expo.log &
+# Set Node.js to use minimal CPU
+export UV_THREADPOOL_SIZE=2
+export NODE_OPTIONS="--max-old-space-size=384 --optimize-for-size"
+
+# Start Expo in production mode with minimal features
+# --no-dev: Disable dev mode features (reduces CPU)
+# --minify: Enable minification (one-time cost, faster runtime)
+# --tunnel: Enable tunnel mode for external access
+npx expo start --tunnel --no-dev --minify --non-interactive 2>&1 | tee /tmp/expo.log &
 
 # Wait for tunnel to be ready
 sleep 10
@@ -24,13 +31,14 @@ fi
 
 # Display Metro Bundler URL
 echo "Metro Bundler: http://localhost:8081"
-echo "DevTools: http://localhost:19002"
 echo ""
 echo "To connect:"
 echo "1. Open Expo Go app on your phone"
 echo "2. Tap 'Enter URL manually'"
 echo "3. Check the logs above for the exp:// URL"
 echo "   OR run: docker-compose logs mobile | grep 'exp://'"
+echo ""
+echo "NOTE: Running in production mode for CPU optimization"
 echo "========================================="
 echo ""
 

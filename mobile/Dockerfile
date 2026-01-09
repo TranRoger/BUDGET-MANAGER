@@ -46,6 +46,10 @@ EXPOSE 19000 19001 19002
 # Set environment variables
 ENV EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
 ENV EXPO_NO_TELEMETRY=1
+ENV NODE_ENV=production
+ENV CI=1
+ENV METRO_MAX_WORKERS=1
+ENV UV_THREADPOOL_SIZE=2
 
 # Start Expo using wrapper script
 CMD ["sh", "./start-expo.sh"]
