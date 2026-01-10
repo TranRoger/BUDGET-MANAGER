@@ -1,102 +1,651 @@
-# BUDGET MANAGER
+<div align="center">
 
-Chào mừng bạn đến với dự án Budget Manager! Đây là một ứng dụng quản lý tài chính cá nhân giúp bạn theo dõi thu nhập, chi tiêu và lập ngân sách một cách hiệu quả. Ứng dụng này cũng tích hợp các tính năng AI để cung cấp những gợi ý và phân tích tài chính thông minh.
+# 💰 Budget Manager
 
-## Features
+**A Modern AI-Powered Personal Finance Management Platform**
 
-- **Income và Expense Tracking**: Dễ dàng ghi lại thu nhập và chi tiêu của bạn với các danh mục và thẻ.
-- **Budget Management**: Đặt ngân sách cho các danh mục khác nhau và theo dõi chi tiêu của bạn so với chúng.
-- **Reports and Analytics**: Tạo báo cáo để trực quan hóa dữ liệu tài chính của bạn và xác định các xu hướng.
-- **AI Insights**: Nhận lời khuyên và phân tích tài chính cá nhân hóa được hỗ trợ bởi AI.
-- **AI Chatbot**: Tương tác với chatbot được hỗ trợ bởi AI để nhận câu trả lời ngay lập tức cho các câu hỏi tài chính của bạn.
-- **⚙️ User-Configurable AI Settings**: Mỗi người dùng có thể cấu hình API key riêng của Google AI và chọn model phù hợp (gemini-2.0-flash-exp, gemini-1.5-flash, gemini-1.5-pro).
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-## Architecture
+[Quick Start](#-quick-start) •
+[Features](#-key-features) •
+[Architecture](#-overall-architecture) •
+[Documentation](#-documentation) •
+[Contributing](#-contributing)
 
-The Budget Manager application is xây dựng dựa trên kiến trúc mô-đun để đảm bảo khả năng mở rộng và dễ bảo trì. Các thành phần chính bao gồm:
+</div>
 
-- **Frontend**: Giao diện thân thiện với người dùng được xây dựng bằng React.js để tương tác mượt mà.
-- **Backend**: API RESTful phát triển bằng Node.js và Express.js để xử lý logic nghiệp vụ và dữ liệu.
-- **Database**: Cơ sở dữ liệu PostgreSQL để lưu trữ dữ liệu người dùng một cách an toàn.
-- **AI Module**: Dịch vụ hỗ trợ AI cung cấp những gợi ý và phân tích tài chính.
-- **Deployment**: Được container hóa bằng Docker và Docker Compose để dễ dàng triển khai và mở rộng.
+---
 
-## Goals
+## 📖 Introduction
 
-Mục tiêu của dự án Budget Manager bao gồm:
+**Budget Manager** is a comprehensive, AI-powered personal finance management platform designed to help individuals take control of their financial health. Built with modern web technologies and powered by Google's Gemini AI, it provides intelligent insights, automated budgeting, and personalized financial recommendations.
 
-- Người dùng cung cấp thu nhập và chi tiêu của họ, các khoản nợ và tài sản.
-- Người dùng có thể thiết lập ngân sách cho các danh mục khác nhau.
-- Cung cấp báo cáo và phân tích chi tiết về tình hình tài chính của người dùng
-- Tích hợp AI để cung cấp lời khuyên tài chính cá nhân hóa.
-- Tạo một chatbot AI để hỗ trợ người dùng trong việc quản lý tài chính.
+Whether you're tracking daily expenses, managing debts, setting savings goals, or seeking AI-driven financial advice, Budget Manager offers a seamless experience across web and mobile platforms.
 
-## AI Service
+### Why Budget Manager?
 
-Google AI Studio (Gemini API) được sử dụng để cung cấp các tính năng AI trong ứng dụng Budget Manager. Dịch vụ này bao gồm:    
-- **AI Insights**: Sử dụng mô hình Gemini Pro để phân tích dữ liệu tài chính của người dùng và cung cấp các gợi ý cải thiện quản lý tài chính.    
-- **AI Chatbot**: Tích hợp chatbot sử dụng mô hình ngôn ngữ tự nhiên để trả lời các câu hỏi tài chính của người dùng và cung cấp hỗ trợ tức thì
-- **Function Calling**: AI có thể tự động thêm transactions, debts, và goals vào database khi người dùng nói chuyện
-- **Smart Recommendations**: Phân tích thu nhập, nợ, và chi tiêu để đưa ra gợi ý tiết kiệm thông minh
-- **⚙️ User-Specific API Keys**: Mỗi người dùng có thể cấu hình API key riêng, không chia sẻ quota với người khác. Xem [AI Settings Guide](AI-SETTINGS-GUIDE.md) để biết chi tiết.
+- 🎯 **Smart Financial Insights** – AI-powered analysis of your spending patterns and personalized recommendations
+- 🔐 **Privacy-First** – User-configurable API keys ensure your data and AI quota remain private
+- 📊 **Comprehensive Tracking** – Monitor income, expenses, debts, assets, and budgets in one place
+- 🤖 **Conversational AI** – Natural language chatbot for financial queries and automated transaction entry
+- 🚀 **Production-Ready** – Containerized architecture with Docker for easy deployment and scaling
+- 📱 **Cross-Platform** – Web and mobile (Expo React Native) applications
 
-### Supported AI Models
+---
 
-- **gemini-2.0-flash-exp** (Mặc định) - Nhanh nhất, phù hợp sử dụng hàng ngày
-- **gemini-1.5-flash** - Cân bằng giữa tốc độ và chất lượng
-- **gemini-1.5-pro** - Chất lượng cao nhất, phân tích sâu
+## ✨ Key Features
 
-## Quick Start
+### 💳 Financial Management
 
-### Option 1: Using Docker (Recommended)
+- **Transaction Tracking**: Record and categorize income and expenses with custom tags
+- **Budget Planning**: Set budgets by category with support for daily, weekly, monthly, and yearly periods
+- **Debt Management**: Track debts, payment schedules, and calculate payoff timelines
+- **Asset Management**: Monitor savings, investments, and other assets
+- **Goal Setting**: Define financial goals with target amounts and track progress
+
+### 🤖 AI-Powered Intelligence
+
+- **Financial Insights**: Receive AI-generated analysis of spending patterns and trends
+- **Smart Chatbot**: Conversational AI assistant for financial questions and guidance
+- **Function Calling**: AI automatically creates transactions, debts, and goals through natural conversation
+- **Spending Plans**: AI-generated personalized spending recommendations based on your financial data
+- **User-Configurable AI**: Each user can configure their own Google AI API key and choose models:
+  - `gemini-2.0-flash-exp` (Default) – Fastest, ideal for daily use
+  - `gemini-1.5-flash` – Balanced speed and quality
+  - `gemini-1.5-pro` – Highest quality, deep analysis
+
+### 📊 Analytics & Reports
+
+- **Financial Dashboard**: Visual overview of income, expenses, and budget performance
+- **Spending Trends**: Charts and graphs showing spending patterns over time
+- **Budget Performance**: Track actual vs. planned spending by category
+- **Custom Reports**: Generate detailed financial reports for any period
+
+### 🔒 Security & Authentication
+
+- **JWT Authentication**: Secure token-based authentication system
+- **Password Encryption**: bcrypt hashing for user credentials
+- **Role-Based Access**: Admin and user role management
+- **Rate Limiting**: Protection against brute force and DDoS attacks
+- **Security Headers**: Helmet.js implementation for enhanced security
+
+---
+
+## 🏗️ Overall Architecture
+
+Budget Manager follows a modern, microservices-inspired architecture with clear separation of concerns:
+
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        WEB[Web App<br/>React + TypeScript]
+        MOBILE[Mobile App<br/>React Native + Expo]
+    end
+    
+    subgraph "API Layer"
+        NGINX[Nginx Reverse Proxy]
+        API[Backend API<br/>Node.js + Express]
+    end
+    
+    subgraph "Data Layer"
+        DB[(PostgreSQL<br/>Database)]
+    end
+    
+    subgraph "AI Layer"
+        GEMINI[Google Gemini AI<br/>User-Configurable Keys]
+    end
+    
+    WEB --> NGINX
+    MOBILE --> NGINX
+    NGINX --> API
+    API --> DB
+    API --> GEMINI
+    
+    style WEB fill:#61dafb
+    style MOBILE fill:#61dafb
+    style API fill:#68a063
+    style DB fill:#336791
+    style GEMINI fill:#4285f4
+```
+
+### System Components
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Frontend** | React 19 + TypeScript | Modern, type-safe user interface |
+| **Mobile** | React Native + Expo | Cross-platform mobile application |
+| **Backend API** | Node.js + Express | RESTful API server with business logic |
+| **Database** | PostgreSQL 15 | Relational data storage with ACID compliance |
+| **AI Service** | Google Gemini API | AI-powered insights and chat functionality |
+| **Reverse Proxy** | Nginx | Load balancing and SSL termination |
+| **Containerization** | Docker + Docker Compose | Consistent deployment across environments |
+
+### Data Flow Architecture
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant Database
+    participant AI
+    
+    User->>Frontend: Interact with UI
+    Frontend->>Backend: API Request (JWT)
+    Backend->>Backend: Validate & Authenticate
+    Backend->>Database: Query/Update Data
+    Database-->>Backend: Return Results
+    
+    alt AI Feature Request
+        Backend->>Database: Fetch User AI Config
+        Database-->>Backend: API Key & Model
+        Backend->>AI: Generate Insights
+        AI-->>Backend: AI Response
+    end
+    
+    Backend-->>Frontend: JSON Response
+    Frontend-->>User: Update UI
+```
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- **Docker & Docker Compose** (recommended) OR
+- **Node.js** 16+ and **npm**
+- **PostgreSQL** 15+ (if running without Docker)
+- **Google AI Studio API Key** ([Get one here](https://aistudio.google.com/app/apikey))
+
+### Option 1: Docker Installation (Recommended)
+
+The fastest way to get started is using Docker:
 
 ```bash
 # 1. Clone the repository
-git clone <repository-url>
+git clone https://github.com/TranRoger/BUDGET-MANAGER.git
 cd BUDGET-MANAGER
 
-# 2. Get Google AI Studio API Key
-# Visit: https://aistudio.google.com/app/apikey
-# Create API Key and copy it
-
-# 3. Configure environment
+# 2. Configure environment variables
 cd backend
 cp .env.example .env
-# Edit .env and add: GOOGLE_AI_API_KEY=your-api-key-here
 
-# 4. Run the setup script
+# 3. Edit .env and add your Google AI API key
+nano .env  # or use your preferred editor
+# Add: GOOGLE_AI_API_KEY=your-api-key-here
+
+# 4. Return to project root and start services
+cd ..
 ./start.sh
 ```
 
-### Option 2: Manual Setup
+The startup script will:
+- Build and start all Docker containers
+- Initialize the PostgreSQL database with schema and seed data
+- Start the backend API on port 5000
+- Start the frontend on port 3000
+- Configure Nginx reverse proxy on port 80
+
+### Option 2: Manual Installation
+
+For development or when Docker is not available:
 
 ```bash
-# 1. Get Google AI Studio API Key from https://aistudio.google.com/app/apikey
+# 1. Clone the repository
+git clone https://github.com/TranRoger/BUDGET-MANAGER.git
+cd BUDGET-MANAGER
 
-# 2. Run the manual setup script
-./setup-manual.sh
+# 2. Install and setup PostgreSQL
+createdb budget_manager
+psql budget_manager < database/schema.sql
+psql budget_manager < database/seed.sql
+psql budget_manager < database/add-ai-settings.sql
 
-# 3. Configure backend/.env with GOOGLE_AI_API_KEY
-
-# 4. Start backend (in one terminal)
+# 3. Configure and start backend
 cd backend
+npm install
+cp .env.example .env
+# Edit .env with your database credentials and Google AI API key
 npm run dev
 
-# 5. Start frontend (in another terminal)
+# 4. In a new terminal, configure and start frontend
 cd frontend
+npm install
 npm start
 ```
 
 ### Access the Application
 
-- **I Settings Guide](AI-SETTINGS-GUIDE.md) - **NEW!** Configure your own Google AI API key
-- [AI Settings Implementation](AI-SETTINGS-IMPLEMENTATION.md) - Technical documentation
-- [AI Settings Test](AI-SETTINGS-TEST.md) - Testing guide
-- [AFrontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
-- **Database**: localhost:5432
+Once running, access the application at:
 
-## Documentation
+- **Web Application**: http://localhost:3000
+- **Backend API**: http://localhost:5000/api
+- **API Documentation**: http://localhost:5000/api/docs
+- **PostgreSQL**: localhost:5432
+
+### Default Credentials
+
+For testing purposes, use these default credentials:
+
+```
+Email: admin@budgetmanager.com
+Password: Admin@123
+```
+
+> ⚠️ **Important**: Change the default admin password immediately in production environments!
+
+---
+
+## ⚙️ Environment Configuration
+
+### Backend Environment Variables
+
+Create a `.env` file in the `backend/` directory:
+
+```bash
+# Server Configuration
+NODE_ENV=development
+PORT=5000
+
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=budget_manager
+DB_USER=postgres
+DB_PASSWORD=postgres123
+
+# JWT Configuration
+JWT_SECRET=your_super_secret_jwt_key_change_in_production
+JWT_EXPIRES_IN=7d
+
+# Google AI Configuration (Optional - users can configure their own)
+GOOGLE_AI_API_KEY=your_google_ai_api_key_here
+
+# CORS Configuration
+CORS_ORIGIN=http://localhost:3000
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+```
+
+### Frontend Environment Variables
+
+Create a `.env` file in the `frontend/` directory:
+
+```bash
+# API Configuration
+REACT_APP_API_URL=http://localhost:5000/api
+
+# Feature Flags
+REACT_APP_ENABLE_AI_FEATURES=true
+REACT_APP_ENABLE_MOBILE_FEATURES=false
+```
+
+### Docker Environment Variables
+
+The `docker-compose.yml` file uses environment variables. Create a `.env` file in the project root:
+
+```bash
+# Google AI API Key
+GOOGLE_AI_API_KEY=your_google_ai_api_key_here
+
+# Database Credentials
+POSTGRES_PASSWORD=postgres123
+```
+
+---
+
+## 📁 Folder Structure
+
+```
+BUDGET-MANAGER/
+│
+├── 📄 README.md                    # You are here
+├── 📄 docker-compose.yml           # Docker orchestration
+├── 📄 start.sh                     # Quick start script
+│
+├── 📂 backend/                     # Node.js API Server
+│   ├── 📄 server.js                # Application entry point
+│   ├── 📄 package.json             # Dependencies
+│   ├── 📂 config/                  # Configuration files
+│   │   ├── database.js             # Database connection
+│   │   └── security.js             # Security settings
+│   ├── 📂 middleware/              # Express middleware
+│   │   ├── auth.js                 # JWT authentication
+│   │   ├── errorHandler.js         # Global error handling
+│   │   ├── rateLimiter.js          # Rate limiting
+│   │   └── validation.js           # Input validation
+│   ├── 📂 routes/                  # API endpoints
+│   │   ├── auth.js                 # Authentication routes
+│   │   ├── transactions.js         # Transaction management
+│   │   ├── budgets.js              # Budget management
+│   │   ├── categories.js           # Category management
+│   │   ├── debts.js                # Debt tracking
+│   │   ├── goals.js                # Goal management
+│   │   ├── reports.js              # Analytics & reports
+│   │   ├── spendingLimits.js       # Spending limits
+│   │   └── ai.js                   # AI features
+│   ├── 📂 services/                # Business logic
+│   │   └── aiService.js            # AI integration service
+│   └── 📂 utils/                   # Utility functions
+│       ├── asyncHandler.js         # Async error handling
+│       ├── errors.js               # Custom error classes
+│       └── logger.js               # Winston logger
+│
+├── 📂 frontend/                    # React Web Application
+│   ├── 📄 package.json             # Dependencies
+│   ├── 📂 public/                  # Static assets
+│   │   ├── index.html              # HTML template
+│   │   └── manifest.json           # PWA manifest
+│   └── 📂 src/
+│       ├── 📄 App.tsx              # Root component
+│       ├── 📄 index.tsx            # Application entry
+│       ├── 📂 components/          # Reusable UI components
+│       │   ├── Navbar.tsx          # Navigation bar
+│       │   ├── Card.tsx            # Card component
+│       │   ├── ChatBubble.tsx      # Chat UI component
+│       │   ├── TransactionList.tsx # Transaction display
+│       │   └── ProtectedRoute.tsx  # Route guard
+│       ├── 📂 pages/               # Page components
+│       │   ├── Dashboard.tsx       # Main dashboard
+│       │   ├── Transactions.tsx    # Transaction management
+│       │   ├── Budgets.tsx         # Budget planning
+│       │   ├── Reports.tsx         # Analytics
+│       │   ├── AIChat.tsx          # AI chatbot
+│       │   └── Settings.tsx        # User settings
+│       ├── 📂 services/            # API client services
+│       │   ├── authService.ts      # Authentication
+│       │   ├── transactionService.ts
+│       │   ├── budgetService.ts
+│       │   └── aiService.ts
+│       ├── 📂 context/             # React Context
+│       │   └── AuthContext.tsx     # Auth state management
+│       ├── 📂 hooks/               # Custom React hooks
+│       └── 📂 utils/               # Utility functions
+│
+├── 📂 mobile/                      # React Native Mobile App
+│   ├── 📄 App.tsx                  # Mobile app entry
+│   ├── 📄 app.json                 # Expo configuration
+│   └── 📂 src/
+│       ├── 📂 screens/             # Mobile screens
+│       ├── 📂 components/          # Mobile components
+│       └── 📂 services/            # API services
+│
+├── 📂 database/                    # Database schemas & migrations
+│   ├── 📄 schema.sql               # Complete database schema
+│   ├── 📄 seed.sql                 # Sample data
+│   ├── 📄 add-ai-settings.sql      # AI configuration migration
+│   ├── 📄 add-roles.sql            # User roles migration
+│   ├── 📄 spending-plans-schema.sql # Spending plans
+│   └── 📄 debt-transactions-schema.sql # Debt transactions
+│
+├── 📂 nginx/                       # Nginx configuration
+│   └── 📄 nginx.conf               # Reverse proxy config
+│
+└── 📂 docs/                        # Documentation
+    ├── 📄 API.md                   # API documentation
+    ├── 📄 SETUP.md                 # Detailed setup guide
+    ├── 📄 CONTRIBUTING.md          # Contribution guidelines
+    ├── 📄 AI-SETTINGS-GUIDE.md     # AI configuration guide
+    └── 📄 ARCHITECTURE-DIAGRAM.md  # System architecture
+```
+
+---
+
+## 🏃 Running the Project
+
+### Development Mode
+
+**Backend:**
+```bash
+cd backend
+npm run dev  # Runs with nodemon for auto-reload
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm start    # Starts development server on port 3000
+```
+
+**Mobile:**
+```bash
+cd mobile
+npm start    # Starts Expo development server
+# Then press 'i' for iOS simulator or 'a' for Android emulator
+```
+
+### Production Mode
+
+**Using Docker Compose:**
+```bash
+docker-compose up -d --build
+```
+
+**Manual Production Build:**
+```bash
+# Build frontend
+cd frontend
+npm run build
+
+# Serve with static file server or nginx
+npx serve -s build -l 3000
+
+# Start backend in production mode
+cd ../backend
+NODE_ENV=production npm start
+```
+
+### Database Management
+
+**Reset Database:**
+```bash
+./cleanup-inodes.sh  # Clean up old data
+docker-compose down -v
+docker-compose up -d
+```
+
+**Run Migrations:**
+```bash
+psql -h localhost -U postgres -d budget_manager -f database/add-ai-settings.sql
+```
+
+**Backup Database:**
+```bash
+pg_dump -h localhost -U postgres budget_manager > backup_$(date +%Y%m%d).sql
+```
+
+---
+
+## 📚 Documentation
+
+Comprehensive documentation is available in the `docs/` folder:
+
+- **[API Documentation](API.md)** – Complete REST API reference with examples
+- **[Setup Guide](SETUP.md)** – Detailed installation and configuration instructions
+- **[Architecture Diagram](ARCHITECTURE-DIAGRAM.md)** – System design and data flow
+- **[AI Settings Guide](AI-SETTINGS-GUIDE.md)** – Configure user-specific AI settings
+- **[Contributing Guidelines](CONTRIBUTING.md)** – How to contribute to the project
+- **[Quick Start Guide](QUICKSTART.md)** – Get started in 5 minutes
+- **[Admin Guide](QUICKSTART-ADMIN.md)** – Admin features and management
+- **[Mobile Quick Start](MOBILE-QUICKSTART.md)** – Mobile app setup
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Budget Manager is open-source and thrives on collaboration.
+
+### How to Contribute
+
+1. **Fork the Repository**
+   ```bash
+   git fork https://github.com/TranRoger/BUDGET-MANAGER
+   ```
+
+2. **Create a Feature Branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+
+3. **Make Your Changes**
+   - Write clean, readable code
+   - Follow existing code style and conventions
+   - Add tests for new features
+   - Update documentation as needed
+
+4. **Commit Your Changes**
+   ```bash
+   git commit -m "feat: add amazing feature"
+   ```
+   
+   We follow [Conventional Commits](https://www.conventionalcommits.org/):
+   - `feat:` – New feature
+   - `fix:` – Bug fix
+   - `docs:` – Documentation changes
+   - `style:` – Code style changes (formatting)
+   - `refactor:` – Code refactoring
+   - `test:` – Adding tests
+   - `chore:` – Maintenance tasks
+
+5. **Push and Create Pull Request**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+   Then open a Pull Request on GitHub
+
+### Development Guidelines
+
+- **Code Style**: We use ESLint and Prettier for consistent code formatting
+- **Testing**: Write unit tests for new features using Jest
+- **Documentation**: Update README and relevant docs for user-facing changes
+- **Commits**: Use meaningful commit messages with conventional commit format
+- **Pull Requests**: Provide clear descriptions and link related issues
+
+### Areas for Contribution
+
+- 🐛 Bug fixes and issue resolution
+- ✨ New features and enhancements
+- 📝 Documentation improvements
+- 🌍 Internationalization and translations
+- 🎨 UI/UX improvements
+- ⚡ Performance optimizations
+- 🧪 Test coverage improvements
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
+
+```
+MIT License
+
+Copyright (c) 2026 Budget Manager Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+```
+
+---
+
+## 🗺️ Roadmap
+
+### Version 1.0 (Current) ✅
+
+- [x] Core financial tracking (transactions, budgets, debts, goals)
+- [x] User authentication and authorization
+- [x] AI-powered insights and chatbot
+- [x] User-configurable AI settings
+- [x] Web application (React + TypeScript)
+- [x] Mobile application (React Native + Expo)
+- [x] Docker containerization
+- [x] PostgreSQL database with comprehensive schema
+
+### Version 1.5 (Q2 2026) 🚧
+
+- [ ] **Bank Integration** – Connect to bank accounts for automatic transaction import
+- [ ] **Receipt Scanning** – OCR-powered receipt capture and categorization
+- [ ] **Recurring Transactions** – Automated handling of recurring income/expenses
+- [ ] **Multi-Currency Support** – Track finances in multiple currencies with exchange rates
+- [ ] **Data Export** – Export financial data to CSV, Excel, and PDF
+- [ ] **Advanced Analytics** – Machine learning-based spending predictions
+
+### Version 2.0 (Q4 2026) 🔮
+
+- [ ] **Investment Tracking** – Monitor stocks, bonds, and cryptocurrency portfolios
+- [ ] **Bill Reminders** – Smart notifications for upcoming bills and payments
+- [ ] **Collaborative Budgets** – Share budgets with family members or partners
+- [ ] **Tax Preparation** – Generate tax reports and categorize deductible expenses
+- [ ] **API for Third-Party Integration** – Public API for developers
+- [ ] **White-Label Solution** – Customizable branding for enterprise deployments
+
+### Long-Term Vision 🌟
+
+- **AI Financial Advisor** – Advanced AI model trained on financial best practices
+- **Blockchain Integration** – Decentralized finance (DeFi) tracking
+- **Global Marketplace** – Connect with financial service providers
+- **Credit Score Monitoring** – Track and improve credit scores
+- **Insurance Management** – Monitor policies and optimize coverage
+
+---
+
+## 🙏 Acknowledgments
+
+Budget Manager is built with amazing open-source technologies:
+
+- **[React](https://reactjs.org/)** – UI framework
+- **[Node.js](https://nodejs.org/)** – Backend runtime
+- **[PostgreSQL](https://www.postgresql.org/)** – Reliable database
+- **[Google Gemini AI](https://ai.google.dev/)** – AI capabilities
+- **[Expo](https://expo.dev/)** – Mobile development platform
+- **[Docker](https://www.docker.com/)** – Containerization
+- **[TypeScript](https://www.typescriptlang.org/)** – Type safety
+- **[Express.js](https://expressjs.com/)** – Web framework
+
+---
+
+## 📞 Support & Community
+
+- **Issues**: [GitHub Issues](https://github.com/TranRoger/BUDGET-MANAGER/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/TranRoger/BUDGET-MANAGER/discussions)
+- **Email**: support@budgetmanager.com
+
+---
+
+<div align="center">
+
+**Made with ❤️ by the Budget Manager Team**
+
+⭐ Star us on GitHub — it helps!
+
+[Report Bug](https://github.com/TranRoger/BUDGET-MANAGER/issues) •
+[Request Feature](https://github.com/TranRoger/BUDGET-MANAGER/issues) •
+[Documentation](https://github.com/TranRoger/BUDGET-MANAGER/wiki)
+
+</div>
 
 - [Setup Guide](SETUP.md) - Detailed setup instructions
 - [API Reference](API.md) - Complete API documentation
