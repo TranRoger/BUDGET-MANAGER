@@ -391,12 +391,16 @@ BUDGET-MANAGER/
 ├── 📂 nginx/                       # Nginx configuration
 │   └── 📄 nginx.conf               # Reverse proxy config
 │
-└── 📂 docs/                        # Documentation
-    ├── 📄 API.md                   # API documentation
-    ├── 📄 SETUP.md                 # Detailed setup guide
-    ├── 📄 CONTRIBUTING.md          # Contribution guidelines
+└── 📂 docs/                        # 📚 Complete Documentation Hub
+    ├── 📄 INDEX.md                 # Documentation index & navigation
+    ├── 📄 QUICKSTART.md            # Quick start guide
+    ├── 📄 SETUP.md                 # Detailed setup instructions
+    ├── 📄 API.md                   # Complete API reference
+    ├── 📄 ARCHITECTURE-DIAGRAM.md  # System architecture & diagrams
     ├── 📄 AI-SETTINGS-GUIDE.md     # AI configuration guide
-    └── 📄 ARCHITECTURE-DIAGRAM.md  # System architecture
+    ├── 📄 ADMIN-GUIDE.md           # Administrator's guide
+    ├── 📄 MOBILE-QUICKSTART.md     # Mobile app setup
+    └── ... (20+ documentation files)
 ```
 
 ---
@@ -468,16 +472,32 @@ pg_dump -h localhost -U postgres budget_manager > backup_$(date +%Y%m%d).sql
 
 ## 📚 Documentation
 
-Comprehensive documentation is available in the `docs/` folder:
+Comprehensive documentation is available in the [`docs/`](docs/) folder:
 
-- **[API Documentation](API.md)** – Complete REST API reference with examples
-- **[Setup Guide](SETUP.md)** – Detailed installation and configuration instructions
-- **[Architecture Diagram](ARCHITECTURE-DIAGRAM.md)** – System design and data flow
-- **[AI Settings Guide](AI-SETTINGS-GUIDE.md)** – Configure user-specific AI settings
-- **[Contributing Guidelines](CONTRIBUTING.md)** – How to contribute to the project
-- **[Quick Start Guide](QUICKSTART.md)** – Get started in 5 minutes
-- **[Admin Guide](QUICKSTART-ADMIN.md)** – Admin features and management
-- **[Mobile Quick Start](MOBILE-QUICKSTART.md)** – Mobile app setup
+### 🚀 Getting Started
+- **[Quick Start Guide](docs/QUICKSTART.md)** – Get started in 5 minutes
+- **[Setup Guide](docs/SETUP.md)** – Detailed installation and configuration
+- **[Mobile Quick Start](docs/MOBILE-QUICKSTART.md)** – Mobile app setup guide
+- **[Admin Quick Start](docs/QUICKSTART-ADMIN.md)** – Admin features guide
+
+### 📖 Core Documentation
+- **[API Documentation](docs/API.md)** – Complete REST API reference with examples
+- **[Architecture Diagram](docs/ARCHITECTURE-DIAGRAM.md)** – System design and data flow
+- **[Project Summary](docs/PROJECT-SUMMARY.md)** – Overview of features and structure
+
+### 🤖 AI Features
+- **[AI Settings Guide](docs/AI-SETTINGS-GUIDE.md)** – Configure your own Google AI API key
+- **[AI Settings Implementation](docs/AI-SETTINGS-IMPLEMENTATION.md)** – Technical documentation
+- **[AI Settings Test](docs/AI-SETTINGS-TEST.md)** – Testing guide for AI features
+
+### 🛠️ Advanced Topics
+- **[Tunnel Setup](docs/TUNNEL-SETUP.md)** – Configure external access
+- **[CPU Optimization](docs/CPU-OPTIMIZATION.md)** – Performance tuning
+- **[Inode Management](docs/INODE-MANAGEMENT.md)** – Disk space management
+- **[No Auth Mode](docs/NO-AUTH-MODE.md)** – Run without authentication
+
+### 📑 Complete Documentation Index
+See **[Documentation Index](docs/INDEX.md)** for a complete list of all available documentation.
 
 ---
 
@@ -727,37 +747,6 @@ This project is licensed under the ISC License.
 ## Support
 
 For issues and questions, please create an issue in the repository.
-
----
-
-## 🎉 Frontend Status: HOÀN THÀNH
-
-### ✅ Frontend đã được triển khai đầy đủ với:
-
-- **27 TypeScript files** - Components, Pages, Services, Hooks
-- **12 CSS files** - Professional styling
-- **6 complete pages** - Login, Register, Dashboard, Transactions, Budgets, Reports, AI Chat
-- **7 API services** - Full integration với backend
-- **Responsive design** - Mobile & Desktop
-- **Modern UI/UX** - Gradient design, animations, color-coding
-
-### 🚀 Quick Test Frontend
-
-```bash
-# Test frontend ngay
-./test-frontend.sh
-
-# Hoặc manual
-cd frontend
-npm install
-npm start
-```
-
-### 📚 Documentation
-
-- [FRONTEND-SUMMARY.md](FRONTEND-SUMMARY.md) - Tổng quan frontend
-- [FRONTEND-COMPLETE.md](FRONTEND-COMPLETE.md) - Chi tiết implementation
-- [frontend/FRONTEND-README.md](frontend/FRONTEND-README.md) - Hướng dẫn frontend
 
 ---
 
